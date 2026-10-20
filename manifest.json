@@ -1,0 +1,21 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "yentldawn.github",
+  "orientation": "portrait",
+  "scope": "/Bawns-Buttjet/",
+  "short_name": "yentldawn.github",
+  "start_url": "/Bawns-Buttjet/",
+  "theme_color": "#ffffff",
+  "id": "Bawn's ButtJet",
+  "description": "Finance &amp; Fitness Tracker App",
+  "lang": "en",
+  "categories": [
+    "finance",
+    "health",
+    "lifestyle"
+  ],
+  "iarc_rating_id": "Bawn's ButtJet",
+  "prefer_related_applications": true
+}
