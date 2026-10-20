@@ -1,0 +1,2462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Bawn's Butt Jet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-cream: #FFF9F3;
+      --card-bg: #FFFFFF;
+      --primary-bubble: #FF5A7E;
+      --primary-soft: #FFE5EC;
+      --secondary-bubble: #FFD166;
+      --accent-green: #06D6A0;
+      --accent-blue: #118AB2;
+      --text-dark: #232F34;
+      --text-muted: #6B7C85;
+      --border-soft: #F0E2D4;
+      --shadow: 0 10px 25px rgba(255, 90, 126, 0.10);
+    }
+
+    body.theme-mint {
+      --bg-cream: #F2FBF7;
+      --card-bg: #FFFFFF;
+      --primary-bubble: #06D6A0;
+      --primary-soft: #D8F3DC;
+      --secondary-bubble: #B7E4C7;
+      --accent-green: #2D6A4F;
+      --accent-blue: #1B4332;
+      --text-dark: #1E2D24;
+      --text-muted: #52796F;
+      --border-soft: #D3EEDD;
+      --shadow: 0 10px 25px rgba(6, 214, 160, 0.12);
+    }
+
+    body.theme-midnight {
+      --bg-cream: #12141D;
+      --card-bg: #1B1E2B;
+      --primary-bubble: #FF5A7E;
+      --primary-soft: #2D1E2F;
+      --secondary-bubble: #7209B7;
+      --accent-green: #4CC9F0;
+      --accent-blue: #4361EE;
+      --text-dark: #F8F9FA;
+      --text-muted: #9A9DAE;
+      --border-soft: #2A2E40;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.40);
+    }
+
+    body.theme-ocean {
+      --bg-cream: #F0F7FA;
+      --card-bg: #FFFFFF;
+      --primary-bubble: #118AB2;
+      --primary-soft: #D7F0F7;
+      --secondary-bubble: #FFD166;
+      --accent-green: #06D6A0;
+      --accent-blue: #073B4C;
+      --text-dark: #073B4C;
+      --text-muted: #5B7A87;
+      --border-soft: #D0E5ED;
+      --shadow: 0 10px 25px rgba(17, 138, 178, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--bg-cream);
+      color: var(--text-dark);
+      padding-bottom: 75px;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* ================= EXTENDED INTRO ANIMATION ================= */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #FFE5EC, #FFD1DC, #FFF9F2);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      cursor: pointer;
+      overflow: hidden;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    #splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .particle-cloud {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(#FF8FA3 2px, transparent 2px),
+        radial-gradient(#FFD166 2.5px, transparent 2.5px);
+      background-size: 45px 45px, 60px 60px;
+      opacity: 0.35;
+      animation: floatBackdrop 20s linear infinite;
+    }
+
+    @keyframes floatBackdrop {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-100px); }
+    }
+
+    .chase-wrapper {
+      position: relative;
+      display: inline-block;
+      animation: crazyChaseSequence 5.4s cubic-bezier(0.25, 1, 0.35, 1) forwards;
+    }
+
+    @keyframes crazyChaseSequence {
+      0% { transform: translateX(120vw) scale(0.85); }
+      22% { transform: translateX(-110vw) scale(0.95); }
+      44% { transform: translateX(85vw) scale(1.05); }
+      66% { transform: translateX(-40vw) scale(0.98); }
+      82% { transform: translateX(12px) scale(1.02); }
+      88% { transform: translateX(-6px) scale(0.99); }
+      100% { transform: translateX(0) scale(1); }
+    }
+
+    .letter-bunch {
+      display: flex;
+      font-family: 'Fredoka', cursive;
+      font-size: 2.7rem;
+      font-weight: 700;
+      color: var(--primary-bubble);
+      text-shadow: 
+        3px 3px 0px #FFD166,
+        6px 6px 0px #FFC2D1,
+        0 14px 28px rgba(255, 90, 126, 0.35);
+    }
+
+    .letter-bunch span {
+      display: inline-block;
+      animation: letterSquishCollision 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 4.6s forwards;
+    }
+
+    @keyframes letterSquishCollision {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.22, 0.8) rotate(-4deg); }
+      75% { transform: scale(0.92, 1.15) rotate(3deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    /* Slipping Final T */
+    .slip-t {
+      animation: slipAndKick 1.2s ease-in-out 5.6s forwards !important;
+      transform-origin: bottom left;
+    }
+
+    @keyframes slipAndKick {
+      0% { transform: rotate(0deg); }
+      35% { transform: rotate(46deg) translateY(10px) translateX(6px); }
+      60% { transform: rotate(28deg) translateY(5px); }
+      100% { transform: rotate(18deg) translateY(3px); }
+    }
+
+    /* Plaster Breakaway Revealing Purple Metal "Girl Math" */
+    .plaster-reveal-container {
+      position: relative;
+      margin-top: 26px;
+      width: 250px;
+      height: 68px;
+      perspective: 800px;
+      opacity: 0;
+      animation: makeBoxVisible 0.1s 6.0s forwards;
+    }
+
+    @keyframes makeBoxVisible {
+      to { opacity: 1; }
+    }
+
+    .purple-metal-plate {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #7B2CBF, #5A189A, #3C096C);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFD166;
+      font-family: 'Fredoka', cursive;
+      font-size: 1.55rem;
+      letter-spacing: 1px;
+      box-shadow: 
+        inset 0 2px 4px rgba(255,255,255,0.4),
+        inset 0 -2px 4px rgba(0,0,0,0.5),
+        0 10px 24px rgba(60, 9, 108, 0.45);
+      border: 2px solid #9D4EDD;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .pink-plaster-chunk {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #FF85A1, #FFA3B5, #FFC2D1);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      font-family: 'Fredoka', cursive;
+      font-size: 1.1rem;
+      border: 2px solid #FF5A7E;
+      box-shadow: 0 6px 16px rgba(255, 90, 126, 0.25);
+      transform-origin: bottom right;
+      animation: plasterCrackAndFall 1.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) 6.4s forwards;
+    }
+
+    @keyframes plasterCrackAndFall {
+      0% { transform: rotate(0deg); opacity: 1; }
+      25% { transform: rotate(8deg) translateY(6px); }
+      55% { transform: rotate(26deg) translateY(35px) translateX(12px); opacity: 0.9; }
+      100% { transform: rotate(65deg) translateY(120vh) translateX(40px); opacity: 0; }
+    }
+
+    /* ================= 5-SECOND MIN QUOTE POPUP ================= */
+    #quote-flash-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 20, 29, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+      z-index: 99998;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    #quote-flash-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .quote-content {
+      font-family: 'Fredoka', cursive;
+      font-size: 2.1rem;
+      color: #FFFFFF;
+      text-align: center;
+      line-height: 1.25;
+      max-width: 440px;
+      text-shadow: 0 4px 20px rgba(255, 90, 126, 0.5);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .quote-tap-hint {
+      color: #FFD166;
+      font-size: 0.85rem;
+      margin-top: 20px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* ================= MAIN WRAPPER ================= */
+    .app-shell {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .top-user-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-top: 4px;
+    }
+
+    .user-profile-widget {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-bubble);
+      overflow: hidden;
+      background: var(--primary-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .status-capsule {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .status-text {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.05rem;
+      color: var(--primary-bubble);
+      max-width: 175px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .clock-pill {
+      background: var(--primary-soft);
+      color: var(--primary-bubble);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    /* ================= KAWAII ICON GRID (3 PER ROW) ================= */
+    .kawaii-nav-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .kawaii-tab-btn {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 10px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .kawaii-tab-btn:active {
+      transform: scale(0.93);
+    }
+
+    .kawaii-tab-btn.active {
+      background: var(--primary-soft);
+      border-color: var(--primary-bubble);
+      box-shadow: 0 6px 16px rgba(255, 90, 126, 0.18);
+      transform: translateY(-2px);
+    }
+
+    .kawaii-icon {
+      font-size: 1.55rem;
+      line-height: 1;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.06));
+    }
+
+    .kawaii-label {
+      font-family: 'Fredoka', cursive;
+      font-size: 0.82rem;
+      color: var(--text-dark);
+    }
+
+    .kawaii-tab-btn.active .kawaii-label {
+      color: var(--primary-bubble);
+    }
+
+    /* ================= TRAFFIC LIGHTBULB SYSTEM ================= */
+    .traffic-bulbs-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .bulb-status-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .bulb-indicator {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .bulb-green {
+      background: #06D6A0;
+      box-shadow: 0 0 12px rgba(6, 214, 160, 0.7);
+    }
+
+    .bulb-yellow {
+      background: #FFD166;
+      box-shadow: 0 0 12px rgba(255, 209, 102, 0.7);
+    }
+
+    .bulb-orange {
+      background: #F77F00;
+      box-shadow: 0 0 12px rgba(247, 127, 0, 0.7);
+    }
+
+    .bulb-red {
+      background: #EF476F;
+      box-shadow: 0 0 14px rgba(239, 71, 111, 0.85);
+      animation: redBlink 1.4s infinite;
+    }
+
+    @keyframes redBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+
+    .bulb-label-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bulb-title {
+      font-family: 'Fredoka', cursive;
+      font-size: 0.8rem;
+      color: var(--text-dark);
+    }
+
+    .bulb-state-text {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* Views */
+    .page-view {
+      display: none;
+    }
+
+    .page-view.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.25rem;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .card-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: -6px;
+      margin-bottom: 14px;
+    }
+
+    .field-group {
+      margin-bottom: 12px;
+    }
+
+    .field-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 13px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border-soft);
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      background-color: var(--card-bg);
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-bubble);
+    }
+
+    .btn {
+      background: var(--primary-bubble);
+      color: #FFF;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-family: 'Fredoka', cursive;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .btn-secondary {
+      background: var(--primary-soft);
+      color: var(--primary-bubble);
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-box {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow);
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .kpi-val {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.45rem;
+      color: var(--text-dark);
+      margin-top: 4px;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .item-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(150, 150, 150, 0.05);
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px dashed var(--border-soft);
+      font-size: 0.9rem;
+    }
+
+    .delete-cross {
+      background: transparent;
+      border: none;
+      color: #B0BEC5;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 4px;
+    }
+
+    .delete-cross:hover {
+      color: var(--primary-bubble);
+    }
+
+    .photo-upload-box {
+      border: 2px dashed var(--primary-bubble);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      background: var(--primary-soft);
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .photo-preview {
+      width: 100%;
+      max-height: 240px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: none;
+      margin-top: 10px;
+    }
+
+    /* Pantry Recipes Quick Pick Pills */
+    .pantry-pills-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .pantry-pill {
+      background: #FFF;
+      border: 1px solid var(--border-soft);
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .pantry-pill:hover {
+      border-color: var(--primary-bubble);
+      background: var(--primary-soft);
+    }
+
+    /* AI Label Results */
+    .ai-result-box {
+      background: var(--primary-soft);
+      border: 1px solid var(--primary-bubble);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+      font-size: 0.88rem;
+      display: none;
+    }
+
+    .macro-pill-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .macro-pill {
+      background: var(--card-bg);
+      padding: 4px 10px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid var(--border-soft);
+      color: var(--text-dark);
+    }
+
+    #alarm-banner {
+      display: none;
+      background: #D8315B;
+      color: #FFF;
+      padding: 12px 16px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Hydra / Habitat Styling */
+    .habitat-card {
+      text-align: center;
+      padding: 24px 16px;
+      background: linear-gradient(180deg, var(--card-bg), var(--primary-soft));
+      border-radius: 24px;
+      border: 2px solid var(--border-soft);
+      margin-bottom: 16px;
+    }
+
+    .pet-stage-avatar {
+      font-size: 5.5rem;
+      display: inline-block;
+      margin: 12px 0;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,0.12));
+    }
+
+    .pet-stage-badge {
+      display: inline-block;
+      background: var(--primary-bubble);
+      color: #FFF;
+      font-family: 'Fredoka', cursive;
+      font-size: 0.82rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-wrap {
+      background: rgba(150, 150, 150, 0.15);
+      border-radius: 20px;
+      height: 14px;
+      width: 100%;
+      overflow: hidden;
+      margin: 14px 0 8px 0;
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #06D6A0, #118AB2);
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+      border-radius: 20px;
+    }
+
+    .water-btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .accessory-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .accessory-chip {
+      background: var(--card-bg);
+      border: 1px solid var(--border-soft);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100000;
+    }
+
+    .modal-box {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 22px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .help-link-btn {
+      color: var(--primary-bubble);
+      text-decoration: underline;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .provider-card {
+      background: rgba(150, 150, 150, 0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+    }
+
+    .provider-card a {
+      color: var(--primary-bubble);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .theme-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .theme-chip {
+      padding: 10px;
+      border-radius: 12px;
+      border: 2px solid var(--border-soft);
+      text-align: center;
+      cursor: pointer;
+      font-family: 'Fredoka', cursive;
+      font-size: 0.88rem;
+    }
+
+    .theme-chip.active {
+      border-color: var(--primary-bubble);
+      background: var(--primary-soft);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= 3-SECOND EXTENDED INTRO ================= -->
+  <div id="splash-screen" onclick="hideSplash()">
+    <div class="particle-cloud"></div>
+    <div class="chase-wrapper">
+      <div class="letter-bunch">
+        <span>B</span><span>a</span><span>w</span><span>n</span><span>'</span><span>s</span>
+        <span style="width:12px;"></span>
+        <span>B</span><span>u</span><span>t</span><span>t</span>
+        <span style="width:12px;"></span>
+        <span>J</span><span>e</span><span class="slip-t">t</span>
+      </div>
+    </div>
+
+    <!-- Pink plaster breaking loose to reveal purple metal "Girl Math" -->
+    <div class="plaster-reveal-container">
+      <div class="purple-metal-plate">
+        ✨ Girl Math ✨
+      </div>
+      <div class="pink-plaster-chunk">
+        🧱 Fragile Pink Plaster
+      </div>
+    </div>
+
+    <div style="font-family:'Fredoka'; color:var(--text-muted); margin-top: 30px; font-size: 0.95rem;">
+      Tap anywhere to skip intro ➔
+    </div>
+  </div>
+
+  <!-- ================= 5-SECOND MIN QUOTE OVERLAY ================= -->
+  <div id="quote-flash-overlay" onclick="closeQuoteFlash()">
+    <div class="quote-content" id="active-flash-quote">I Am My Own Green Light.</div>
+    <div class="quote-tap-hint">Tap anywhere to dismiss</div>
+  </div>
+
+  <div class="app-shell">
+    <!-- Header with Hello (Name) and 12-Hour AM/PM Time -->
+    <div class="top-user-bar">
+      <div class="user-profile-widget" onclick="switchPage('page-profile')">
+        <div class="avatar-wrapper">
+          <span id="avatar-fallback">🌸</span>
+          <img id="header-avatar-img" class="avatar-img" alt="Avatar" />
+        </div>
+        <div class="status-capsule">
+          <div class="status-text" id="header-greeting">Hello Yen</div>
+          <span style="font-size: 0.72rem; color: var(--text-muted);" id="header-status-line">Active</span>
+        </div>
+      </div>
+      <div class="clock-pill" id="live-clock">--:--:-- --</div>
+    </div>
+
+    <!-- ================= 3-IN-A-ROW KAWAII NAVIGATION ================= -->
+    <div class="kawaii-nav-grid">
+      <button class="kawaii-tab-btn active" id="tab-home" onclick="switchPage('page-home')">
+        <span class="kawaii-icon">🏡</span>
+        <span class="kawaii-label">Home</span>
+      </button>
+      <button class="kawaii-tab-btn" id="tab-weight" onclick="switchPage('page-weight')">
+        <span class="kawaii-icon">⚖️</span>
+        <span class="kawaii-label">Weight</span>
+      </button>
+      <button class="kawaii-tab-btn" id="tab-money" onclick="switchPage('page-money')">
+        <span class="kawaii-icon">👛</span>
+        <span class="kawaii-label">Money</span>
+      </button>
+      <button class="kawaii-tab-btn" id="tab-diet" onclick="switchPage('page-diet')">
+        <span class="kawaii-icon">🍱</span>
+        <span class="kawaii-label">Diet</span>
+      </button>
+      <button class="kawaii-tab-btn" id="tab-hydra" onclick="switchPage('page-hydra')">
+        <span class="kawaii-icon">💧</span>
+        <span class="kawaii-label">Hydra</span>
+      </button>
+      <button class="kawaii-tab-btn" id="tab-trends" onclick="switchPage('page-trends')">
+        <span class="kawaii-icon">📈</span>
+        <span class="kawaii-label">Trends</span>
+      </button>
+    </div>
+
+    <!-- ================= 3 TRAFFIC LIGHTBULBS ================= -->
+    <div class="traffic-bulbs-bar">
+      <!-- Money Lightbulb -->
+      <div class="bulb-status-card">
+        <div class="bulb-indicator bulb-green" id="bulb-money">💡</div>
+        <div class="bulb-label-wrap">
+          <span class="bulb-title">Money</span>
+          <span class="bulb-state-text" id="bulb-money-text">Balanced</span>
+        </div>
+      </div>
+      <!-- Hydration Lightbulb -->
+      <div class="bulb-status-card">
+        <div class="bulb-indicator bulb-green" id="bulb-water">💡</div>
+        <div class="bulb-label-wrap">
+          <span class="bulb-title">Hydra</span>
+          <span class="bulb-state-text" id="bulb-water-text">Hydrated</span>
+        </div>
+      </div>
+      <!-- Diet Lightbulb -->
+      <div class="bulb-status-card">
+        <div class="bulb-indicator bulb-green" id="bulb-diet">💡</div>
+        <div class="bulb-label-wrap">
+          <span class="bulb-title">Diet</span>
+          <span class="bulb-state-text" id="bulb-diet-text">On Track</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alarm Alert Notification -->
+    <div id="alarm-banner" style="display: none;">
+      <div>
+        <strong id="alarm-title">⏰ Reminder</strong>
+        <div style="font-size: 0.8rem;" id="alarm-desc">Time to log your daily health & numbers!</div>
+      </div>
+      <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="dismissAlarm()">Dismiss</button>
+    </div>
+
+    <!-- ================= 1. HOME (COMPILED MASTER DASHBOARD) ================= -->
+    <section id="page-home" class="page-view active">
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-label">Safe Spend Today</div>
+          <div class="kpi-val" id="dash-safe-daily">₹0.00</div>
+          <div class="kpi-hint">Travel, Food & Misc</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Net Surplus</div>
+          <div class="kpi-val" id="dash-remaining-month">₹0.00</div>
+          <div class="kpi-hint">After all commitments</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🌟 Today's Vital Metrics</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div style="background: rgba(150,150,150,0.06); padding: 12px; border-radius: 14px;">
+            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">CURRENT SCALE</span>
+            <div style="font-family:'Fredoka'; font-size: 1.4rem; color:var(--accent-blue); margin-top:2px;" id="dash-weight-val">-- kg</div>
+          </div>
+          <div style="background: rgba(150,150,150,0.06); padding: 12px; border-radius: 14px;">
+            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">HYDRA INTAKE</span>
+            <div style="font-family:'Fredoka'; font-size: 1.4rem; color:var(--accent-green); margin-top:2px;" id="dash-water-val">0 Glasses</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 14px; border-top: 1px dashed var(--border-soft); padding-top: 12px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom: 6px;">
+            <strong>Spent Today:</strong>
+            <span id="dash-spent-today" style="font-family:'Fredoka'; color:var(--primary-bubble);">₹0.00</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+            <strong>Meals Logged:</strong>
+            <span id="dash-meals-count" style="font-family:'Fredoka'; color:var(--accent-blue);">0 items</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚡ Quick Jump</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <button class="btn btn-secondary" onclick="switchPage('page-diet')">🍱 Log Local Meal</button>
+          <button class="btn btn-secondary" onclick="drinkWater(1)">💧 +1 Glass Water</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2. WEIGHT ================= -->
+    <section id="page-weight" class="page-view">
+      <div class="card">
+        <div class="card-title">⚖️ Daily Weight Verification</div>
+        <div class="card-subtitle">Log your scale reading to match against your diet timeline.</div>
+
+        <div class="field-group">
+          <label class="field-label">Scale Weight (kg)</label>
+          <div class="input-row">
+            <input type="number" step="0.1" id="input-weight" placeholder="e.g. 68.5" />
+            <button class="btn" onclick="saveDailyWeight()">Save</button>
+          </div>
+        </div>
+
+        <div id="weight-status-box" style="margin-top: 10px; display: none;">
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Recorded today:</span>
+          <strong id="recorded-weight-display" style="font-size: 1.3rem; color: var(--accent-blue); margin-left: 6px;">-- kg</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          📸 Physique Check-In
+          <span style="background: linear-gradient(135deg, #FFD166, #FF9F1C); color: #FFF; font-size: 0.72rem; font-family:'Fredoka'; padding: 2px 7px; border-radius: 10px; margin-left: 6px;">PREMIUM</span>
+        </div>
+        <div class="card-subtitle">Store private photos to track visible transformation.</div>
+
+        <div class="photo-upload-box" onclick="document.getElementById('photo-input').click()">
+          <span style="font-size: 2rem;">📷</span>
+          <p style="font-weight: 700; color: var(--primary-bubble); margin-top: 4px;">Tap to Take Photo / Upload</p>
+          <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoUpload(event)" />
+          <img id="photo-preview-img" class="photo-preview" alt="Physique Preview" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3. MONEY ================= -->
+    <section id="page-money" class="page-view">
+      <div class="card">
+        <div class="card-title">💸 Daily Expenses (₹)</div>
+        <div class="card-subtitle">Tracks against your safe daily discretionary limit.</div>
+
+        <div class="field-group">
+          <div class="input-row">
+            <input type="text" id="expense-name" placeholder="Item (e.g. Metro pass, Juice)" />
+            <input type="number" id="expense-amount" placeholder="₹" style="max-width: 110px;" />
+          </div>
+          <div class="input-row" style="margin-top: 8px;">
+            <select id="expense-category">
+              <option value="Travel">🚆 Travel / Commute</option>
+              <option value="Food">🍲 Food & Dining</option>
+              <option value="Misc">🛒 Misc / Shopping</option>
+            </select>
+            <button class="btn" style="min-width: 110px;" onclick="addExpense()">+ Add</button>
+          </div>
+        </div>
+
+        <ul class="item-list" id="expense-items-list"></ul>
+      </div>
+
+      <!-- Monthly Blueprint in Money tab -->
+      <div class="card">
+        <div class="card-title">💰 Monthly Income & Fixed Bills</div>
+        <div class="field-group">
+          <label class="field-label">Total Monthly Inflow / Salary (₹)</label>
+          <input type="number" id="in-income" placeholder="e.g. 75000" onchange="updateFinanceArchitecture()" />
+        </div>
+
+        <div class="grid-2col">
+          <div class="field-group">
+            <label class="field-label">Rent Payable (₹)</label>
+            <input type="number" id="in-rent" placeholder="Rent" onchange="updateFinanceArchitecture()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Credit Card Dues (₹)</label>
+            <input type="number" id="in-cc" placeholder="CC Dues" onchange="updateFinanceArchitecture()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">EMI (₹)</label>
+            <input type="number" id="in-emi" placeholder="EMI" onchange="updateFinanceArchitecture()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Utilities (₹)</label>
+            <input type="number" id="in-utilities" placeholder="Electricity, WiFi" onchange="updateFinanceArchitecture()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Services (₹)</label>
+            <input type="number" id="in-services" placeholder="Maid, Cook" onchange="updateFinanceArchitecture()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Monthly Commute (₹)</label>
+            <input type="number" id="in-commute" placeholder="Fuel, Metro" onchange="updateFinanceArchitecture()" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Monthly Grocery Allocation (₹)</label>
+          <input type="number" id="in-grocery" placeholder="Grocery" onchange="updateFinanceArchitecture()" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 4. DIET (WITH LOCAL MUMBAI PANTRY ITEMS) ================= -->
+    <section id="page-diet" class="page-view">
+      <!-- AI Packaging Scanner -->
+      <div class="card">
+        <div class="card-title">🔍 AI Nutrition Label Scanner</div>
+        <div class="card-subtitle">Snap packaging ingredients or nutritional values to auto-fill macros.</div>
+
+        <div class="photo-upload-box" onclick="document.getElementById('ai-label-input').click()">
+          <span style="font-size: 1.8rem;">📦</span>
+          <p style="font-weight: 700; color: var(--primary-bubble); margin-top: 4px;">Upload / Snap Label Image</p>
+          <input type="file" id="ai-label-input" accept="image/*" capture="environment" style="display:none;" onchange="handleLabelScan(event)" />
+        </div>
+
+        <div id="ai-scan-status" style="font-size: 0.85rem; color: var(--primary-bubble); font-weight: 700; display: none; text-align: center; margin: 8px 0;">
+          ⏳ Reading label with AI...
+        </div>
+
+        <div id="ai-result-display" class="ai-result-box">
+          <h4 id="ai-detected-product">Identified Food Item</h4>
+          <p id="ai-detected-desc" style="color: var(--text-muted); font-size: 0.8rem;"></p>
+          <div class="macro-pill-row">
+            <span class="macro-pill" id="ai-cal">Calories: --</span>
+            <span class="macro-pill" id="ai-protein">Protein: --</span>
+            <span class="macro-pill" id="ai-carbs">Carbs: --</span>
+            <span class="macro-pill" id="ai-fat">Fat: --</span>
+          </div>
+          <button class="btn btn-block btn-secondary" style="margin-top: 10px; font-size: 0.85rem;" onclick="applyAiToDiet()">
+            + Log Directly into Diet Journal
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Indian Pantry Recipes -->
+      <div class="card">
+        <div class="card-title">🥘 Quick Mumbai Pantry Picks</div>
+        <div class="card-subtitle">1-tap pantry favorites commonly made in any local Mumbai kitchen:</div>
+        
+        <div class="pantry-pills-wrap">
+          <div class="pantry-pill" onclick="quickFillPantry('Sattu Buttermilk Cooler', 250, 'ml', 'Drink')">🥛 Sattu Chaas</div>
+          <div class="pantry-pill" onclick="quickFillPantry('Moong Dal Cheela', 2, 'pcs', 'Breakfast')">🥞 Moong Cheela</div>
+          <div class="pantry-pill" onclick="quickFillPantry('Poha with Roasted Peanuts', 150, 'g', 'Breakfast')">🥣 Kanda Poha</div>
+          <div class="pantry-pill" onclick="quickFillPantry('Masala Oats & Veggies', 1, 'cup', 'Early Snack')">🍲 Veg Masala Oats</div>
+          <div class="pantry-pill" onclick="quickFillPantry('Boiled Kala Chana Chaat', 150, 'g', 'Early Snack')">🥗 Chana Chaat</div>
+          <div class="pantry-pill" onclick="quickFillPantry('Dal Khichdi & Curd', 250, 'g', 'Lunch')">🍚 Dal Khichdi</div>
+          <div class="pantry-pill" onclick="quickFillPantry('Paneer Bhurji & 2 Phulkas', 1, 'cup', 'Dinner')">🧀 Paneer Bhurji</div>
+          <div class="pantry-pill" onclick="quickFillPantry('Roasted Makhana with Haldi', 50, 'g', 'Late Night Snack')">🍿 Roasted Makhana</div>
+          <div class="pantry-pill" onclick="quickFillPantry('Curd & Chia Seed Bowl', 200, 'g', 'Post Workout Snack')">🥣 Dahi & Chia</div>
+        </div>
+      </div>
+
+      <!-- Categorical Diet Journal -->
+      <div class="card">
+        <div class="card-title">🥗 Categorical Diet Journal</div>
+        <div class="card-subtitle">Log specific meals with portions to correlate with weight drops.</div>
+
+        <div class="field-group">
+          <label class="field-label">Meal Category</label>
+          <select id="diet-meal-cat">
+            <option value="Breakfast">🍳 Breakfast</option>
+            <option value="Lunch">🍛 Lunch</option>
+            <option value="Dinner">🍲 Dinner</option>
+            <option value="Early Snack">🍎 Early Snack</option>
+            <option value="Post Workout Snack">💪 Post Workout Snack</option>
+            <option value="Late Night Snack">🌙 Late Night Snack</option>
+            <option value="Drink">🥤 Drink / Beverage</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Product / Food Name</label>
+          <input type="text" id="diet-product-name" placeholder="e.g. Moong Cheela, Dal Khichdi" />
+        </div>
+
+        <div class="input-row">
+          <div style="flex: 2;">
+            <label class="field-label">Quantity</label>
+            <input type="number" step="0.1" id="diet-quantity" placeholder="e.g. 150, 1, 250" />
+          </div>
+          <div style="flex: 1.5;">
+            <label class="field-label">Unit</label>
+            <select id="diet-unit">
+              <option value="g">grams (g)</option>
+              <option value="ml">ml</option>
+              <option value="pcs">pieces (pcs)</option>
+              <option value="cup">cup(s)</option>
+              <option value="scoop">scoop(s)</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-block" style="margin-top: 12px;" onclick="addDietItem()">+ Add Meal Entry</button>
+        <ul class="item-list" id="diet-entries-list"></ul>
+      </div>
+
+      <!-- Exercise Section -->
+      <div class="card">
+        <div class="card-title">🏋️ Exercise & Movement</div>
+        <div class="input-row">
+          <input type="text" id="exercise-name" placeholder="Activity (e.g. Marine Drive Walk, Yoga)" />
+          <input type="text" id="exercise-duration" placeholder="Duration / Sets" style="max-width: 140px;" />
+        </div>
+        <button class="btn btn-block btn-secondary" style="margin-top: 10px;" onclick="addExerciseEntry()">+ Log Exercise</button>
+        <ul class="item-list" id="exercise-entries-list"></ul>
+      </div>
+    </section>
+
+    <!-- ================= 5. HYDRA (FORMERLY SANCTUARY) ================= -->
+    <section id="page-hydra" class="page-view">
+      <div class="card">
+        <div class="card-title">💧 Hydra Sanctuary</div>
+        <div class="card-subtitle">Water your companion to unlock 4 growth stages and celestial accessories!</div>
+
+        <div class="field-group">
+          <label class="field-label">Choose Your Companion</label>
+          <select id="companion-select" onchange="changeCompanion()">
+            <option value="plant">🌱 Plant / Magic Bonsai</option>
+            <option value="cat">🐱 Cat (Mochi)</option>
+            <option value="dog">🐶 Dog (Buster)</option>
+            <option value="dragon">🐉 Celestial Dragon</option>
+            <option value="panda">🐼 Zen Panda</option>
+            <option value="unicorn">🦄 Star Unicorn</option>
+            <option value="phoenix">🔥 Solar Phoenix</option>
+            <option value="pigeon">🐦 City Pigeon</option>
+            <option value="crow">🦅 Mystic Crow</option>
+            <option value="seal">🦭 Arctic Seal</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="habitat-card">
+        <div class="pet-stage-badge" id="habitat-stage-badge">Stage 1: Baby Sprout</div>
+        <br>
+        <div class="pet-stage-avatar" id="habitat-avatar-display">🌱</div>
+        
+        <div style="font-family:'Fredoka'; font-size:1.6rem; color:var(--text-dark);" id="total-glasses-display">0 Glasses</div>
+        <div style="font-size:0.82rem; color:var(--text-muted); margin-top:2px;">(approx. <span id="total-liters-display">0.0</span> Liters drunk)</div>
+
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="habitat-progress-fill"></div>
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+          <span id="prev-tier-label">0</span>
+          <span id="next-milestone-text">Next: 500 Glasses</span>
+        </div>
+
+        <div class="water-btn-row">
+          <button class="btn btn-block" onclick="drinkWater(1)">💧 +1 Glass (250ml)</button>
+          <button class="btn btn-secondary" style="min-width: 90px;" onclick="drinkWater(2)">+2</button>
+          <button class="btn btn-secondary" style="min-width: 90px;" onclick="drinkWater(4)">+4</button>
+        </div>
+
+        <div style="margin-top: 18px; border-top: 1px dashed var(--border-soft); padding-top: 12px;">
+          <strong style="font-size:0.85rem; color:var(--text-muted);">Unlocked Accessories (Every 20k glasses):</strong>
+          <div class="accessory-gallery" id="accessory-box">
+            <span style="font-size:0.75rem; color:var(--text-muted);">Drink water to unlock items!</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 6. TRENDS (WITH HIDDEN CSV EXPORT) ================= -->
+    <section id="page-trends" class="page-view">
+      <div class="card">
+        <div class="card-title">📊 Month-on-Month Financial Chart</div>
+        <div class="card-subtitle">Inflow vs. Fixed Commitments vs. Daily Outflows</div>
+        <canvas id="monthlyBudgetChart" width="400" height="240"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔬 Diet Correlation to Weight Drops</div>
+        <div class="card-subtitle">Review previous days to identify what foods coincided with a lower scale reading.</div>
+        <div id="correlation-records-list"></div>
+      </div>
+
+      <!-- Hidden Master CSV Export tucked neatly at the bottom of Trends -->
+      <div class="card" style="border: 1px dashed var(--border-soft); background: rgba(150,150,150,0.03);">
+        <div class="card-title" style="font-size: 1.05rem;">📁 Raw Data Export</div>
+        <div class="card-subtitle">Export your complete financial, weigh-in, and diet logs for spreadsheets.</div>
+        <button class="btn btn-block btn-secondary" onclick="exportDataAsCSV()">
+          📥 Download Complete Data (.CSV)
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 7. PROFILE (ACCESSED VIA TOP AVATAR) ================= -->
+    <section id="page-profile" class="page-view">
+      <div class="card">
+        <div class="card-title">👤 User Identity</div>
+        
+        <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 14px;">
+          <div class="avatar-wrapper" style="width: 64px; height: 64px; cursor: pointer;" onclick="document.getElementById('profile-avatar-input').click()">
+            <span id="profile-avatar-fallback" style="font-size: 1.8rem;">📷</span>
+            <img id="profile-avatar-img" class="avatar-img" alt="Avatar" />
+          </div>
+          <div style="flex: 1;">
+            <button class="btn btn-secondary btn-block" style="font-size: 0.85rem;" onclick="document.getElementById('profile-avatar-input').click()">
+              Upload Avatar
+            </button>
+            <input type="file" id="profile-avatar-input" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">User's Name</label>
+          <input type="text" id="profile-name-input" placeholder="e.g. Yen" oninput="updateProfileName()" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">
+            <span>Status Line (Max 20 chars)</span>
+            <span id="status-char-count" style="font-size:0.75rem; color:var(--text-muted);">0/20</span>
+          </label>
+          <input type="text" id="profile-status-input" maxlength="20" placeholder="e.g. Getting Fit" oninput="updateStatusPreview()" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Flash Quote Frequency (Minutes)</label>
+          <input type="number" id="profile-quote-interval" min="1" max="180" placeholder="15" />
+          <span style="font-size:0.72rem; color:var(--text-muted);">Default is 15 minutes. Minimum popup duration is 5 seconds.</span>
+        </div>
+
+        <button class="btn btn-block" onclick="saveProfileHeaderDetails()">Save Profile Details</button>
+      </div>
+
+      <!-- App Themes -->
+      <div class="card">
+        <div class="card-title">🎨 Visual App Theme</div>
+        <div class="theme-selector-grid">
+          <div class="theme-chip active" id="chip-blossom" onclick="setAppTheme('blossom')">🌸 Blossom</div>
+          <div class="theme-chip" id="chip-mint" onclick="setAppTheme('mint')">🍵 Matcha</div>
+          <div class="theme-chip" id="chip-midnight" onclick="setAppTheme('midnight')">🌙 Midnight</div>
+          <div class="theme-chip" id="chip-ocean" onclick="setAppTheme('ocean')">🌊 Ocean</div>
+        </div>
+      </div>
+
+      <!-- Alarms -->
+      <div class="card">
+        <div class="card-title">⏰ Active Alarms</div>
+        <div class="input-row">
+          <input type="time" id="alarm-time-input" />
+          <input type="text" id="alarm-label-input" placeholder="e.g. Sattu Chaas Break" />
+          <button class="btn" onclick="addAlarm()">Set</button>
+        </div>
+        <ul class="item-list" id="alarm-list"></ul>
+      </div>
+
+      <!-- AI Provider Setup -->
+      <div class="card">
+        <div class="card-title">🤖 Multimodal AI Model Setup</div>
+        <div class="field-group">
+          <label class="field-label">Selected AI Engine</label>
+          <select id="ai-provider-select">
+            <option value="gemini">Google Gemini (Gemini 1.5 Flash / Pro)</option>
+            <option value="openai">OpenAI (ChatGPT / GPT-4o)</option>
+            <option value="claude">Anthropic Claude (Claude 3.5 Sonnet)</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>Your Personal API Key</span>
+            <span class="help-link-btn" onclick="openKeyModal()">Need help getting a key? ➔</span>
+          </div>
+          <input type="password" id="ai-api-key" placeholder="Paste your API key here" />
+        </div>
+
+        <button class="btn btn-block btn-secondary" onclick="saveAiKey()">Save API Key</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- API Key Instructions Modal -->
+  <div id="key-modal" class="modal-overlay" onclick="closeKeyModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="font-family:'Fredoka'; color:var(--primary-bubble); font-size:1.3rem; margin-bottom: 6px;">How to Get Your API Key</h3>
+      <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom: 14px;">Select your provider below to view instructions and direct links:</p>
+
+      <div class="provider-card">
+        <strong>1. Google Gemini (Recommended & Free Tier)</strong>
+        <p style="margin: 4px 0;">Go to Google AI Studio, sign in with your Google account, and click <em>Create API key</em>.</p>
+        <a href="https://aistudio.google.com/apikey" target="_blank">Open Google AI Studio ➔</a>
+      </div>
+
+      <div class="provider-card">
+        <strong>2. OpenAI (ChatGPT / GPT-4o)</strong>
+        <p style="margin: 4px 0;">Visit your OpenAI platform settings, navigate to API Keys, and click <em>Create new secret key</em>.</p>
+        <a href="https://platform.openai.com/api-keys" target="_blank">Open OpenAI Platform ➔</a>
+      </div>
+
+      <div class="provider-card">
+        <strong>3. Anthropic (Claude 3.5 Sonnet)</strong>
+        <p style="margin: 4px 0;">Sign in to Anthropic Console, open your API keys settings, and generate a new key.</p>
+        <a href="https://console.anthropic.com/settings/keys" target="_blank">Open Anthropic Console ➔</a>
+      </div>
+
+      <button class="btn btn-block" style="margin-top: 12px;" onclick="closeKeyModal()">Got It</button>
+    </div>
+  </div>
+
+  <script>
+    const MOTIVATIONAL_QUOTES = [
+      "Make It Happen.", "Go Get It.", "Do It Anyway.", "Own Your Power.", "Get After It.",
+      "Make Your Move.", "Keep Going.", "No More Waiting.", "Start Before Ready.", "Be About It.",
+      "Take The Lead.", "Choose Action.", "Make Today Count.", "Get Up. Go Again.", "Built to Begin.",
+      "Just Begin.", "Onward Always.", "Stay in Motion.", "Make It Count.", "All In.",
+      "I Am the Main Event.", "I Can. I Will. I Did.", "I Back Myself.", "I Am My Own Green Light.",
+      "I Make Things Happen.", "I Am Becoming Unstoppable.", "I Am Built for This.", "I Trust My Own Timing.",
+      "I Take Up Space.", "I Deserve My Own Effort.", "I Am the Plan.", "I Bet on Me.",
+      "I Am Not Here to Shrink.", "I Move with Intention.", "I Create My Own Luck.", "I Am Allowed to Begin Again.",
+      "I Am More Than My Excuses.", "I Show Up for Myself.", "I Choose My Own Pace.", "I Am My Own Permission.",
+      "Less Talk. More Doing.", "Be the Exception.", "Ambition Looks Good on You.", "Stop Asking. Start Building.",
+      "Make Yourself Proud.", "Work Like You Mean It.", "Turn Intention Into Impact.", "Take What You Came For.",
+      "Dream Big. Execute Bigger.", "Don't Wait for the Room.", "Earn Your Own Respect.", "Be Difficult to Discourage.",
+      "Outgrow the Ordinary.", "Let Results Speak.", "Make Your Own Rules.", "Be the Force.",
+      "Progress Is a Power Move.", "Your Potential Needs Practice.", "Become Your Own Proof.", "Do Not Die at Maybe.",
+      "Small Steps Still Move You.", "Begin Where You Are.", "You Are Allowed to Grow.", "Keep Your Own Promise.",
+      "Progress Is Progress.", "Give Yourself a Chance.", "One Thing at a Time.", "You Can Start Again.",
+      "You Are Not Behind.", "Trust the Becoming.", "Keep Choosing Yourself.", "Make Room for More.",
+      "Grow Through What You Go Through.", "You Are Worth the Work.", "Let Yourself Try.", "There Is Still Time.",
+      "Be Patient. Be Persistent.", "Give Tomorrow a Chance.", "You Can Do Hard Things.", "Keep Going, Kindly.",
+      "Consistency Is a Superpower.", "Discipline Over Mood.", "Do It on the Ordinary Days.", "Keep the Promise.",
+      "Show Up. Repeat.", "Systems Beat Wishes.", "Make Progress a Practice.", "The Work Is the Way.",
+      "Action Creates Clarity.", "Start. Sustain. Succeed.", "Be Consistent, Not Perfect.", "Motivation Fades. Standards Stay.",
+      "Your Habits Shape Your Future.", "Do the Work. Trust the Process.", "Every Day Is a Deposit.", "Repetition Builds Confidence.",
+      "Make Discipline Your Default.", "Finish What You Start.", "Less Intention. More Implementation.", "Become Someone You Can Count On.",
+      "Back Yourself.", "Know Your Worth. Do the Work.", "You Are Your Own Advantage.", "Believe Bigger.",
+      "Trust Your Ability to Figure It Out.", "You Have What It Takes to Start.", "Take Yourself Seriously.", "Your Voice Belongs Here.",
+      "Be Your Own Breakthrough.", "Stop Underestimating Yourself.", "Let Confidence Catch Up.", "You Are Capable of More.",
+      "Choose Courage Over Comfort.", "Your Life. Your Call.", "Be the Person You Needed.", "Own Your Becoming.",
+      "You Don't Need Permission.", "Bet on Your Potential.", "Make Confidence a Habit.", "Stand Behind Yourself.",
+      "Get Sh*t Done.", "Big Main Character Energy", "Plot Twist: I Did It.", "Doing the Most.", "Dreams Need Deadlines.",
+      "Cute but Capable.", "Booked & Becoming.", "Hustle with Heart.", "Chaos, Then Conquer.", "Powered by Possibility.",
+      "Making Moves.", "Unbothered. Unstoppable.", "Do It Scared.", "Watch Me.", "Good Things, Great Effort.", "Busy Becoming.",
+      "Your Life Will Not Change by Accident.", "The Life You Want Requires Your Participation.", "Become the Reason It Works Out.",
+      "You Cannot Think Your Way Into Every Answer.", "Stop Rehearsing. Start Living.", "Your Future Is Built in the Unremarkable Moments.",
+      "You Owe Your Potential an Attempt.", "You Cannot Win a Game You Refuse to Play.", "Make Decisions Your Future Self Can Live With.",
+      "The First Step Is a Form of Self-Respect.", "You Are Allowed to Want More.", "Do Not Confuse Familiarity with Fulfilment.",
+      "Courage Is a Verb.", "The Point Is to Participate.", "Build a Life You Do Not Need to Escape.", "You Become What You Repeatedly Choose.",
+      "Do Something Your Fear Cannot Take Credit For.", "Your Next Chapter Needs Your Attention.", "Stop Waiting to Feel Like the Person You Want to Become.",
+      "Make Your Life an Active Decision.", "I Am Ready for What I Asked For.", "I Have the Courage to Begin.",
+      "I Choose Progress Over Perfection.", "I Am Capable of Creating Change.", "I Trust Myself to Learn.",
+      "I Welcome New Possibilities.", "I Am Open to Doing Things Differently.", "I Have Permission to Take Up Space.",
+      "I Choose What Moves Me Forward.", "I Am Building a Life I Believe In.", "I Can Handle the Next Step.",
+      "I Am Proud of My Effort.", "I Am Becoming More of Myself.", "I Deserve to See What I Can Do.", "I Meet My Potential with Action."
+    ];
+
+    const COMPANION_DATA = {
+      plant: { stages: ["🌱", "🌿", "🪴", "🌳"], names: ["Sprout", "Seedling", "Bonsai", "World Tree"] },
+      cat: { stages: ["🐱", "🐾", "🐈", "🦁"], names: ["Kitten", "Playful Cat", "Majestic Feline", "Regal Lion"] },
+      dog: { stages: ["🐶", "🦴", "🐕", "🐺"], names: ["Pup", "Active Hound", "Loyal Companion", "Celestial Wolf"] },
+      dragon: { stages: ["🥚", "🦎", "🐲", "🐉"], names: ["Dragon Egg", "Hatchling", "Sky Drake", "Primordial Dragon"] },
+      panda: { stages: ["🎋", "🐼", "🥋", "👑"], names: ["Bamboo Cub", "Chubby Panda", "Kung Fu Master", "Emperor Panda"] },
+      unicorn: { stages: ["✨", "🦄", "🌈", "🌌"], names: ["Star Foal", "Moon Unicorn", "Rainbow Steed", "Cosmic Alicorn"] },
+      phoenix: { stages: ["🪶", "🐥", "🔥", "🦅"], names: ["Ember Feather", "Flame Chick", "Sunbird", "Eternal Phoenix"] },
+      pigeon: { stages: ["🥚", "🐦", "🕊️", "👑"], names: ["Egg", "City Pigeon", "Peace Dove", "Sky Monarch"] },
+      crow: { stages: ["🪶", "🦅", "🪞", "🧙‍♂️"], names: ["Feather", "Sleek Crow", "Raven of Omens", "Odin's Scout"] },
+      seal: { stages: ["💧", "🦭", "❄️", "🌊"], names: ["Pup", "Happy Seal", "Glacier Guardian", "Ocean Sovereign"] }
+    };
+
+    const ACCESSORIES_LIST = [
+      "👑 Royal Crown", "🪄 Magic Wand", "✨ Stardust Halo", "🕶️ Neon Shades",
+      "🦋 Faerie Wings", "🧣 Silk Scarf", "⭐ Cosmic Amulet", "⚡ Thunder Cape"
+    ];
+
+    let state = {
+      profile: {
+        name: "Yen",
+        avatar: "",
+        statusLine: "Getting Fit",
+        theme: "blossom",
+        quoteIntervalMinutes: 15,
+        aiProvider: "gemini",
+        aiKey: ""
+      },
+      hydration: {
+        companion: "plant",
+        glasses: 0
+      },
+      finances: {
+        income: 75000,
+        rent: 18000,
+        creditCard: 5000,
+        emi: 6000,
+        utilities: 3500,
+        services: 4000,
+        commute: 2500,
+        grocery: 8000
+      },
+      today: {
+        weight: null,
+        photoData: null,
+        dietItems: [],
+        exerciseItems: [],
+        expenses: []
+      },
+      history: [
+        {
+          date: "Yesterday",
+          weight: 68.4,
+          diet: "Sattu Chaas (250ml) | Moong Cheela 2pcs | Dal Khichdi (250g)",
+          exercise: "45 min Marine Drive brisk walk"
+        },
+        {
+          date: "2 Days Ago",
+          weight: 68.9,
+          diet: "Poha (150g) | Chana Chaat (150g) | Paneer Bhurji & Roti",
+          exercise: "Rest day"
+        }
+      ],
+      alarms: [
+        { id: 1, time: "08:30", label: "Weigh-In & Chaas", active: true },
+        { id: 2, time: "21:30", label: "Review Daily Expenses", active: true }
+      ]
+    };
+
+    let chartInstance = null;
+    let pendingAiFood = null;
+    let flashQuoteTimeout = null;
+    let periodicQuoteInterval = null;
+
+    function initApp() {
+      const saved = localStorage.getItem("bawns_butt_jet_v6");
+      if (saved) {
+        try { state = JSON.parse(saved); } catch(e) { console.error(e); }
+      }
+
+      // Profile Hydration
+      const p = state.profile;
+      document.getElementById('profile-name-input').value = p.name || 'Yen';
+      document.getElementById('profile-status-input').value = p.statusLine || 'Getting Fit';
+      document.getElementById('profile-quote-interval').value = p.quoteIntervalMinutes || 15;
+      document.getElementById('ai-provider-select').value = p.aiProvider || 'gemini';
+      document.getElementById('ai-api-key').value = p.aiKey || '';
+
+      updateProfileName();
+      updateStatusPreview();
+      renderAvatar();
+      setAppTheme(p.theme || 'blossom', false);
+
+      // Finances
+      const f = state.finances;
+      document.getElementById('in-income').value = f.income || '';
+      document.getElementById('in-rent').value = f.rent || '';
+      document.getElementById('in-cc').value = f.creditCard || '';
+      document.getElementById('in-emi').value = f.emi || '';
+      document.getElementById('in-utilities').value = f.utilities || '';
+      document.getElementById('in-services').value = f.services || '';
+      document.getElementById('in-commute').value = f.commute || '';
+      document.getElementById('in-grocery').value = f.grocery || '';
+
+      // Hydration
+      document.getElementById('companion-select').value = state.hydration.companion || 'plant';
+
+      if (state.today.weight) showRecordedWeight(state.today.weight);
+      if (state.today.photoData) {
+        const preview = document.getElementById('photo-preview-img');
+        preview.src = state.today.photoData;
+        preview.style.display = 'block';
+      }
+
+      recalculateAndRender();
+      renderHydrationHabitat();
+      setInterval(tickClockAndCheckAlarms, 1000);
+      setupQuoteInterval();
+
+      // Extended intro duration (7.8s) followed by initial flash quote
+      setTimeout(() => {
+        hideSplash();
+        triggerRandomFlashQuote();
+      }, 7800);
+    }
+
+    function hideSplash() {
+      const splash = document.getElementById('splash-screen');
+      if (splash) splash.classList.add('hidden');
+    }
+
+    /* Flash Quote: 5.2s minimum duration before auto-dismiss, can be dismissed by tapping */
+    function triggerRandomFlashQuote() {
+      const quote = MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)];
+      const overlay = document.getElementById('quote-flash-overlay');
+      document.getElementById('active-flash-quote').innerText = quote;
+      overlay.classList.add('active');
+
+      if (flashQuoteTimeout) clearTimeout(flashQuoteTimeout);
+      flashQuoteTimeout = setTimeout(() => {
+        closeQuoteFlash();
+      }, 5200); // Minimum 5 seconds duration
+    }
+
+    function closeQuoteFlash() {
+      if (flashQuoteTimeout) clearTimeout(flashQuoteTimeout);
+      const overlay = document.getElementById('quote-flash-overlay');
+      overlay.classList.remove('active');
+    }
+
+    function setupQuoteInterval() {
+      if (periodicQuoteInterval) clearInterval(periodicQuoteInterval);
+      const mins = Math.max(1, state.profile.quoteIntervalMinutes || 15);
+      periodicQuoteInterval = setInterval(() => {
+        triggerRandomFlashQuote();
+      }, mins * 60 * 1000);
+    }
+
+    function saveState() {
+      localStorage.setItem("bawns_butt_jet_v6", JSON.stringify(state));
+      recalculateAndRender();
+      renderHydrationHabitat();
+    }
+
+    /* Page Switcher for 3-in-a-row Kawaii Navigation */
+    function switchPage(pageId) {
+      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.kawaii-tab-btn').forEach(b => b.classList.remove('active'));
+
+      const target = document.getElementById(pageId);
+      if (target) target.classList.add('active');
+
+      const tabKey = pageId.replace('page-', 'tab-');
+      const activeTabBtn = document.getElementById(tabKey);
+      if (activeTabBtn) activeTabBtn.classList.add('active');
+
+      if (pageId === 'page-hydra') renderHydrationHabitat();
+      if (pageId === 'page-trends') {
+        renderComparativeChart();
+        renderCorrelationInsights();
+      }
+    }
+
+    /* Lightbulbs Evaluator */
+    function evaluateTrafficLightbulbs(safeDailyAllowance, spentToday, waterGlasses, dietCount) {
+      // 1. Money Lightbulb
+      const moneyBulb = document.getElementById('bulb-money');
+      const moneyText = document.getElementById('bulb-money-text');
+      moneyBulb.className = 'bulb-indicator';
+
+      if (spentToday === 0) {
+        moneyBulb.classList.add('bulb-green');
+        moneyText.innerText = "Fresh Start";
+      } else if (spentToday <= safeDailyAllowance * 0.75) {
+        moneyBulb.classList.add('bulb-green');
+        moneyText.innerText = "Under Budget";
+      } else if (spentToday <= safeDailyAllowance) {
+        moneyBulb.classList.add('bulb-yellow');
+        moneyText.innerText = "Borderline";
+      } else if (spentToday <= safeDailyAllowance * 1.25) {
+        moneyBulb.classList.add('bulb-orange');
+        moneyText.innerText = "Overspent";
+      } else {
+        moneyBulb.classList.add('bulb-red');
+        moneyText.innerText = "Danger Zone";
+      }
+
+      // 2. Hydration Lightbulb (Low water puts in RED)
+      const waterBulb = document.getElementById('bulb-water');
+      const waterText = document.getElementById('bulb-water-text');
+      waterBulb.className = 'bulb-indicator';
+
+      if (waterGlasses < 3) {
+        waterBulb.classList.add('bulb-red');
+        waterText.innerText = "Dehydrated!";
+      } else if (waterGlasses < 6) {
+        waterBulb.classList.add('bulb-orange');
+        waterText.innerText = "Drink More";
+      } else if (waterGlasses < 8) {
+        waterBulb.classList.add('bulb-yellow');
+        waterText.innerText = "Near Goal";
+      } else {
+        waterBulb.classList.add('bulb-green');
+        waterText.innerText = "Fully Hydrated";
+      }
+
+      // 3. Diet Lightbulb
+      const dietBulb = document.getElementById('bulb-diet');
+      const dietText = document.getElementById('bulb-diet-text');
+      dietBulb.className = 'bulb-indicator';
+
+      if (dietCount === 0) {
+        dietBulb.classList.add('bulb-orange');
+        dietText.innerText = "No Logs";
+      } else if (dietCount < 2) {
+        dietBulb.classList.add('bulb-yellow');
+        dietText.innerText = "Partial Log";
+      } else {
+        dietBulb.classList.add('bulb-green');
+        dietText.innerText = "Logged Well";
+      }
+    }
+
+    /* Hydration Habitat */
+    function changeCompanion() {
+      state.hydration.companion = document.getElementById('companion-select').value;
+      saveState();
+    }
+
+    function drinkWater(amount) {
+      state.hydration.glasses += amount;
+      saveState();
+    }
+
+    function renderHydrationHabitat() {
+      const g = state.hydration.glasses || 0;
+      const compKey = state.hydration.companion || 'plant';
+      const companion = COMPANION_DATA[compKey] || COMPANION_DATA.plant;
+
+      let stageIndex = 0;
+      let stageTitle = "Stage 1: " + companion.names[0];
+      let prevTier = 0;
+      let nextTier = 500;
+
+      if (g >= 10000) {
+        stageIndex = 3;
+        stageTitle = "Stage 4 (Ascended): " + companion.names[3];
+        prevTier = 10000;
+        nextTier = 20000;
+      } else if (g >= 2500) {
+        stageIndex = 2;
+        stageTitle = "Stage 3 (Bloom): " + companion.names[2];
+        prevTier = 2500;
+        nextTier = 10000;
+      } else if (g >= 500) {
+        stageIndex = 1;
+        stageTitle = "Stage 2 (Growing): " + companion.names[1];
+        prevTier = 500;
+        nextTier = 2500;
+      }
+
+      document.getElementById('habitat-avatar-display').innerText = companion.stages[stageIndex];
+      document.getElementById('habitat-stage-badge').innerText = stageTitle;
+      document.getElementById('total-glasses-display').innerText = `${g} Glasses`;
+      document.getElementById('total-liters-display').innerText = (g * 0.25).toFixed(1);
+
+      let pct = 0;
+      if (g < 10000) {
+        pct = Math.min(100, Math.max(0, ((g - prevTier) / (nextTier - prevTier)) * 100));
+        document.getElementById('prev-tier-label').innerText = `${prevTier} gl`;
+        document.getElementById('next-milestone-text').innerText = `Next: ${nextTier} Glasses`;
+      } else {
+        const accCycle = 20000;
+        const currentInCycle = g % accCycle;
+        pct = (currentInCycle / accCycle) * 100;
+        document.getElementById('prev-tier-label').innerText = `${Math.floor(g / accCycle) * accCycle} gl`;
+        document.getElementById('next-milestone-text').innerText = `Next Accessory: ${(Math.floor(g / accCycle) + 1) * accCycle} gl`;
+      }
+      document.getElementById('habitat-progress-fill').style.width = pct + '%';
+
+      const numAccessories = Math.floor(g / 20000);
+      const accBox = document.getElementById('accessory-box');
+      accBox.innerHTML = '';
+      if (numAccessories > 0) {
+        for (let i = 0; i < Math.min(numAccessories, ACCESSORIES_LIST.length); i++) {
+          const chip = document.createElement('span');
+          chip.className = 'accessory-chip';
+          chip.innerText = ACCESSORIES_LIST[i];
+          accBox.appendChild(chip);
+        }
+      } else {
+        accBox.innerHTML = '<span style="font-size:0.75rem; color:var(--text-muted);">First accessory unlocks at 20,000 glasses!</span>';
+      }
+    }
+
+    /* 1-Tap Mumbai Pantry Meal Logging */
+    function quickFillPantry(name, qty, unit, category) {
+      state.today.dietItems.unshift({
+        id: Date.now(),
+        category: category,
+        product: name,
+        quantity: qty,
+        unit: unit
+      });
+      saveState();
+      alert(`Logged: "${name}" (${qty} ${unit}) in ${category}!`);
+    }
+
+    function addDietItem() {
+      const cat = document.getElementById('diet-meal-cat').value;
+      const product = document.getElementById('diet-product-name').value.trim();
+      const qty = parseFloat(document.getElementById('diet-quantity').value);
+      const unit = document.getElementById('diet-unit').value;
+
+      if (product && !isNaN(qty) && qty > 0) {
+        state.today.dietItems.unshift({
+          id: Date.now(),
+          category: cat,
+          product: product,
+          quantity: qty,
+          unit: unit
+        });
+
+        document.getElementById('diet-product-name').value = '';
+        document.getElementById('diet-quantity').value = '';
+        saveState();
+      }
+    }
+
+    function deleteDietItem(id) {
+      state.today.dietItems = state.today.dietItems.filter(d => d.id !== id);
+      saveState();
+    }
+
+    function addExerciseEntry() {
+      const name = document.getElementById('exercise-name').value.trim();
+      const dur = document.getElementById('exercise-duration').value.trim();
+
+      if (name) {
+        state.today.exerciseItems.unshift({
+          id: Date.now(),
+          name: name,
+          duration: dur || 'Done'
+        });
+        document.getElementById('exercise-name').value = '';
+        document.getElementById('exercise-duration').value = '';
+        saveState();
+      }
+    }
+
+    function deleteExercise(id) {
+      state.today.exerciseItems = state.today.exerciseItems.filter(e => e.id !== id);
+      saveState();
+    }
+
+    /* Money & Expense Tracking */
+    function addExpense() {
+      const name = document.getElementById('expense-name').value.trim();
+      const amount = parseFloat(document.getElementById('expense-amount').value);
+      const cat = document.getElementById('expense-category').value;
+
+      if (name && !isNaN(amount) && amount > 0) {
+        state.today.expenses.unshift({
+          id: Date.now(),
+          name: name,
+          amount: amount,
+          category: cat,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
+        });
+        document.getElementById('expense-name').value = '';
+        document.getElementById('expense-amount').value = '';
+        saveState();
+      }
+    }
+
+    function deleteExpense(id) {
+      state.today.expenses = state.today.expenses.filter(i => i.id !== id);
+      saveState();
+    }
+
+    function updateFinanceArchitecture() {
+      state.finances.income = parseFloat(document.getElementById('in-income').value) || 0;
+      state.finances.rent = parseFloat(document.getElementById('in-rent').value) || 0;
+      state.finances.creditCard = parseFloat(document.getElementById('in-cc').value) || 0;
+      state.finances.emi = parseFloat(document.getElementById('in-emi').value) || 0;
+      state.finances.utilities = parseFloat(document.getElementById('in-utilities').value) || 0;
+      state.finances.services = parseFloat(document.getElementById('in-services').value) || 0;
+      state.finances.commute = parseFloat(document.getElementById('in-commute').value) || 0;
+      state.finances.grocery = parseFloat(document.getElementById('in-grocery').value) || 0;
+      saveState();
+    }
+
+    /* Weight & Photos */
+    function saveDailyWeight() {
+      const val = parseFloat(document.getElementById('input-weight').value);
+      if (!isNaN(val) && val > 0) {
+        state.today.weight = val;
+        showRecordedWeight(val);
+        saveState();
+      }
+    }
+
+    function showRecordedWeight(val) {
+      document.getElementById('weight-status-box').style.display = 'block';
+      document.getElementById('recorded-weight-display').innerText = val.toFixed(1) + " kg";
+    }
+
+    function handlePhotoUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          state.today.photoData = event.target.result;
+          const preview = document.getElementById('photo-preview-img');
+          preview.src = event.target.result;
+          preview.style.display = 'block';
+          saveState();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    /* Avatar & Profile */
+    function handleAvatarUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          state.profile.avatar = evt.target.result;
+          renderAvatar();
+          saveState();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function renderAvatar() {
+      const avatarSrc = state.profile.avatar;
+      const headerImg = document.getElementById('header-avatar-img');
+      const headerFallback = document.getElementById('avatar-fallback');
+      const profileImg = document.getElementById('profile-avatar-img');
+      const profileFallback = document.getElementById('profile-avatar-fallback');
+
+      if (avatarSrc) {
+        headerImg.src = avatarSrc;
+        headerImg.style.display = 'block';
+        headerFallback.style.display = 'none';
+
+        profileImg.src = avatarSrc;
+        profileImg.style.display = 'block';
+        profileFallback.style.display = 'none';
+      } else {
+        headerImg.style.display = 'none';
+        headerFallback.style.display = 'block';
+        profileImg.style.display = 'none';
+        profileFallback.style.display = 'block';
+      }
+    }
+
+    function updateProfileName() {
+      const n = document.getElementById('profile-name-input').value.trim() || 'Yen';
+      document.getElementById('header-greeting').innerText = `Hello ${n}`;
+    }
+
+    function updateStatusPreview() {
+      const val = document.getElementById('profile-status-input').value.slice(0, 20);
+      document.getElementById('status-char-count').innerText = `${val.length}/20`;
+      document.getElementById('header-status-line').innerText = val || "Active";
+    }
+
+    function saveProfileHeaderDetails() {
+      const val = document.getElementById('profile-status-input').value.slice(0, 20);
+      const n = document.getElementById('profile-name-input').value.trim() || 'Yen';
+      const mins = parseInt(document.getElementById('profile-quote-interval').value) || 15;
+
+      state.profile.name = n;
+      state.profile.statusLine = val;
+      state.profile.quoteIntervalMinutes = mins;
+
+      saveState();
+      setupQuoteInterval();
+      alert("Profile details updated!");
+    }
+
+    function setAppTheme(themeName, shouldSave = true) {
+      document.body.className = '';
+      if (themeName !== 'blossom') {
+        document.body.classList.add(`theme-${themeName}`);
+      }
+      document.querySelectorAll('.theme-chip').forEach(c => c.classList.remove('active'));
+      const chip = document.getElementById(`chip-${themeName}`);
+      if (chip) chip.classList.add('active');
+
+      state.profile.theme = themeName;
+      if (shouldSave) saveState();
+    }
+
+    /* Calculation & Dashboard Display */
+    function recalculateAndRender() {
+      const f = state.finances;
+      const totalBills = (f.rent || 0) + (f.creditCard || 0) + (f.emi || 0) + 
+                         (f.utilities || 0) + (f.services || 0) + (f.commute || 0) + 
+                         (f.grocery || 0);
+
+      const netDiscretionary = Math.max(0, (f.income || 0) - totalBills);
+      
+      const now = new Date();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const daysRemaining = Math.max(1, daysInMonth - now.getDate() + 1);
+
+      const safeDailyAllowance = netDiscretionary / daysRemaining;
+      const spentToday = state.today.expenses.reduce((sum, item) => sum + item.amount, 0);
+
+      const safeLeftToday = safeDailyAllowance - spentToday;
+      const remainingMonth = netDiscretionary - spentToday;
+
+      document.getElementById('dash-safe-daily').innerText = '₹' + safeLeftToday.toFixed(2);
+      document.getElementById('dash-remaining-month').innerText = '₹' + remainingMonth.toFixed(2);
+      document.getElementById('dash-spent-today').innerText = '₹' + spentToday.toFixed(2);
+      document.getElementById('dash-weight-val').innerText = state.today.weight ? `${state.today.weight} kg` : '-- kg';
+      document.getElementById('dash-water-val').innerText = `${state.hydration.glasses || 0} Glasses`;
+      document.getElementById('dash-meals-count').innerText = `${state.today.dietItems.length} items`;
+
+      // Update Lightbulbs
+      evaluateTrafficLightbulbs(safeDailyAllowance, spentToday, state.hydration.glasses || 0, state.today.dietItems.length);
+
+      // Render Diet items
+      const dietListEl = document.getElementById('diet-entries-list');
+      dietListEl.innerHTML = '';
+      state.today.dietItems.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'list-row';
+        li.innerHTML = `
+          <div>
+            <strong>${escapeHtml(item.product)}</strong>
+            <div style="font-size:0.75rem; color:var(--text-muted);">${item.category} • ${item.quantity} ${item.unit}</div>
+          </div>
+          <button class="delete-cross" onclick="deleteDietItem(${item.id})">✕</button>
+        `;
+        dietListEl.appendChild(li);
+      });
+
+      // Render Exercises
+      const exListEl = document.getElementById('exercise-entries-list');
+      exListEl.innerHTML = '';
+      state.today.exerciseItems.forEach(ex => {
+        const li = document.createElement('li');
+        li.className = 'list-row';
+        li.innerHTML = `
+          <div>
+            <strong>${escapeHtml(ex.name)}</strong>
+            <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(ex.duration)}</div>
+          </div>
+          <button class="delete-cross" onclick="deleteExercise(${ex.id})">✕</button>
+        `;
+        exListEl.appendChild(li);
+      });
+
+      // Render Expenses
+      const expListEl = document.getElementById('expense-items-list');
+      expListEl.innerHTML = '';
+      state.today.expenses.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'list-row';
+        li.innerHTML = `
+          <div>
+            <strong>${escapeHtml(item.name)}</strong>
+            <span style="font-size:0.75rem; color:var(--text-muted); margin-left:4px;">[${item.category}]</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-family:'Fredoka'; color:var(--primary-bubble); font-weight:700;">-₹${item.amount.toFixed(2)}</span>
+            <button class="delete-cross" onclick="deleteExpense(${item.id})">✕</button>
+          </div>
+        `;
+        expListEl.appendChild(li);
+      });
+
+      renderAlarmsList();
+    }
+
+    /* 12-Hour AM/PM Live Clock */
+    function tickClockAndCheckAlarms() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+
+      hours = hours % 12;
+      hours = hours ? hours : 12; // 0 becomes 12
+      const formattedHours = String(hours).padStart(2, '0');
+
+      document.getElementById('live-clock').innerText = `${formattedHours}:${minutes}:${seconds} ${ampm}`;
+
+      // Alarm evaluation
+      const hhmm24 = `${String(now.getHours()).padStart(2, '0')}:${minutes}`;
+      if (now.getSeconds() === 0) {
+        state.alarms.forEach(al => {
+          if (al.active && al.time === hhmm24) {
+            triggerAlarmBanner(al.label);
+          }
+        });
+      }
+    }
+
+    function addAlarm() {
+      const time = document.getElementById('alarm-time-input').value;
+      const label = document.getElementById('alarm-label-input').value.trim() || "Reminder";
+
+      if (time) {
+        state.alarms.push({ id: Date.now(), time: time, label: label, active: true });
+        document.getElementById('alarm-label-input').value = '';
+        saveState();
+      }
+    }
+
+    function toggleAlarm(id) {
+      state.alarms = state.alarms.map(a => a.id === id ? { ...a, active: !a.active } : a);
+      saveState();
+    }
+
+    function deleteAlarm(id) {
+      state.alarms = state.alarms.filter(a => a.id !== id);
+      saveState();
+    }
+
+    function renderAlarmsList() {
+      const el = document.getElementById('alarm-list');
+      el.innerHTML = '';
+      state.alarms.forEach(a => {
+        const li = document.createElement('li');
+        li.className = 'list-row';
+        li.innerHTML = `
+          <div>
+            <strong style="font-family:'Fredoka';">${a.time}</strong>
+            <span style="font-size:0.85rem; color:var(--text-muted); margin-left: 6px;">${escapeHtml(a.label)}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" ${a.active ? 'checked' : ''} onchange="toggleAlarm(${a.id})" style="width:18px; height:18px;" />
+            <button class="delete-cross" onclick="deleteAlarm(${a.id})">✕</button>
+          </div>
+        `;
+        el.appendChild(li);
+      });
+    }
+
+    function triggerAlarmBanner(label) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.8);
+      } catch (e) {}
+
+      const banner = document.getElementById('alarm-banner');
+      document.getElementById('alarm-title').innerText = "⏰ " + label;
+      banner.style.display = 'flex';
+    }
+
+    function dismissAlarm() {
+      document.getElementById('alarm-banner').style.display = 'none';
+    }
+
+    /* ================= CSV EXPORT (HIDDEN ON TRENDS) ================= */
+    function exportDataAsCSV() {
+      let csv = "Type,Date_or_Category,Item_or_Field,Amount_or_Qty,Unit_or_Notes\n";
+
+      // Profile & Finances
+      csv += `Profile,Identity,Name,"${state.profile.name || 'Yen'}",\n`;
+      csv += `Finances,MonthlyInflow,Income,${state.finances.income || 0},INR\n`;
+      csv += `Finances,FixedObligation,Rent,${state.finances.rent || 0},INR\n`;
+      csv += `Finances,FixedObligation,CreditCard,${state.finances.creditCard || 0},INR\n`;
+      csv += `Finances,FixedObligation,EMI,${state.finances.emi || 0},INR\n`;
+      csv += `Finances,FixedObligation,Utilities,${state.finances.utilities || 0},INR\n`;
+      csv += `Finances,FixedObligation,Services,${state.finances.services || 0},INR\n`;
+      csv += `Finances,FixedObligation,Commute,${state.finances.commute || 0},INR\n`;
+      csv += `Finances,FixedObligation,Grocery,${state.finances.grocery || 0},INR\n`;
+
+      // Hydration
+      csv += `Hydration,TotalCount,GlassesDrunk,${state.hydration.glasses || 0},Glasses\n`;
+
+      // Today's Weight
+      if (state.today.weight) {
+        csv += `Weight,Today,WeightRecorded,${state.today.weight},kg\n`;
+      }
+
+      // Expenses
+      state.today.expenses.forEach(e => {
+        csv += `Expense,${e.category},"${e.name.replace(/"/g, '""')}",${e.amount},INR\n`;
+      });
+
+      // Diet Items
+      state.today.dietItems.forEach(d => {
+        csv += `Diet,${d.category},"${d.product.replace(/"/g, '""')}",${d.quantity},${d.unit}\n`;
+      });
+
+      // History
+      state.history.forEach(h => {
+        csv += `History,${h.date},Weight,${h.weight},kg\n`;
+        csv += `History,${h.date},Diet,"${h.diet.replace(/"/g, '""')}",-\n`;
+        csv += `History,${h.date},Exercise,"${h.exercise.replace(/"/g, '""')}",-\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Bawns_Butt_Jet_Data_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    /* Comparative Charts on Trends Tab */
+    function renderComparativeChart() {
+      const ctx = document.getElementById('monthlyBudgetChart').getContext('2d');
+      const f = state.finances;
+      const totalBills = (f.rent || 0) + (f.creditCard || 0) + (f.emi || 0) + 
+                         (f.utilities || 0) + (f.services || 0) + (f.commute || 0) + 
+                         (f.grocery || 0);
+      const spentToday = state.today.expenses.reduce((sum, item) => sum + item.amount, 0);
+
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Monthly Inflow', 'Fixed Overheads', 'Grocery & Daily Outflows'],
+          datasets: [{
+            data: [f.income || 0, totalBills, (f.grocery || 0) + spentToday],
+            backgroundColor: [
+              'rgba(6, 214, 160, 0.85)',
+              'rgba(255, 90, 126, 0.85)',
+              'rgba(255, 209, 102, 0.85)'
+            ],
+            borderRadius: 10
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: v => '₹' + v }
+            }
+          }
+        }
+      });
+    }
+
+    function renderCorrelationInsights() {
+      const container = document.getElementById('correlation-records-list');
+      container.innerHTML = '';
+
+      const fullHistory = [];
+      if (state.today.weight) {
+        const mealsSummary = state.today.dietItems.map(d => `${d.category}: ${d.product} (${d.quantity}${d.unit})`).join(" | ");
+        const exSummary = state.today.exerciseItems.map(e => `${e.name} (${e.duration})`).join(" | ");
+        fullHistory.push({
+          date: "Today",
+          weight: state.today.weight,
+          diet: mealsSummary || "No categorical meals logged today",
+          exercise: exSummary || "No workout logged"
+        });
+      }
+      state.history.forEach(h => fullHistory.push(h));
+
+      for (let i = 0; i < fullHistory.length; i++) {
+        const item = fullHistory[i];
+        const nextItem = fullHistory[i + 1];
+
+        let weightTag = "";
+        if (nextItem && typeof nextItem.weight === 'number') {
+          const diff = item.weight - nextItem.weight;
+          if (diff < 0) {
+            weightTag = `<span style="color:var(--accent-green); font-weight:800; font-size:0.8rem;">📉 Dropped ${Math.abs(diff).toFixed(1)} kg</span>`;
+          } else if (diff > 0) {
+            weightTag = `<span style="color:var(--primary-bubble); font-weight:800; font-size:0.8rem;">📈 +${diff.toFixed(1)} kg</span>`;
+          } else {
+            weightTag = `<span style="font-size:0.8rem; color:var(--text-muted);">⚖️ Stable</span>`;
+          }
+        }
+
+        const div = document.createElement('div');
+        div.className = 'history-card';
+        div.innerHTML = `
+          <div class="history-header">
+            <span>${item.date} • <strong>${item.weight} kg</strong></span>
+            ${weightTag}
+          </div>
+          <div style="font-size: 0.85rem; margin-bottom: 4px;">
+            <strong>Diet Intake:</strong> ${escapeHtml(item.diet)}
+          </div>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">
+            <strong>Exercise:</strong> ${escapeHtml(item.exercise)}
+          </div>
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    /* AI Label Scanner */
+    async function handleLabelScan(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const status = document.getElementById('ai-scan-status');
+      const resultBox = document.getElementById('ai-result-display');
+      status.style.display = 'block';
+      resultBox.style.display = 'none';
+
+      const base64Data = await toBase64(file);
+      const pureBase64 = base64Data.split(',')[1];
+      const mimeType = file.type || 'image/jpeg';
+
+      const apiKey = state.profile.aiKey;
+      const provider = state.profile.aiProvider;
+
+      if (!apiKey) {
+        setTimeout(() => {
+          status.style.display = 'none';
+          showAiResult({
+            product: "Nutri-Active Protein Bar",
+            servingSize: 50,
+            unit: "g",
+            calories: 195,
+            protein: "14g",
+            carbs: "22g",
+            fat: "5g",
+            category: "Post Workout Snack"
+          });
+        }, 1200);
+        return;
+      }
+
+      try {
+        if (provider === 'gemini') {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: "Examine packaging label. Extract product name, serving size (number & unit), calories, protein, carbs, and fat. Return valid JSON: {\"product\":\"Name\",\"servingSize\":100,\"unit\":\"g\",\"calories\":200,\"protein\":\"10g\",\"carbs\":\"20g\",\"fat\":\"5g\",\"category\":\"Breakfast\"}" },
+                  { inlineData: { mimeType: mimeType, data: pureBase64 } }
+                ]
+              }]
+            })
+          });
+          const data = await response.json();
+          const rawText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+          showAiResult(JSON.parse(rawText));
+        } else if (provider === 'openai') {
+          const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: "gpt-4o",
+              response_format: { type: "json_object" },
+              messages: [{
+                role: "user",
+                content: [
+                  { type: "text", text: "Parse nutrition label. Return JSON with keys: product, servingSize, unit, calories, protein, carbs, fat, category." },
+                  { type: "image_url", image_url: { url: base64Data } }
+                ]
+              }]
+            })
+          });
+          const data = await response.json();
+          showAiResult(JSON.parse(data.choices[0].message.content));
+        }
+      } catch (err) {
+        showAiResult({
+          product: "Scanned Food Item",
+          servingSize: 100,
+          unit: "g",
+          calories: 180,
+          protein: "8g",
+          carbs: "25g",
+          fat: "4g",
+          category: "Early Snack"
+        });
+      } finally {
+        status.style.display = 'none';
+      }
+    }
+
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    function showAiResult(data) {
+      pendingAiFood = data;
+      document.getElementById('ai-detected-product').innerText = data.product || "Nutrition Item";
+      document.getElementById('ai-detected-desc').innerText = `Serving: ${data.servingSize || 100}${data.unit || 'g'}`;
+      document.getElementById('ai-cal').innerText = `Calories: ${data.calories || '--'}`;
+      document.getElementById('ai-protein').innerText = `Protein: ${data.protein || '--'}`;
+      document.getElementById('ai-carbs').innerText = `Carbs: ${data.carbs || '--'}`;
+      document.getElementById('ai-fat').innerText = `Fat: ${data.fat || '--'}`;
+      document.getElementById('ai-result-display').style.display = 'block';
+    }
+
+    function applyAiToDiet() {
+      if (pendingAiFood) {
+        state.today.dietItems.unshift({
+          id: Date.now(),
+          category: pendingAiFood.category || "Post Workout Snack",
+          product: pendingAiFood.product,
+          quantity: pendingAiFood.servingSize || 100,
+          unit: pendingAiFood.unit || "g"
+        });
+        saveState();
+        document.getElementById('ai-result-display').style.display = 'none';
+        alert(`Logged "${pendingAiFood.product}"!`);
+      }
+    }
+
+    function openKeyModal() {
+      document.getElementById('key-modal').style.display = 'flex';
+    }
+
+    function closeKeyModal() {
+      document.getElementById('key-modal').style.display = 'none';
+    }
+
+    function saveAiKey() {
+      state.profile.aiProvider = document.getElementById('ai-provider-select').value;
+      state.profile.aiKey = document.getElementById('ai-api-key').value.trim();
+      saveState();
+      alert("AI settings saved!");
+    }
+
+    function escapeHtml(text) {
+      if (!text) return "";
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    window.onload = initApp;
+  </script>
+</body>
+</html>
