@@ -1,21 +1,27 @@
 {
-  "background_color": "#ffffff",
-  "dir": "ltr",
-  "display": "standalone",
-  "name": "yentldawn.github",
-  "orientation": "portrait",
-  "scope": "/Bawns-Buttjet/",
-  "short_name": "yentldawn.github",
+  "name": "Bawn's Butt Jet",
+  "short_name": "ButtJet",
+  "description": "Personal health, budget and diet tracker",
+  "id": "bawns-buttjet-app",
   "start_url": "/Bawns-Buttjet/",
-  "theme_color": "#ffffff",
-  "id": "Bawn's ButtJet",
-  "description": "Finance &amp; Fitness Tracker App",
-  "lang": "en",
-  "categories": [
-    "finance",
-    "health",
-    "lifestyle"
-  ],
-  "iarc_rating_id": "Bawn's ButtJet",
-  "prefer_related_applications": true
+  "scope": "/Bawns-Buttjet/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "dir": "ltr",
+  "background_color": "#FFF9F3",
+  "theme_color": "#FF5A7E",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
