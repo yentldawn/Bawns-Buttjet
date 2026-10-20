@@ -1,0 +1,35 @@
+{
+  "background_color": "#fff9f3",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Bawn's Butt Jet",
+  "orientation": "portrait",
+  "scope": "/Bawns-Buttjet/",
+  "short_name": "ButtJet",
+  "start_url": "/Bawns-Buttjet/",
+  "theme_color": "#ff5a7e",
+  "id": "bawns-buttjet-app",
+  "description": "Personal health, budget and diet tracker",
+  "lang": "en",
+  "categories": [
+    "finance",
+    "fitness",
+    "food",
+    "health",
+    "productivity"
+  ],
+  "edge_side_panel": {
+    "preferred_width": 0
+  },
+  "share_target": {
+    "method": "GET",
+    "params": {
+      "title": "Bawn's Buttjet",
+      "text": "Finance &amp;amp; Firness Tracker",
+      "url": "https://yentldawn.github.io/Bawns-Buttjet/"
+    },
+    "action": "https://yentldawn.github.io/Bawns-Buttjet/"
+  },
+  "iarc_rating_id": "Bawn's Butt Jet",
+  "prefer_related_applications": true
+}
