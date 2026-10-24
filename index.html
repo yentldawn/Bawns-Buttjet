@@ -4,19 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Buttjet - Daily Calendar & Wellness Companion</title>
-  
-  <!-- Tailwind CSS -->
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Google Fonts: Plus Jakarta Sans (Universal/Crisp) & Fredoka + Quicksand (Bubble & Soft Rounding) -->
+
+  <!-- Google Fonts: Plus Jakarta Sans, Fredoka, Quicksand -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- Firebase v9 Compat for direct zero-build browser runtime -->
+  <!-- Firebase v9 Compat Web SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -33,28 +33,39 @@
           },
           colors: {
             pastel: {
-              bg: '#FFF8F4',
+              bg: '#FFFDF9',
               card: '#FFFFFF',
-              cardSubtle: '#FFF1F4',
-              accent: '#FF7597',
-              accentLight: '#FFE2EA',
+              cardSubtle: '#FFF5F7',
+              accent: '#FF5A7E',
+              accentHover: '#E84569',
+              accentLight: '#FFE3EC',
               lavender: '#EEDBFF',
+              lavenderSubtle: '#F6EEFF',
               mint: '#D8F7EE',
               text: '#2D1B2E',
               subtext: '#765C78',
-              border: '#F8D8E3'
+              border: '#F8D8E3',
+              safeGreen: '#10B981'
             },
             electric: {
               bg: '#0E0B16',
               card: '#181326',
-              cardSubtle: '#221B35',
+              cardSubtle: '#221937',
               accent: '#FF007F',
+              accentHover: '#E0006F',
+              accentLight: '#3D1035',
               cyan: '#00F5D4',
               purple: '#9B5DE5',
               text: '#F5F5FA',
               subtext: '#9D97B5',
-              border: '#33274D'
+              border: '#33274D',
+              safeGreen: '#00F5D4'
             }
+          },
+          boxShadow: {
+            'bubble': '0 8px 24px -4px rgba(255, 90, 126, 0.25)',
+            'bubble-lg': '0 16px 36px -6px rgba(255, 90, 126, 0.35)',
+            'electric-glow': '0 0 20px rgba(255, 0, 127, 0.4), 0 0 40px rgba(0, 245, 212, 0.2)'
           }
         }
       }
@@ -62,7 +73,6 @@
   </script>
 
   <style>
-    /* Custom Smooth Transitions & Scrollbars */
     * {
       -webkit-tap-highlight-color: transparent;
       user-select: none;
@@ -78,135 +88,173 @@
       scrollbar-width: none;
     }
 
-    /* 3D Bubble Text Styling */
-    .bubble-3d-pink {
+    /* 3D Tactile Bubble Text styling */
+    .bubble-text-pink {
       font-family: 'Fredoka', cursive;
-      color: #FF5A7E;
-      text-shadow: 
-        0 2px 0 #e03b63,
-        0 4px 0 #c2294e,
-        0 6px 12px rgba(255, 90, 126, 0.35);
+      color: #FF70A6;
+      display: inline-block;
+      text-shadow:
+        0 2px 0 #E34A83,
+        0 4px 0 #BD2B64,
+        0 6px 14px rgba(255, 112, 166, 0.45);
     }
-    .bubble-3d-purple {
+    .bubble-text-lavender {
       font-family: 'Fredoka', cursive;
-      color: #B272FA;
-      text-shadow: 
-        0 2px 0 #9346eb,
-        0 4px 0 #7826d4,
-        0 6px 12px rgba(178, 114, 250, 0.35);
+      color: #B388FF;
+      display: inline-block;
+      text-shadow:
+        0 2px 0 #8E5FE2,
+        0 4px 0 #6C3EB8,
+        0 6px 14px rgba(179, 136, 255, 0.45);
     }
 
-    /* Intro Opening Wall Blocks Animation */
-    @keyframes fallWallLeft {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      40% { transform: translateY(15px) rotate(-4deg); opacity: 0.95; }
-      100% { transform: translateY(240px) rotate(-22deg); opacity: 0; pointer-events: none; }
-    }
-    @keyframes fallWallRight {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      40% { transform: translateY(15px) rotate(4deg); opacity: 0.95; }
-      100% { transform: translateY(240px) rotate(22deg); opacity: 0; pointer-events: none; }
-    }
-    @keyframes revealPassRight {
-      0% { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); opacity: 0; transform: translateX(-24px); }
-      100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); opacity: 1; transform: translateX(0); }
-    }
-
-    .wall-fall-l {
-      animation: fallWallLeft 1.4s cubic-bezier(0.55, 0, 0.8, 0.5) 1.2s forwards;
-    }
-    .wall-fall-r {
-      animation: fallWallRight 1.4s cubic-bezier(0.55, 0, 0.8, 0.5) 1.35s forwards;
-    }
-    .reveal-content {
-      animation: revealPassRight 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+    /* Concept 1: Soap Bubble Inflation Animation Keyframes */
+    @keyframes bubbleInflate {
+      0% {
+        transform: scale(0.08);
+        opacity: 0.3;
+        border-radius: 50%;
+      }
+      45% {
+        transform: scale(1.06);
+        opacity: 0.95;
+        border-radius: 46% 54% 52% 48% / 51% 47% 53% 49%;
+      }
+      70% {
+        transform: scale(0.97);
+        border-radius: 52% 48% 47% 53% / 48% 52% 48% 52%;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+        border-radius: 40px;
+      }
     }
 
-    /* Water Droplet Pulse */
-    @keyframes popIn {
-      0% { transform: scale(0.6); opacity: 0.2; }
-      70% { transform: scale(1.15); }
-      100% { transform: scale(1); opacity: 1; }
+    @keyframes fadeInSlideDown {
+      0% { opacity: 0; transform: translateY(-12px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
-    .droplet-pop {
-      animation: popIn 0.25s ease-out;
+
+    @keyframes bounceLetter {
+      0% { transform: translateY(35px) scale(0.6); opacity: 0; }
+      55% { transform: translateY(-10px) scale(1.15); opacity: 1; }
+      75% { transform: translateY(4px) scale(0.95); }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    @keyframes anchorSlideUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .bubble-sphere {
+      animation: bubbleInflate 1.8s cubic-bezier(0.28, 0.84, 0.42, 1) forwards;
+    }
+    .thisis-fade {
+      opacity: 0;
+      animation: fadeInSlideDown 0.8s ease-out 0.9s forwards;
+    }
+    .letter-bounce {
+      opacity: 0;
+      animation: bounceLetter 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .anchor-brand {
+      opacity: 0;
+      animation: anchorSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2.1s forwards;
+    }
+
+    /* Droplet Pop Animation */
+    @keyframes dropPulse {
+      0% { transform: scale(0.7); }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .drop-pop {
+      animation: dropPulse 0.25s ease-out;
     }
   </style>
 </head>
-<body class="bg-pastel-bg text-pastel-text transition-colors duration-300 font-sans min-h-screen flex flex-col justify-between overflow-x-hidden" id="appBody">
+<body id="appBody" class="bg-pastel-bg text-pastel-text transition-colors duration-300 font-sans min-h-screen flex flex-col justify-between overflow-x-hidden">
 
-  <!-- ==================== 1. SLOW SINGLE-PASS INTRO OVERLAY ==================== -->
-  <div id="introOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FFF7F4] px-6 transition-opacity duration-700">
-    <div class="relative w-full max-w-sm flex flex-col items-center">
-      
-      <!-- Top Wall Blocks labeled "This is" -->
-      <div class="relative w-full flex justify-center items-center gap-3 mb-4 z-20">
-        <div class="wall-fall-l bg-[#FFB5C5] text-[#7A1D37] font-bubble font-bold text-lg md:text-xl px-5 py-3 rounded-2xl shadow-lg border-2 border-[#FFA0B5]">
-          This
-        </div>
-        <div class="wall-fall-r bg-[#FFB5C5] text-[#7A1D37] font-bubble font-bold text-lg md:text-xl px-5 py-3 rounded-2xl shadow-lg border-2 border-[#FFA0B5]">
-          is
-        </div>
-      </div>
+  <!-- ==================== 1. OPENING ANIMATION: CONCEPT 1 (EXPANDING PLAYFUL BUBBLE) ==================== -->
+  <div id="introOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FFF9F3] px-6 transition-opacity duration-700">
+    <!-- Top Instant Skip Button -->
+    <button onclick="dismissIntro()" class="absolute top-6 right-6 text-xs font-semibold uppercase tracking-wider text-[#9E7385] hover:text-[#2D1B2E] transition-colors py-1.5 px-3 rounded-full border border-[#FFCAD7] bg-white/70 shadow-sm z-30">
+      Skip ✕
+    </button>
 
-      <!-- Content Behind the Falling Blocks -->
-      <div class="reveal-content flex flex-col items-center text-center z-10 w-full">
-        <!-- 3D Bubble Text: Girl Math -->
-        <div class="flex items-center justify-center gap-3 text-5xl md:text-6xl py-2">
-          <span class="bubble-3d-pink">Girl</span>
-          <span class="bubble-3d-purple">Math</span>
+    <!-- Expanding Bubble Container -->
+    <div class="relative w-full max-w-sm flex flex-col items-center justify-center">
+      <!-- Tactile Soap Bubble Background Card -->
+      <div class="bubble-sphere absolute w-72 h-72 md:w-80 md:h-80 bg-gradient-to-tr from-[#FFE4EE] via-[#FFF1F6] to-[#EEDBFF] shadow-bubble-lg border-2 border-white/80 pointer-events-none -z-10"></div>
+
+      <!-- Animation Content -->
+      <div class="flex flex-col items-center text-center z-10 px-4 py-8">
+        <!-- "This is" -->
+        <span class="thisis-fade text-sm md:text-base font-semibold uppercase tracking-widest text-[#9C657B] font-rounded mb-1">
+          This is
+        </span>
+
+        <!-- "Girl Math" in Bouncing 3D Bubble Letters -->
+        <div class="flex items-center justify-center gap-1 text-5xl md:text-6xl py-2 my-1 select-none">
+          <span class="letter-bounce bubble-text-pink" style="animation-delay: 1.1s;">G</span>
+          <span class="letter-bounce bubble-text-pink" style="animation-delay: 1.18s;">i</span>
+          <span class="letter-bounce bubble-text-pink" style="animation-delay: 1.26s;">r</span>
+          <span class="letter-bounce bubble-text-pink" style="animation-delay: 1.34s;">l</span>
+          <span class="w-3"></span>
+          <span class="letter-bounce bubble-text-lavender" style="animation-delay: 1.45s;">M</span>
+          <span class="letter-bounce bubble-text-lavender" style="animation-delay: 1.53s;">a</span>
+          <span class="letter-bounce bubble-text-lavender" style="animation-delay: 1.61s;">t</span>
+          <span class="letter-bounce bubble-text-lavender" style="animation-delay: 1.69s;">h</span>
         </div>
 
-        <p class="text-sm font-rounded text-[#8C6575] mt-1 mb-5 font-semibold tracking-wide">
+        <p class="thisis-fade text-xs md:text-sm font-rounded text-[#8C6575] mt-2 mb-6 font-semibold tracking-wide" style="animation-delay: 1.8s;">
           Guilt-free calendar, hydration & wellness
         </p>
 
-        <!-- Buttjet Universal Branding -->
-        <div class="mt-2 bg-white/90 backdrop-blur-md px-6 py-2.5 rounded-full shadow-sm border border-[#FFD3DF] flex items-center gap-2">
+        <!-- "Buttjet" Anchored in Universal Plus Jakarta Sans -->
+        <div class="anchor-brand bg-white/95 backdrop-blur-md px-6 py-2.5 rounded-full shadow-sm border border-[#FFD3DF] flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-[#FF5A7E] animate-ping"></span>
           <span class="font-sans font-extrabold text-xl tracking-tight text-[#2D1B2E]">Buttjet</span>
         </div>
       </div>
-
-      <button id="skipIntroBtn" onclick="dismissIntro()" class="mt-10 text-xs font-semibold uppercase tracking-wider text-[#9E7385] hover:text-[#2D1B2E] transition-colors py-2 px-4 rounded-full border border-[#FFCAD7] bg-white/50">
-        Skip &rarr;
-      </button>
     </div>
   </div>
 
-  <!-- ==================== 2. MAIN HEADER & GLOBAL NAVIGATION ==================== -->
-  <header class="sticky top-0 z-40 bg-white/80 dark:bg-electric-card/80 backdrop-blur-md border-b border-pastel-border dark:border-electric-border px-4 py-3">
+  <!-- ==================== 2. HEADER & NAVIGATION ==================== -->
+  <header class="sticky top-0 z-40 bg-white/85 dark:bg-electric-card/85 backdrop-blur-md border-b border-pastel-border dark:border-electric-border px-4 py-3">
     <div class="max-w-md mx-auto flex items-center justify-between">
       
-      <!-- Brand & Active Date -->
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-pastel-accent to-[#B272FA] flex items-center justify-center text-white shadow-md font-bubble text-lg">
+      <!-- Logo & Active Date Tag -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-pastel-accent to-[#B272FA] flex items-center justify-center text-white shadow-md font-bubble text-lg font-bold">
           B
         </div>
         <div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5">
             <h1 class="font-extrabold text-lg tracking-tight text-pastel-text dark:text-electric-text leading-none">
               Buttjet
             </h1>
-            <span id="headerSyncStatus" class="inline-block w-2 h-2 rounded-full bg-emerald-400" title="Data synced"></span>
+            <span id="cloudSyncIndicator" class="w-2 h-2 rounded-full bg-emerald-400" title="Cloud / Storage Synced"></span>
           </div>
-          <span id="activeDateDisplay" class="text-xs font-medium text-pastel-subtext dark:text-electric-subtext">
+          <span id="activeDateHeaderLabel" class="text-xs font-semibold text-pastel-subtext dark:text-electric-subtext">
             Today
           </span>
         </div>
       </div>
 
-      <!-- Action Icons: AI Companion, Theme Toggle, Profile / Sign-in -->
+      <!-- Action Buttons: Theme Toggle, Companion Trigger, Profile -->
       <div class="flex items-center gap-1.5">
-        <!-- Companion Trigger -->
-        <button onclick="toggleCompanionDrawer()" class="p-2 rounded-full hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan transition-colors" title="AI Sanctuary">
+        <!-- Companion Drawer Trigger -->
+        <button onclick="toggleCompanionDrawer()" class="p-2 rounded-full hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan transition-all" title="Ask Companion Sanctuary">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
           </svg>
         </button>
 
-        <!-- Theme Toggle -->
-        <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle text-pastel-subtext dark:text-electric-subtext transition-colors" title="Switch Theme">
+        <!-- Dual Theme Toggle (Pastel <-> Electric) -->
+        <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle text-pastel-subtext dark:text-electric-subtext transition-all" title="Toggle Theme">
           <svg id="themeIconSun" class="w-5 h-5 hidden dark:block text-electric-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
           </svg>
@@ -215,9 +263,9 @@
           </svg>
         </button>
 
-        <!-- Profile & Account Trigger -->
-        <button onclick="openProfileModal()" class="p-1 rounded-full border border-pastel-border dark:border-electric-border overflow-hidden" title="Account & Preferences">
-          <div id="userAvatarBadge" class="w-7 h-7 rounded-full bg-pastel-accentLight dark:bg-electric-purple text-pastel-accent dark:text-white flex items-center justify-center font-bold text-xs">
+        <!-- Profile / Settings Trigger -->
+        <button onclick="openProfileModal()" class="p-1 rounded-full border border-pastel-border dark:border-electric-border" title="Profile & Cloud Account">
+          <div id="userAvatarPill" class="w-7 h-7 rounded-full bg-pastel-accentLight dark:bg-electric-purple text-pastel-accent dark:text-white flex items-center justify-center font-bold text-xs">
             U
           </div>
         </button>
@@ -228,98 +276,99 @@
 
   <!-- ==================== 3. HYBRID CALENDAR CONTROLLER ==================== -->
   <section class="max-w-md mx-auto w-full px-4 pt-3 pb-1">
-    <!-- View Switcher & Month Header -->
+    <!-- Month Title & View Switcher -->
     <div class="flex items-center justify-between mb-2">
       <div class="flex items-center gap-2">
-        <h2 id="calendarMonthLabel" class="font-bold text-base text-pastel-text dark:text-electric-text">
+        <h2 id="currentMonthYearLabel" class="font-bold text-base text-pastel-text dark:text-electric-text">
           October 2026
         </h2>
-        <button onclick="jumpToToday()" class="text-xs bg-pastel-accentLight dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold px-2 py-0.5 rounded-full hover:opacity-80 transition-opacity">
+        <button onclick="jumpToToday()" class="text-xs bg-pastel-accentLight dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold px-2 py-0.5 rounded-full hover:opacity-85 transition-opacity">
           Today
         </button>
       </div>
 
-      <!-- Toggle: Ribbon vs Month Grid -->
+      <!-- Toggle: Ribbon vs Grid View -->
       <div class="flex items-center bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-xl p-0.5 shadow-sm text-xs font-semibold">
         <button id="viewRibbonBtn" onclick="switchCalendarView('ribbon')" class="px-2.5 py-1 rounded-lg bg-pastel-accent text-white dark:bg-electric-accent transition-all">
           Week
         </button>
-        <button id="viewGridBtn" onclick="switchCalendarView('grid')" class="px-2.5 py-1 rounded-lg text-pastel-subtext dark:text-electric-subtext hover:text-pastel-text dark:hover:text-electric-text transition-all">
-          Month
+        <button id="viewGridBtn" onclick="switchCalendarView('grid')" class="px-2.5 py-1 rounded-lg text-pastel-subtext dark:text-electric-subtext hover:text-pastel-text transition-all">
+          Grid
         </button>
       </div>
     </div>
 
     <!-- View A: Horizontal 7-Day Ribbon -->
     <div id="calendarRibbonContainer" class="flex items-center justify-between gap-1 overflow-x-auto py-1 no-scrollbar">
-      <!-- Days populated via JS -->
+      <!-- Injected via JavaScript -->
     </div>
 
-    <!-- View B: Full Month Block Grid (Collapsible) -->
+    <!-- View B: Full Month 7x5 Block Grid -->
     <div id="calendarGridContainer" class="hidden bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-2xl p-3 shadow-sm mt-1">
       <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-pastel-subtext dark:text-electric-subtext mb-2">
         <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
       </div>
       <div id="calendarGridDays" class="grid grid-cols-7 gap-1">
-        <!-- 35 Day cells populated via JS -->
+        <!-- 35 Day cells injected via JavaScript -->
       </div>
     </div>
   </section>
 
-  <!-- ==================== 4. ACTIVE DAY OPERATIONAL LEDGER ==================== -->
+  <!-- ==================== 4. DAILY ACTIVE LEDGER (FOCUS CARDS) ==================== -->
   <main class="max-w-md mx-auto w-full px-4 py-3 flex-1 flex flex-col gap-4">
 
     <!-- Card 1: Dual-Tier Water Tracker -->
     <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-3xl p-4 shadow-sm relative overflow-hidden">
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
           <div class="p-1.5 rounded-xl bg-cyan-100 dark:bg-cyan-950 text-cyan-500">
+            <!-- Rounded Droplet Icon -->
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 2c-.6 0-1.1.3-1.4.8C7.5 4.6 4 10.3 4 13a6 6 0 1012 0c0-2.7-3.5-8.4-4.6-10.2A1.6 1.6 0 0010 2zm0 15a4 4 0 01-4-4c0-1.8 2.2-5.6 4-8.2 1.8 2.6 4 6.4 4 8.2a4 4 0 01-4 4z" clip-rule="evenodd"/>
             </svg>
           </div>
           <div>
-            <h3 class="font-bold text-sm text-pastel-text dark:text-electric-text">Today's Hydration</h3>
+            <h3 class="font-bold text-sm text-pastel-text dark:text-electric-text">Today's Water</h3>
             <p class="text-[11px] text-pastel-subtext dark:text-electric-subtext">Target: 8 glasses (2.0L)</p>
           </div>
         </div>
 
-        <!-- Quick Reset/Decrement -->
-        <button onclick="adjustWater(-1)" class="w-8 h-8 rounded-full border border-pastel-border dark:border-electric-border flex items-center justify-center text-pastel-subtext hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle">
+        <!-- Decrement Button -->
+        <button onclick="adjustWater(-1)" class="w-8 h-8 rounded-full border border-pastel-border dark:border-electric-border flex items-center justify-center text-pastel-subtext hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle font-bold">
           -
         </button>
       </div>
 
-      <!-- Primary Visual: Glasses Count & Clickable Droplets -->
+      <!-- Primary Visual: Huge Display & Clickable Droplet Strip -->
       <div class="flex items-baseline gap-2 mb-3">
         <span id="waterDayCount" class="font-bubble text-4xl font-bold text-cyan-500 dark:text-electric-cyan">0</span>
         <span class="text-sm font-semibold text-pastel-subtext dark:text-electric-subtext">/ 8 Glasses</span>
       </div>
 
-      <!-- 8 Interactive Droplets -->
       <div id="waterDropletsRow" class="grid grid-cols-8 gap-1.5 py-1">
-        <!-- Rendered by JS -->
+        <!-- Rendered via JS -->
       </div>
 
-      <!-- Secondary Visual: Cumulative Total Glasses Across All Days -->
+      <!-- Secondary Visual: Cumulative Lifetime Hydration -->
       <div class="mt-3 pt-2.5 border-t border-pastel-border/60 dark:border-electric-border/60 flex items-center justify-between text-[11px] text-pastel-subtext dark:text-electric-subtext font-medium">
         <span>Lifetime Journey:</span>
-        <span id="waterCumulativeDisplay" class="font-bold text-pastel-text dark:text-electric-text">0 total glasses logged</span>
+        <span id="waterCumulativeCounter" class="font-bold text-pastel-text dark:text-electric-text">0 total glasses logged</span>
       </div>
     </div>
 
-    <!-- Card 2: Safe Spend & Financials ("Girl Math" Safe Budget) -->
+    <!-- Card 2: Money Blueprint ("Girl Math" Safe Spend vs Expenses) -->
     <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-3xl p-4 shadow-sm">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
           <div class="p-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-500">
+            <!-- Rounded Rupee/Wallet Icon -->
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.001-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </div>
           <div>
             <h3 class="font-bold text-sm text-pastel-text dark:text-electric-text">Safe Spend & Joy Money</h3>
-            <p id="safeSpendCalculatedLabel" class="text-[11px] text-pastel-subtext dark:text-electric-subtext">Safe limit: ₹500/day</p>
+            <p id="safeDailyCalculatedLabel" class="text-[11px] text-pastel-subtext dark:text-electric-subtext">Safe limit: ₹500/day</p>
           </div>
         </div>
 
@@ -328,7 +377,7 @@
         </button>
       </div>
 
-      <!-- Financial Metrics Ribbon -->
+      <!-- Financial Metrics Strip -->
       <div class="grid grid-cols-2 gap-2 mb-3 bg-pastel-cardSubtle dark:bg-electric-cardSubtle p-2.5 rounded-2xl">
         <div>
           <span class="text-[10px] uppercase font-bold text-pastel-subtext dark:text-electric-subtext">Spent Today</span>
@@ -340,7 +389,7 @@
         </div>
       </div>
 
-      <!-- Expense Items Logged for the Active Date -->
+      <!-- Daily Expense Items Logged -->
       <div id="dayExpensesList" class="flex flex-col gap-1.5 max-h-36 overflow-y-auto no-scrollbar">
         <!-- Rendered via JS -->
       </div>
@@ -351,6 +400,7 @@
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
           <div class="p-1.5 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-500">
+            <!-- Fork & Bowl Rounded Icon -->
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.87c1.355 0 2.697.055 4.024.165C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-4.5H6" />
             </svg>
@@ -362,30 +412,31 @@
         </div>
       </div>
 
-      <!-- Categorical Meals Tabs -->
-      <div class="grid grid-cols-4 gap-1 mb-3">
+      <!-- Categories Navigation -->
+      <div class="grid grid-cols-4 gap-1 mb-2.5">
         <button onclick="selectMealCategory('breakfast')" id="mealTab-breakfast" class="py-1 text-xs font-bold rounded-xl bg-pastel-accent text-white">B-Fast</button>
         <button onclick="selectMealCategory('lunch')" id="mealTab-lunch" class="py-1 text-xs font-bold rounded-xl bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-subtext">Lunch</button>
         <button onclick="selectMealCategory('dinner')" id="mealTab-dinner" class="py-1 text-xs font-bold rounded-xl bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-subtext">Dinner</button>
         <button onclick="selectMealCategory('snacks')" id="mealTab-snacks" class="py-1 text-xs font-bold rounded-xl bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-subtext">Snacks</button>
       </div>
 
-      <!-- Quick Pantry Tags -->
+      <!-- One-Tap Mumbai Pantry Quick-Chips -->
       <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 mb-2 text-xs">
-        <span class="text-[10px] font-bold text-pastel-subtext">Quick:</span>
-        <button onclick="quickAddPantry('Sattu Chaas')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap">+ Chaas</button>
-        <button onclick="quickAddPantry('2 Boiled Eggs')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap">+ Eggs</button>
-        <button onclick="quickAddPantry('Dal Khichdi')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap">+ Khichdi</button>
-        <button onclick="quickAddPantry('Sprouts Bhel')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap">+ Sprouts</button>
+        <span class="text-[10px] font-bold text-pastel-subtext whitespace-nowrap">Quick:</span>
+        <button onclick="quickAddPantry('Sattu Chaas')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Chaas</button>
+        <button onclick="quickAddPantry('2 Boiled Eggs')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Eggs</button>
+        <button onclick="quickAddPantry('Dal Khichdi')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Khichdi</button>
+        <button onclick="quickAddPantry('Poha with Peanuts')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Poha</button>
+        <button onclick="quickAddPantry('Fresh Papaya / Apple')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Fruit</button>
       </div>
 
-      <!-- Input for Custom Meal -->
+      <!-- Meal Input Form -->
       <div class="flex gap-2">
         <input type="text" id="mealInputText" placeholder="Log your plate..." class="flex-1 bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-pastel-accent">
-        <button onclick="addCurrentMeal()" class="bg-pastel-accent dark:bg-electric-accent text-white px-3 py-2 rounded-xl text-xs font-bold">Log</button>
+        <button onclick="addCurrentMeal()" class="bg-pastel-accent dark:bg-electric-accent text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm">Log</button>
       </div>
 
-      <!-- Current Selected Category Meal List -->
+      <!-- Current Category Meals List -->
       <div id="currentCategoryMealList" class="flex flex-col gap-1 mt-2.5 text-xs">
         <!-- Rendered via JS -->
       </div>
@@ -396,6 +447,7 @@
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
           <div class="p-1.5 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-500">
+            <!-- Scale / Gauge Icon -->
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m9-9H3" />
             </svg>
@@ -416,6 +468,16 @@
       </div>
     </div>
 
+    <!-- Card 5: Export & Backup Options -->
+    <div class="flex items-center justify-between gap-2 px-1 py-1 text-xs text-pastel-subtext dark:text-electric-subtext">
+      <button onclick="downloadJsonBackup()" class="flex items-center gap-1.5 hover:text-pastel-text transition-colors">
+        <span>📥 JSON Backup</span>
+      </button>
+      <button onclick="downloadCsvSummary()" class="flex items-center gap-1.5 hover:text-pastel-text transition-colors">
+        <span>📊 Export CSV</span>
+      </button>
+    </div>
+
   </main>
 
   <!-- ==================== 5. KIND AI COMPANION SANCTUARY (DRAWER) ==================== -->
@@ -424,7 +486,7 @@
     <!-- Drawer Header -->
     <div class="p-4 border-b border-pastel-border dark:border-electric-border flex items-center justify-between bg-pastel-cardSubtle dark:bg-electric-cardSubtle">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pastel-accent to-purple-400 flex items-center justify-center text-white text-xs font-bold">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pastel-accent to-purple-400 flex items-center justify-center text-white text-xs font-bold shadow-sm">
           ✨
         </div>
         <div>
@@ -439,31 +501,36 @@
       </button>
     </div>
 
-    <!-- Quick Action Prompts -->
+    <!-- Quick Prompt Chips -->
     <div class="px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-pastel-border/50 dark:border-electric-border/50 text-xs">
-      <button onclick="askCompanionPrompt('checkin')" class="px-2.5 py-1 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold whitespace-nowrap text-[11px] border border-pastel-border dark:border-electric-border">
-        💖 Mental Check-in
+      <button onclick="askCompanionPrompt('tired')" class="px-2.5 py-1 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold whitespace-nowrap text-[11px] border border-pastel-border dark:border-electric-border">
+        💖 I feel tired
       </button>
-      <button onclick="askCompanionPrompt('meal')" class="px-2.5 py-1 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold whitespace-nowrap text-[11px] border border-pastel-border dark:border-electric-border">
-        🍲 Comfort Meal Idea
+      <button onclick="askCompanionPrompt('snack')" class="px-2.5 py-1 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold whitespace-nowrap text-[11px] border border-pastel-border dark:border-electric-border">
+        🍲 5-min snack idea
       </button>
-      <button onclick="askCompanionPrompt('cheer')" class="px-2.5 py-1 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold whitespace-nowrap text-[11px] border border-pastel-border dark:border-electric-border">
-        🌸 Micro Cheer
+      <button onclick="askCompanionPrompt('okay')" class="px-2.5 py-1 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold whitespace-nowrap text-[11px] border border-pastel-border dark:border-electric-border">
+        🌸 Did I do okay today?
       </button>
     </div>
 
-    <!-- Chat Messages Flow -->
+    <!-- Live Gemini API Key Input (Optional) -->
+    <div class="px-4 py-2 bg-pastel-bg dark:bg-electric-bg border-b border-pastel-border/50 dark:border-electric-border/50 text-[11px] flex items-center justify-between">
+      <span class="text-pastel-subtext">Gemini Live Key:</span>
+      <input type="password" id="geminiApiKeyInput" placeholder="Optional AI key..." onchange="saveGeminiKey()" class="w-36 bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-lg px-2 py-0.5 text-xs outline-none">
+    </div>
+
+    <!-- Chat Message Feed -->
     <div id="companionMessages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 text-xs leading-relaxed">
-      <!-- Default Welcome Message -->
       <div class="self-start max-w-[85%] bg-pastel-cardSubtle dark:bg-electric-cardSubtle p-3 rounded-2xl rounded-tl-none border border-pastel-border dark:border-electric-border text-pastel-text dark:text-electric-text">
         Hello lovely! I am your Buttjet companion. Remember: you are doing beautifully, no matter what numbers appear on the scale or receipt today. How is your heart feeling right now?
       </div>
     </div>
 
-    <!-- Input Footer -->
+    <!-- Input Box -->
     <div class="p-3 border-t border-pastel-border dark:border-electric-border bg-pastel-bg dark:bg-electric-bg">
       <div class="flex gap-2">
-        <input type="text" id="companionInput" placeholder="Speak your mind or ask for advice..." onkeydown="if(event.key==='Enter') sendCompanionMessage()" class="flex-1 bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 text-xs outline-none">
+        <input type="text" id="companionInput" placeholder="Speak your mind or ask for gentle guidance..." onkeydown="if(event.key==='Enter') sendCompanionMessage()" class="flex-1 bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-pastel-accent">
         <button onclick="sendCompanionMessage()" class="bg-pastel-accent dark:bg-electric-accent text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm">
           Send
         </button>
@@ -471,7 +538,7 @@
     </div>
   </div>
 
-  <!-- ==================== 6. ONBOARDING & PREFERENCES WIZARD (MODAL) ==================== -->
+  <!-- ==================== 6. ONBOARDING & PROFILE WIZARD (MODAL) ==================== -->
   <div id="onboardingModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border w-full max-w-md rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
       
@@ -483,9 +550,9 @@
         <button onclick="closeProfileModal()" class="text-pastel-subtext hover:text-pastel-text text-sm font-bold">✕</button>
       </div>
 
-      <form id="onboardingForm" onsubmit="saveOnboardingProfile(event)" class="flex flex-col gap-4 text-xs">
+      <form id="onboardingForm" onsubmit="saveOnboardingProfile(event)" class="flex flex-col gap-3.5 text-xs">
         
-        <!-- Preferred Name -->
+        <!-- Nickname -->
         <div>
           <label class="block font-bold mb-1">Preferred Name / Nickname</label>
           <input type="text" id="obName" required placeholder="e.g. Dawn" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
@@ -498,7 +565,7 @@
             <option value="Female">Female</option>
             <option value="Male">Male</option>
             <option value="Non-binary">Non-binary</option>
-            <option value="Prefer not to say">Prefer not to say</option>
+            <option value="Prefer to self-describe">Prefer to self-describe</option>
           </select>
         </div>
 
@@ -518,12 +585,12 @@
         <div>
           <label class="block font-bold mb-1">Monthly Discretionary Budget (₹)</label>
           <input type="number" id="obMonthlyBudget" placeholder="e.g. 15000" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
-          <span class="text-[10px] text-pastel-subtext">Automatically sets your daily safe spending limit.</span>
+          <span class="text-[10px] text-pastel-subtext">Calculates daily safe spending limit.</span>
         </div>
 
         <!-- Date Format Preference -->
         <div>
-          <label class="block font-bold mb-1">Preferred Date Display Format</label>
+          <label class="block font-bold mb-1">Date Display Format</label>
           <select id="obDateFormat" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
             <option value="DD/MM/YYYY">DD/MM/YYYY (e.g. 24/10/2026)</option>
             <option value="MM/DD/YYYY">MM/DD/YYYY (e.g. 10/24/2026)</option>
@@ -531,14 +598,14 @@
           </select>
         </div>
 
-        <!-- Account Sign In & Cloud Sync Section -->
+        <!-- Cloud Account & Firebase Sync -->
         <div class="border-t border-pastel-border dark:border-electric-border pt-3 mt-1">
-          <label class="block font-bold mb-1.5">Cloud Account & Sync (Firebase)</label>
+          <label class="block font-bold mb-1.5">Cloud Sync & Account (Firebase)</label>
           <div class="flex flex-col gap-2">
-            <div id="authUserInfo" class="text-xs text-pastel-subtext mb-1">
+            <div id="authStatusLine" class="text-xs text-pastel-subtext mb-1">
               Currently operating in: <strong id="authStatusText">Guest Mode (Local)</strong>
             </div>
-            
+
             <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2 py-2 px-3 border border-pastel-border dark:border-electric-border rounded-xl font-bold bg-white dark:bg-electric-cardSubtle hover:opacity-90">
               <svg class="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -556,7 +623,7 @@
         </div>
 
         <button type="submit" class="mt-2 w-full bg-pastel-accent dark:bg-electric-accent text-white py-2.5 rounded-xl font-bold shadow-md hover:opacity-90">
-          Save Settings & Return
+          Save Settings & Continue
         </button>
 
       </form>
@@ -568,7 +635,7 @@
     <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border w-full max-w-sm rounded-3xl p-5 shadow-2xl">
       <div class="flex items-center justify-between mb-3">
         <h3 class="font-bold text-sm">Add Expense for Selected Date</h3>
-        <button onclick="closeAddExpenseModal()" class="text-pastel-subtext">✕</button>
+        <button onclick="closeAddExpenseModal()" class="text-pastel-subtext font-bold">✕</button>
       </div>
 
       <div class="flex flex-col gap-3 text-xs">
@@ -578,26 +645,26 @@
         </div>
 
         <div>
-          <label class="block font-bold mb-1">Category / Tag</label>
+          <label class="block font-bold mb-1">Category Tag</label>
           <div class="grid grid-cols-3 gap-1.5 mb-2">
-            <button type="button" onclick="setExpenseTag('Food')" class="tag-btn py-1 px-2 rounded-lg border border-pastel-border dark:border-electric-border text-center">Food</button>
-            <button type="button" onclick="setExpenseTag('Travel')" class="tag-btn py-1 px-2 rounded-lg border border-pastel-border dark:border-electric-border text-center">Travel</button>
-            <button type="button" onclick="setExpenseTag('Joy')" class="tag-btn py-1 px-2 rounded-lg border border-pastel-border dark:border-electric-border text-center">Joy</button>
+            <button type="button" onclick="setExpenseTag('Food')" class="expense-tag-btn py-1 px-2 rounded-lg border border-pastel-border dark:border-electric-border text-center bg-pastel-accent text-white">Food</button>
+            <button type="button" onclick="setExpenseTag('Travel')" class="expense-tag-btn py-1 px-2 rounded-lg border border-pastel-border dark:border-electric-border text-center">Travel</button>
+            <button type="button" onclick="setExpenseTag('Joy')" class="expense-tag-btn py-1 px-2 rounded-lg border border-pastel-border dark:border-electric-border text-center">Joy</button>
           </div>
           <input type="text" id="newExpenseDesc" placeholder="Description (e.g. Iced Latte)" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
         </div>
 
         <button onclick="saveNewExpense()" class="w-full bg-emerald-500 text-white py-2 rounded-xl font-bold shadow-sm mt-1">
-          Save to Calendar Day
+          Save to Day
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ==================== JAVASCRIPT LOGIC ENGINE ==================== -->
+  <!-- ==================== JAVASCRIPT APPLICATION ENGINE ==================== -->
   <script>
     /* ----------------------------------------------------
-       1. FIREBASE SETUP & INITIALIZATION
+       1. FIREBASE SDK INITIALIZATION
     ---------------------------------------------------- */
     const firebaseConfig = {
       apiKey: "AIzaSyBQJvpuJkKZjOZO5ERBW5PFyiwAFRwOCg0",
@@ -618,18 +685,19 @@
       auth = firebase.auth();
       db = firebase.firestore();
     } catch (e) {
-      console.warn("Firebase initialized in offline/fallback mode:", e);
+      console.warn("Firebase initialized in local/offline fallback mode:", e);
     }
 
     /* ----------------------------------------------------
-       2. STATE & DATA STRUCTURE
+       2. APPLICATION STATE
     ---------------------------------------------------- */
     const todayISO = new Date().toISOString().split('T')[0];
     let activeDateISO = todayISO;
     let calendarViewMode = 'ribbon'; // 'ribbon' or 'grid'
     let currentMealCategory = 'breakfast';
+    let currentExpenseTag = 'Food';
 
-    // Default Profile
+    // User Profile
     let userProfile = {
       name: 'Friend',
       gender: 'Female',
@@ -637,43 +705,48 @@
       goalWeight: 62.0,
       monthlyBudget: 15000,
       dateFormat: 'DD/MM/YYYY',
-      theme: 'pastel'
+      theme: 'pastel',
+      geminiKey: ''
     };
 
-    // Date-Indexed Storage: dayRecords[YYYY-MM-DD] = { water: 0, weight: 0, note: '', meals: {breakfast:[], lunch:[], dinner:[], snacks:[]}, expenses: [] }
+    // Date-Indexed Storage: dayRecords[YYYY-MM-DD] = { water: 0, weight: null, weightNote: '', meals: {breakfast:[], lunch:[], dinner:[], snacks:[]}, expenses: [] }
     let dayRecords = {};
 
     /* ----------------------------------------------------
-       3. LIFECYCLE & INITIALIZATION
+       3. LIFECYCLE & STARTUP
     ---------------------------------------------------- */
     window.addEventListener('DOMContentLoaded', () => {
       loadLocalData();
       initAuthListener();
       applyTheme(userProfile.theme);
-      checkIntroStatus();
+      checkFirstLaunch();
       renderCalendar();
       renderActiveDateLedger();
-      setupMidnightWatcher();
+      setupMidnightRollover();
     });
 
-    // Check if Intro was already dismissed this session
-    function checkIntroStatus() {
-      if (sessionStorage.getItem('buttjet_intro_seen')) {
+    // Opening Animation: Concept 1 Auto-Fade after 3.2s
+    function checkFirstLaunch() {
+      if (sessionStorage.getItem('buttjet_bubble_intro_seen')) {
         document.getElementById('introOverlay').style.display = 'none';
+      } else {
+        setTimeout(() => {
+          dismissIntro();
+        }, 3400);
       }
     }
 
     function dismissIntro() {
       const overlay = document.getElementById('introOverlay');
       overlay.style.opacity = '0';
-      sessionStorage.setItem('buttjet_intro_seen', 'true');
+      sessionStorage.setItem('buttjet_bubble_intro_seen', 'true');
       setTimeout(() => {
         overlay.style.display = 'none';
       }, 700);
     }
 
-    // Auto-refresh when crossing midnight
-    function setupMidnightWatcher() {
+    // Daily Midnight Rollover: automatically switch active date to new day
+    function setupMidnightRollover() {
       setInterval(() => {
         const checkToday = new Date().toISOString().split('T')[0];
         if (checkToday !== todayISO) {
@@ -688,12 +761,21 @@
     function loadLocalData() {
       try {
         const savedProfile = localStorage.getItem('buttjet_profile');
-        if (savedProfile) userProfile = JSON.parse(savedProfile);
+        if (savedProfile) {
+          userProfile = JSON.parse(savedProfile);
+        } else {
+          // Trigger first time onboarding modal after intro
+          setTimeout(() => { openProfileModal(); }, 1200);
+        }
 
         const savedDays = localStorage.getItem('buttjet_days');
         if (savedDays) dayRecords = JSON.parse(savedDays);
+
+        if (userProfile.geminiKey) {
+          document.getElementById('geminiApiKeyInput').value = userProfile.geminiKey;
+        }
       } catch (err) {
-        console.error("Local data load error", err);
+        console.error("Local data load warning:", err);
       }
     }
 
@@ -701,17 +783,17 @@
       localStorage.setItem('buttjet_profile', JSON.stringify(userProfile));
       localStorage.setItem('buttjet_days', JSON.stringify(dayRecords));
 
-      // Cloud Firestore Sync if user is logged in
+      // Firestore cloud sync if logged in
       if (currentUser && db) {
         db.collection('users').doc(currentUser.uid).set({
           profile: userProfile,
           days: dayRecords,
           lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true }).then(() => {
-          document.getElementById('headerSyncStatus').className = "inline-block w-2 h-2 rounded-full bg-emerald-400";
-        }).catch(e => {
-          console.warn("Firestore sync warning", e);
-          document.getElementById('headerSyncStatus').className = "inline-block w-2 h-2 rounded-full bg-amber-400";
+          document.getElementById('cloudSyncIndicator').className = "w-2 h-2 rounded-full bg-emerald-400";
+        }).catch(err => {
+          console.warn("Firestore sync pending:", err);
+          document.getElementById('cloudSyncIndicator').className = "w-2 h-2 rounded-full bg-amber-400";
         });
       }
     }
@@ -725,14 +807,14 @@
         currentUser = user;
         const statusText = document.getElementById('authStatusText');
         const signOutBtn = document.getElementById('signOutBtn');
-        const avatar = document.getElementById('userAvatarBadge');
+        const avatar = document.getElementById('userAvatarPill');
 
         if (user) {
           statusText.innerText = user.displayName || user.email;
           signOutBtn.classList.remove('hidden');
           avatar.innerText = (user.displayName || user.email || 'U')[0].toUpperCase();
-          
-          // Pull remote data
+
+          // Sync remote cloud data
           db.collection('users').doc(user.uid).get().then(doc => {
             if (doc.exists) {
               const remote = doc.data();
@@ -754,13 +836,13 @@
 
     function loginWithGoogle() {
       if (!auth) {
-        alert("Firebase Auth is loading or unavailable in this environment.");
+        alert("Firebase is operating in offline mode. Please check connection.");
         return;
       }
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider).catch(err => {
-        console.error("Google sign in error", err);
-        alert("Login note: Please ensure authorized domains include your host.");
+        console.error("Auth sign-in issue:", err);
+        alert("Domain authentication notice: Please ensure yentldawn.github.io is in your Firebase Authorized Domains.");
       });
     }
 
@@ -769,7 +851,7 @@
     }
 
     /* ----------------------------------------------------
-       6. THEME TOGGLING (PASTEL vs ELECTRIC)
+       6. DUAL THEMES (PASTEL vs ELECTRIC)
     ---------------------------------------------------- */
     function toggleTheme() {
       const newTheme = userProfile.theme === 'pastel' ? 'electric' : 'pastel';
@@ -792,7 +874,7 @@
     }
 
     /* ----------------------------------------------------
-       7. HYBRID CALENDAR (RIBBON & FULL MONTH GRID)
+       7. HYBRID CALENDAR (RIBBON & FULL MONTH BLOCK GRID)
     ---------------------------------------------------- */
     function switchCalendarView(mode) {
       calendarViewMode = mode;
@@ -839,12 +921,11 @@
       const year = activeObj.getFullYear();
       const month = activeObj.getMonth();
 
-      // Month Label
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      document.getElementById('calendarMonthLabel').innerText = `${monthNames[month]} ${year}`;
-      document.getElementById('activeDateDisplay').innerText = (activeDateISO === todayISO) ? `Today (${formatDateDisplay(activeDateISO)})` : formatDateDisplay(activeDateISO);
+      document.getElementById('currentMonthYearLabel').innerText = `${monthNames[month]} ${year}`;
+      document.getElementById('activeDateHeaderLabel').innerText = (activeDateISO === todayISO) ? `Today (${formatDateDisplay(activeDateISO)})` : formatDateDisplay(activeDateISO);
 
-      // Render View A: 7-Day Ribbon centered around activeDate
+      // Render View A: 7-Day Ribbon
       const ribbon = document.getElementById('calendarRibbonContainer');
       ribbon.innerHTML = '';
 
@@ -865,7 +946,6 @@
             : 'bg-white dark:bg-electric-card text-pastel-subtext dark:text-electric-subtext border border-pastel-border dark:border-electric-border'
         }`;
 
-        // Indicator micro pips (water, food, spend)
         const hasWater = (record.water || 0) > 0;
         const hasFood = record.meals && Object.values(record.meals).some(arr => arr.length > 0);
         const hasSpend = (record.expenses || []).length > 0;
@@ -874,22 +954,21 @@
           <span class="text-[10px] font-semibold uppercase opacity-80">${dayAbbr}</span>
           <span class="text-sm font-bold font-bubble my-0.5">${dayNum}</span>
           <div class="flex items-center gap-0.5 mt-0.5">
-            <span class="w-1 h-1 rounded-full ${hasWater ? (isActive ? 'bg-white' : 'bg-cyan-400') : 'opacity-0'}"></span>
-            <span class="w-1 h-1 rounded-full ${hasFood ? (isActive ? 'bg-white' : 'bg-amber-400') : 'opacity-0'}"></span>
-            <span class="w-1 h-1 rounded-full ${hasSpend ? (isActive ? 'bg-white' : 'bg-emerald-400') : 'opacity-0'}"></span>
+            <span class="w-1.5 h-1.5 rounded-full ${hasWater ? (isActive ? 'bg-white' : 'bg-cyan-400') : 'opacity-0'}"></span>
+            <span class="w-1.5 h-1.5 rounded-full ${hasFood ? (isActive ? 'bg-white' : 'bg-amber-400') : 'opacity-0'}"></span>
+            <span class="w-1.5 h-1.5 rounded-full ${hasSpend ? (isActive ? 'bg-white' : 'bg-emerald-400') : 'opacity-0'}"></span>
           </div>
         `;
         ribbon.appendChild(chip);
       }
 
-      // Render View B: Full Month Block Grid
+      // Render View B: Full Month 7x5 Grid
       const gridDays = document.getElementById('calendarGridDays');
       gridDays.innerHTML = '';
 
       const firstDayOfMonth = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-      // Empty lead-in spaces
       for (let i = 0; i < firstDayOfMonth; i++) {
         const emptyCell = document.createElement('div');
         emptyCell.className = "h-9 rounded-xl opacity-20";
@@ -916,14 +995,14 @@
         const hasWater = (record.water || 0) >= 8;
         dayBtn.innerHTML = `
           <span>${day}</span>
-          ${hasWater ? `<span class="w-1 h-1 rounded-full ${isActive ? 'bg-white' : 'bg-cyan-400'} absolute bottom-1"></span>` : ''}
+          ${hasWater ? `<span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-cyan-400'} absolute bottom-1"></span>` : ''}
         `;
         gridDays.appendChild(dayBtn);
       }
     }
 
     /* ----------------------------------------------------
-       8. DAILY ACTIVE LEDGER DATA & CONTROLS
+       8. DAILY ACTIVE LEDGER (CARD METRICS)
     ---------------------------------------------------- */
     function getActiveDayRecord() {
       if (!dayRecords[activeDateISO]) {
@@ -941,52 +1020,51 @@
     function renderActiveDateLedger() {
       const rec = getActiveDayRecord();
 
-      // 1. Water Tracker UI
-      const waterCountEl = document.getElementById('waterDayCount');
-      waterCountEl.innerText = rec.water || 0;
+      // 1. Water Tracker
+      document.getElementById('waterDayCount').innerText = rec.water || 0;
+      const dropletsRow = document.getElementById('waterDropletsRow');
+      dropletsRow.innerHTML = '';
 
-      const dropletsContainer = document.getElementById('waterDropletsRow');
-      dropletsContainer.innerHTML = '';
       for (let i = 1; i <= 8; i++) {
         const isFilled = (rec.water || 0) >= i;
-        const dropletBtn = document.createElement('button');
-        dropletBtn.onclick = () => setWaterDirect(i);
-        dropletBtn.className = `h-9 rounded-xl flex items-center justify-center transition-transform active:scale-90 ${
+        const dropBtn = document.createElement('button');
+        dropBtn.onclick = () => setWaterDirect(i);
+        dropBtn.className = `h-9 rounded-xl flex items-center justify-center transition-transform active:scale-90 ${
           isFilled 
-            ? 'bg-cyan-400 text-white shadow-sm droplet-pop' 
+            ? 'bg-cyan-400 text-white shadow-sm drop-pop' 
             : 'bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-cyan-200 border border-pastel-border dark:border-electric-border'
         }`;
-        dropletBtn.innerHTML = `
+        dropBtn.innerHTML = `
           <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 2c-.6 0-1.1.3-1.4.8C7.5 4.6 4 10.3 4 13a6 6 0 1012 0c0-2.7-3.5-8.4-4.6-10.2A1.6 1.6 0 0010 2z" clip-rule="evenodd"/>
           </svg>
         `;
-        dropletsContainer.appendChild(dropletBtn);
+        dropletsRow.appendChild(dropBtn);
       }
 
-      // Secondary Cumulative Water Display
+      // Secondary Cumulative Water Total
       let totalGlassesAllTime = 0;
-      let activeDaysWithWater = 0;
+      let activeHydraDays = 0;
       Object.values(dayRecords).forEach(d => {
         if (d.water && d.water > 0) {
           totalGlassesAllTime += d.water;
-          activeDaysWithWater++;
+          activeHydraDays++;
         }
       });
-      document.getElementById('waterCumulativeDisplay').innerText = `${totalGlassesAllTime} total glasses across ${activeDaysWithWater} active days`;
+      document.getElementById('waterCumulativeCounter').innerText = `${totalGlassesAllTime} total glasses logged across ${activeHydraDays} days`;
 
-      // 2. Safe Spend & Expenses
+      // 2. Safe Daily Spend Blueprint
       const dailySafeLimit = Math.round((userProfile.monthlyBudget || 15000) / 30);
-      document.getElementById('safeSpendCalculatedLabel').innerText = `Safe limit: ₹${dailySafeLimit}/day`;
+      document.getElementById('safeDailyCalculatedLabel').innerText = `Safe limit: ₹${dailySafeLimit}/day`;
 
       let daySpent = 0;
-      (rec.expenses || []).forEach(exp => daySpent += Number(exp.amount || 0));
+      (rec.expenses || []).forEach(item => daySpent += Number(item.amount || 0));
       const remainingSafe = dailySafeLimit - daySpent;
 
       document.getElementById('dayTotalSpentDisplay').innerText = `₹${daySpent}`;
-      const remainingEl = document.getElementById('dayRemainingSafeDisplay');
-      remainingEl.innerText = `₹${remainingSafe}`;
-      remainingEl.className = `font-bubble text-xl font-bold ${remainingSafe >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+      const remEl = document.getElementById('dayRemainingSafeDisplay');
+      remEl.innerText = `₹${remainingSafe}`;
+      remEl.className = `font-bubble text-xl font-bold ${remainingSafe >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
 
       const expenseListEl = document.getElementById('dayExpensesList');
       expenseListEl.innerHTML = '';
@@ -998,7 +1076,7 @@
           row.className = "flex items-center justify-between py-1 border-b border-pastel-border/40 dark:border-electric-border/40 text-xs";
           row.innerHTML = `
             <div class="flex items-center gap-1.5">
-              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-pastel-cardSubtle dark:bg-electric-cardSubtle">${item.tag || 'Misc'}</span>
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-pastel-cardSubtle dark:bg-electric-cardSubtle">${item.tag || 'Food'}</span>
               <span>${item.desc || 'Expense'}</span>
             </div>
             <div class="flex items-center gap-2 font-bold">
@@ -1010,7 +1088,7 @@
         });
       }
 
-      // 3. Scale & Weight
+      // 3. Scale & Check-in
       document.getElementById('dailyWeightInput').value = rec.weight || '';
       document.getElementById('dailyWeightNote').value = rec.weightNote || '';
       document.getElementById('targetWeightNote').innerText = `Goal: ${userProfile.goalWeight || 62.0} kg`;
@@ -1024,16 +1102,16 @@
       const rec = getActiveDayRecord();
       rec.water = Math.max(0, (rec.water || 0) + delta);
       if (rec.water === 8) {
-        confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 } });
+        confetti({ particleCount: 35, spread: 65, origin: { y: 0.8 } });
       }
       saveState();
       renderActiveDateLedger();
       renderCalendar();
     }
 
-    function setWaterDirect(glassIndex) {
+    function setWaterDirect(index) {
       const rec = getActiveDayRecord();
-      rec.water = (rec.water === glassIndex) ? glassIndex - 1 : glassIndex;
+      rec.water = (rec.water === index) ? index - 1 : index;
       if (rec.water === 8) {
         confetti({ particleCount: 40, spread: 70, origin: { y: 0.7 } });
       }
@@ -1121,7 +1199,6 @@
     }
 
     /* Expenses Actions */
-    let currentExpenseTag = 'Food';
     function openAddExpenseModal() {
       document.getElementById('expenseModal').classList.remove('hidden');
     }
@@ -1130,7 +1207,7 @@
     }
     function setExpenseTag(tag) {
       currentExpenseTag = tag;
-      document.querySelectorAll('.tag-btn').forEach(btn => {
+      document.querySelectorAll('.expense-tag-btn').forEach(btn => {
         btn.classList.toggle('bg-pastel-accent', btn.innerText.includes(tag));
         btn.classList.toggle('text-white', btn.innerText.includes(tag));
       });
@@ -1192,44 +1269,74 @@
     }
 
     /* ----------------------------------------------------
-       10. SUPPORTIVE AI COMPANION (SANCTUARY)
+       10. KIND AI COMPANION SANCTUARY
     ---------------------------------------------------- */
     function toggleCompanionDrawer() {
       const drawer = document.getElementById('companionDrawer');
       drawer.classList.toggle('translate-x-full');
     }
 
+    function saveGeminiKey() {
+      userProfile.geminiKey = document.getElementById('geminiApiKeyInput').value.trim();
+      saveState();
+    }
+
     function askCompanionPrompt(type) {
-      if (type === 'checkin') {
-        appendCompanionMsg("I'd love a quick mental check-in today.", true);
-        respondKindCompanion("Take a gentle breath right here. Remember you don't have to carry the whole world today. Are you drinking enough water and being kind to your body? You are worthy and capable, exactly as you are right now.");
-      } else if (type === 'meal') {
-        appendCompanionMsg("What is a comforting, gentle meal idea?", true);
-        respondKindCompanion("How about warm Dal Khichdi with a dash of pure ghee, or a soothing bowl of curd rice with lightly tempered mustard seeds? Light on your stomach, restorative for your energy, and pure comfort.");
-      } else if (type === 'cheer') {
-        appendCompanionMsg("Can you give me a micro cheer?", true);
-        respondKindCompanion("Even opening your calendar and checking in with yourself is a victory. Every sip of water counts. Every breath counts. You are doing so much better than you give yourself credit for! 🌸");
+      if (type === 'tired') {
+        appendCompanionMsg("I feel so tired today.", true);
+        respondKindCompanion("I hear you completely. Please lower any high expectations you placed on yourself today. It's completely okay to do the bare minimum, sip a glass of warm water, and rest without feeling an ounce of guilt. You are doing enough simply by resting.");
+      } else if (type === 'snack') {
+        appendCompanionMsg("Can you give me a comforting 5-min snack idea?", true);
+        respondKindCompanion("How about a quick glass of Sattu Chaas with a pinch of roasted cumin, or a small warm bowl of curd with a tiny drizzle of honey? Light on your stomach, deeply soothing, and takes 2 minutes.");
+      } else if (type === 'okay') {
+        appendCompanionMsg("Did I do okay today?", true);
+        respondKindCompanion(`You showed up for yourself today, ${userProfile.name}. Every drop of water, every mindful pause, and every step counts. Progress is never a straight line, and you are doing so much better than you give yourself credit for! 🌸`);
       }
     }
 
-    function sendCompanionMessage() {
+    async function sendCompanionMessage() {
       const input = document.getElementById('companionInput');
       const text = input.value.trim();
       if (!text) return;
+
       appendCompanionMsg(text, true);
       input.value = '';
 
-      // Kind Heuristic / LLM Companion response
+      // If user provided a Gemini API Key, call Gemini 1.5 Flash
+      if (userProfile.geminiKey) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userProfile.geminiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: `You are the Buttjet AI Wellness & Guilt-free Companion. User name: ${userProfile.name}. Always be emotionally kind, protective, gentle, and encouraging. Never lecture, scold, or cause guilt about food or budget numbers. Respond kindly to: "${text}"`
+                }]
+              }]
+            })
+          });
+          const data = await res.json();
+          if (data.candidates && data.candidates[0].content.parts[0].text) {
+            respondKindCompanion(data.candidates[0].content.parts[0].text);
+            return;
+          }
+        } catch (err) {
+          console.warn("Live Gemini request notice:", err);
+        }
+      }
+
+      // Built-in Kind Empathy Engine
       setTimeout(() => {
         const lower = text.toLowerCase();
-        if (lower.includes('tired') || lower.includes('exhausted') || lower.includes('stressed')) {
-          respondKindCompanion("I hear how tired you are. Please lower any high expectations you placed on yourself today. It's completely okay to do the bare minimum, sip some warm water, and rest without guilt.");
-        } else if (lower.includes('spent') || lower.includes('money') || lower.includes('budget')) {
-          respondKindCompanion("Numbers are just information, never a measurement of your worth. Money exists to support your life and bring you safety. Let's take it one gentle day at a time.");
+        if (lower.includes('stress') || lower.includes('anxious') || lower.includes('worry')) {
+          respondKindCompanion("Take a long, deep breath right where you are. Remember that feelings are temporary visitors, not permanent truths. Be kind to yourself today.");
+        } else if (lower.includes('spent') || lower.includes('money') || lower.includes('cost')) {
+          respondKindCompanion("Numbers are simply information to guide us, never a measure of your worth. Money exists to bring you safety and joy. Take it one gentle day at a time.");
         } else {
-          respondKindCompanion(`I'm listening, ${userProfile.name}. Whatever you are moving through today, please take things one step at a time. I'm cheering for you always!`);
+          respondKindCompanion(`I'm cheering for you, ${userProfile.name}. Whatever you are navigating right now, take it one small breath and one sip of water at a time. I'm right here in your corner! 💖`);
         }
-      }, 600);
+      }, 550);
     }
 
     function appendCompanionMsg(text, isUser = false) {
@@ -1245,6 +1352,40 @@
 
     function respondKindCompanion(text) {
       appendCompanionMsg(text, false);
+    }
+
+    /* ----------------------------------------------------
+       11. EXPORT & BACKUP ENGINE
+    ---------------------------------------------------- */
+    function downloadJsonBackup() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+        profile: userProfile,
+        days: dayRecords,
+        exportedAt: new Date().toISOString()
+      }, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `buttjet_backup_${todayISO}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function downloadCsvSummary() {
+      let csvContent = "data:text/csv;charset=utf-8,Date,WaterGlasses,WeightKg,WeightNote,TotalSpentINR\n";
+      Object.keys(dayRecords).sort().forEach(date => {
+        const d = dayRecords[date];
+        let spent = 0;
+        (d.expenses || []).forEach(e => spent += Number(e.amount || 0));
+        csvContent += `${date},${d.water || 0},${d.weight || ''},"${(d.weightNote || '').replace(/"/g, '""')}",${spent}\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `buttjet_trends_${todayISO}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     }
   </script>
 </body>
