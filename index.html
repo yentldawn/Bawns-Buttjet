@@ -373,7 +373,7 @@
     .metric-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
     .metric-val { font-family: var(--font-brand); font-size: 1.25rem; font-weight: 800; color: var(--text); }
 
-    /* Companion Sanctuary */
+    /* Interactive Companion Sanctuary */
     .companion-banner {
       background: linear-gradient(135deg, rgba(255, 90, 126, 0.1), rgba(155, 114, 207, 0.15));
       border: 1px solid rgba(255, 90, 126, 0.2);
@@ -393,15 +393,49 @@
       font-size: 1.3rem;
       color: var(--primary);
     }
+    
+    /* Scrollable chat thread container */
+    .chat-thread-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+      scrollbar-width: thin;
+    }
     .chat-bubble {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
+      padding: 10px 14px;
+      border-radius: 16px;
       font-size: 0.88rem;
-      line-height: 1.5;
+      line-height: 1.45;
+      max-width: 85%;
+      word-wrap: break-word;
       white-space: pre-wrap;
     }
+    .chat-bubble.bot {
+      align-self: flex-start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-bubble.user {
+      align-self: flex-end;
+      background: var(--primary);
+      color: #FFFFFF;
+      border-bottom-right-radius: 4px;
+      font-weight: 500;
+    }
+    .chat-bubble.error-notice {
+      align-self: center;
+      background: #FFE8E8;
+      border: 1px solid #FF8080;
+      color: #A00000;
+      font-size: 0.78rem;
+      max-width: 95%;
+    }
+
     .chat-input-row { display: flex; gap: 8px; }
     .chat-input {
       flex: 1;
@@ -561,15 +595,19 @@
         </div>
       </section>
 
-      <!-- Companion Sanctuary -->
+      <!-- Companion Sanctuary with Scrollable Chat History -->
       <section class="companion-banner">
         <div class="companion-header-row">
           <h4>Companion Sanctuary ✨</h4>
         </div>
-        <div class="chat-bubble" id="companion-reply">Hey Yentl, I'm right here with you. Take a soft breath. What can I help nourish or lighten for you right now?</div>
+        
+        <div class="chat-thread-container" id="chat-thread">
+          <div class="chat-bubble bot">Hey Yentl, I'm right here with you. Take a soft breath. What can I help nourish or lighten for you right now?</div>
+        </div>
+
         <div class="chat-input-row">
-          <input type="text" id="chat-input-field" class="chat-input" placeholder="Ask for meal ideas, check-in, comfort..." />
-          <button class="chat-send-btn" onclick="handleChatSend()">Send</button>
+          <input type="text" id="chat-input-field" class="chat-input" placeholder="Ask for meal ideas, check-in, comfort..." autocomplete="off" />
+          <button class="chat-send-btn" id="chat-send-btn" onclick="handleChatSend()">Send</button>
         </div>
       </section>
     </main>
@@ -608,7 +646,6 @@
   </div>
 
   <script>
-    // Config: Exact Auth Key from Google AI Studio
     const DEFAULT_AUTH_KEY = "AQ.Ab8RN6JIybenTl2UpyI6seCf4uaPisHPwWHX9Fh8xt7TceY-xQ";
 
     let userName = localStorage.getItem('buttjet_name') || 'Yentl';
@@ -617,7 +654,7 @@
     let currentView = 'ribbon';
     let dailyGlasses = 5;
 
-    // Dismiss Intro
+    // Intro dismiss
     function dismissIntro() {
       const intro = document.getElementById('intro-screen');
       if (intro) {
@@ -628,7 +665,7 @@
     }
     setTimeout(dismissIntro, 3400);
 
-    // Theme Toggle
+    // Theme toggle
     function toggleTheme() {
       const b = document.body;
       b.setAttribute('data-theme', b.getAttribute('data-theme') === 'pastel' ? 'electric' : 'pastel');
@@ -655,7 +692,7 @@
       closeSettingsDirect();
     }
 
-    // Hydration Droplets
+    // Water Droplets
     function renderDroplets() {
       const row = document.getElementById('droplets-row');
       row.innerHTML = '';
@@ -728,28 +765,55 @@
       }
     }
 
-    // AI Companion Call (Using Auth Header Structure)
+    // Enter Key Handler for Chat Input
+    document.getElementById('chat-input-field').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        handleChatSend();
+      }
+    });
+
+    // Append Message to Thread
+    function appendChatMessage(text, sender) {
+      const thread = document.getElementById('chat-thread');
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble ${sender}`;
+      bubble.innerText = text;
+      thread.appendChild(bubble);
+      thread.scrollTop = thread.scrollHeight;
+      return bubble;
+    }
+
+    // Interactive AI Chat Engine
     async function handleChatSend() {
       const input = document.getElementById('chat-input-field');
-      const box = document.getElementById('companion-reply');
       const text = input.value.trim();
       if (!text) return;
 
       input.value = '';
-      box.innerText = "Thinking gently with you...";
+      appendChatMessage(text, 'user');
+
+      const thinkingBubble = appendChatMessage("Thinking gently with you...", 'bot');
 
       try {
-        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', {
+        let endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+        let headers = { 'Content-Type': 'application/json' };
+
+        // Determine format: Auth key (header) vs API key (param)
+        if (geminiKey.startsWith('AIzaSy')) {
+          endpoint += `?key=${encodeURIComponent(geminiKey)}`;
+        } else {
+          headers['x-goog-api-key'] = geminiKey;
+          headers['Authorization'] = `Bearer ${geminiKey}`;
+        }
+
+        const res = await fetch(endpoint, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': geminiKey,
-            'Authorization': `Bearer ${geminiKey}`
-          },
+          headers: headers,
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `You are the emotionally supportive AI Companion in the Buttjet app talking to ${userName}. Always be protective, kind, gentle, and practical. Keep responses under 3 sentences unless giving a recipe or practical routine.\n\nUser: ${text}`
+                text: `You are the emotionally supportive AI Companion in the Buttjet app talking to ${userName}. Always be protective, kind, gentle, and practical. Keep responses concise unless giving a recipe or practical routine.\n\nUser: ${text}`
               }]
             }]
           })
@@ -758,14 +822,16 @@
         const data = await res.json();
         
         if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-          box.innerText = data.candidates[0].content.parts[0].text;
+          thinkingBubble.innerText = data.candidates[0].content.parts[0].text;
         } else if (data.error) {
-          box.innerText = `Notice: ${data.error.message || 'Key authorization issue'}`;
+          thinkingBubble.className = 'chat-bubble error-notice';
+          thinkingBubble.innerText = `Google API Notice (${data.error.code || 'Error'}): ${data.error.message || 'Key unauthorized'}`;
         } else {
-          box.innerText = `I'm right here with you, ${userName}. Take a slow breath, sip a little water, and let's take it one step at a time.`;
+          thinkingBubble.innerText = `I'm right here with you, ${userName}. Take a slow breath, sip some water, and let's take it one step at a time.`;
         }
       } catch (err) {
-        box.innerText = `I'm right here with you, ${userName}. Take a slow breath, sip a little water, and let's take it one step at a time.`;
+        thinkingBubble.className = 'chat-bubble error-notice';
+        thinkingBubble.innerText = `Network error: ${err.message}. Please check your connection or key in Settings.`;
       }
     }
 
