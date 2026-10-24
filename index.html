@@ -1,1392 +1,773 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Buttjet - Daily Calendar & Wellness Companion</title>
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts: Plus Jakarta Sans, Fredoka, Quicksand -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Buttjet</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Canvas Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-  <!-- Firebase v9 Compat Web SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            bubble: ['"Fredoka"', 'cursive'],
-            rounded: ['"Quicksand"', 'sans-serif'],
-          },
-          colors: {
-            pastel: {
-              bg: '#FFFDF9',
-              card: '#FFFFFF',
-              cardSubtle: '#FFF5F7',
-              accent: '#FF5A7E',
-              accentHover: '#E84569',
-              accentLight: '#FFE3EC',
-              lavender: '#EEDBFF',
-              lavenderSubtle: '#F6EEFF',
-              mint: '#D8F7EE',
-              text: '#2D1B2E',
-              subtext: '#765C78',
-              border: '#F8D8E3',
-              safeGreen: '#10B981'
-            },
-            electric: {
-              bg: '#0E0B16',
-              card: '#181326',
-              cardSubtle: '#221937',
-              accent: '#FF007F',
-              accentHover: '#E0006F',
-              accentLight: '#3D1035',
-              cyan: '#00F5D4',
-              purple: '#9B5DE5',
-              text: '#F5F5FA',
-              subtext: '#9D97B5',
-              border: '#33274D',
-              safeGreen: '#00F5D4'
-            }
-          },
-          boxShadow: {
-            'bubble': '0 8px 24px -4px rgba(255, 90, 126, 0.25)',
-            'bubble-lg': '0 16px 36px -6px rgba(255, 90, 126, 0.35)',
-            'electric-glow': '0 0 20px rgba(255, 0, 127, 0.4), 0 0 40px rgba(0, 245, 212, 0.2)'
-          }
-        }
-      }
-    }
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
+    :root {
+      --bg: #FFFDF9;
+      --surface: #FFFFFF;
+      --surface-subtle: #FFF5F0;
+      --primary: #FF5A7E;
+      --primary-light: #FFEBF0;
+      --secondary: #9B72CF;
+      --text: #2D1B2E;
+      --text-muted: #8E7C8F;
+      --border: #F3E5DE;
+      --accent: #00C49F;
+      --shadow: 0 10px 25px -5px rgba(255, 90, 126, 0.12), 0 8px 10px -6px rgba(45, 27, 46, 0.04);
+      --font-brand: 'Plus Jakarta Sans', sans-serif;
+      --font-bubble: 'Fredoka', cursive;
+      --font-ui: 'Quicksand', sans-serif;
     }
-    input, textarea {
-      user-select: auto;
+
+    [data-theme="electric"] {
+      --bg: #0E0B16;
+      --surface: #181424;
+      --surface-subtle: #221C33;
+      --primary: #FF007F;
+      --primary-light: #380C25;
+      --secondary: #00F5D4;
+      --text: #FFFFFF;
+      --text-muted: #A39DB5;
+      --border: #2E2744;
+      --accent: #7B2CBF;
+      --shadow: 0 10px 30px -5px rgba(255, 0, 127, 0.25);
     }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
-    .no-scrollbar {
-      -ms-overflow-style: none;
+
+    .app-viewport {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 90px;
+      background: var(--bg);
+    }
+
+    /* Animated Logo Intro Screen */
+    #intro-screen {
+      position: fixed;
+      inset: 0;
+      background: #FFFDF9;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+    }
+
+    .intro-logo-wrap {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: logoFloat 3s ease-in-out infinite alternate;
+    }
+
+    .bubble-logo-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 15px 30px rgba(255, 90, 126, 0.35));
+      animation: bubblePulse 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes bubblePulse {
+      0% { transform: scale(0.2) rotate(-8deg); opacity: 0; }
+      50% { transform: scale(1.08) rotate(4deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    @keyframes logoFloat {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-10px); }
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #FFF;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #FF85A1;
+      opacity: 0;
+      animation: sparklePop 1.8s 0.6s infinite alternate;
+    }
+    .sparkle.s1 { top: 15%; right: 20%; animation-delay: 0.4s; }
+    .sparkle.s2 { bottom: 25%; left: 18%; animation-delay: 0.9s; }
+
+    @keyframes sparklePop {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.8); opacity: 0.4; }
+    }
+
+    .intro-text-box {
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    .intro-this-is {
+      font-family: var(--font-brand);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #9B72CF;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInText 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .intro-brand-name {
+      font-family: var(--font-brand);
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #2D1B2E;
+      letter-spacing: -0.03em;
+      margin-top: 4px;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fadeInText 0.9s 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .intro-skip-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      font-family: var(--font-brand);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #8E7C8F;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(142, 124, 143, 0.2);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+    }
+
+    @keyframes fadeInText {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header */
+    header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .user-greeting {
+      font-family: var(--font-brand);
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .user-greeting span { color: var(--primary); }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    /* Main Container */
+    main { padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; }
+
+    /* Calendar Strip */
+    .cal-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .cal-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+    .cal-month-name {
+      font-family: var(--font-brand);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .view-toggle-btn {
+      font-family: var(--font-brand);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .ribbon-track {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
       scrollbar-width: none;
     }
+    .ribbon-track::-webkit-scrollbar { display: none; }
+    .ribbon-chip {
+      flex: 0 0 calc((100% - 48px) / 7);
+      min-width: 42px;
+      aspect-ratio: 1 / 1.35;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      cursor: pointer;
+      gap: 3px;
+    }
+    .ribbon-chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 6px 16px -2px rgba(255, 90, 126, 0.4);
+    }
+    .chip-dow { font-size: 0.65rem; font-weight: 700; opacity: 0.8; }
+    .chip-num { font-size: 1rem; font-weight: 800; font-family: var(--font-brand); }
+    .chip-pips { display: flex; gap: 3px; }
+    .pip { width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted); opacity: 0.4; }
+    .ribbon-chip.active .pip { background: #FFFFFF; opacity: 0.9; }
 
-    /* 3D Tactile Bubble Text styling */
-    .bubble-text-pink {
-      font-family: 'Fredoka', cursive;
-      color: #FF70A6;
-      display: inline-block;
-      text-shadow:
-        0 2px 0 #E34A83,
-        0 4px 0 #BD2B64,
-        0 6px 14px rgba(255, 112, 166, 0.45);
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 10px;
     }
-    .bubble-text-lavender {
-      font-family: 'Fredoka', cursive;
-      color: #B388FF;
-      display: inline-block;
-      text-shadow:
-        0 2px 0 #8E5FE2,
-        0 4px 0 #6C3EB8,
-        0 6px 14px rgba(179, 136, 255, 0.45);
+    .grid-dow {
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding-bottom: 4px;
     }
-
-    /* Concept 1: Soap Bubble Inflation Animation Keyframes */
-    @keyframes bubbleInflate {
-      0% {
-        transform: scale(0.08);
-        opacity: 0.3;
-        border-radius: 50%;
-      }
-      45% {
-        transform: scale(1.06);
-        opacity: 0.95;
-        border-radius: 46% 54% 52% 48% / 51% 47% 53% 49%;
-      }
-      70% {
-        transform: scale(0.97);
-        border-radius: 52% 48% 47% 53% / 48% 52% 48% 52%;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-        border-radius: 40px;
-      }
+    .grid-cell {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: var(--font-brand);
+      cursor: pointer;
+    }
+    .grid-cell.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #FFFFFF;
     }
 
-    @keyframes fadeInSlideDown {
-      0% { opacity: 0; transform: translateY(-12px); }
-      100% { opacity: 1; transform: translateY(0); }
+    /* Dual-Tier Water Card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title {
+      font-family: var(--font-brand);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .water-primary-num {
+      font-family: var(--font-bubble);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: center;
+    }
+    .water-droplets-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .drop-btn {
+      width: 32px;
+      height: 38px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    .drop-btn svg { width: 100%; height: 100%; fill: var(--border); transition: fill 0.2s; }
+    .drop-btn.filled svg { fill: #00B4D8; }
+    .water-secondary-stat {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-top: 1px dashed var(--border);
+      padding-top: 8px;
     }
 
-    @keyframes bounceLetter {
-      0% { transform: translateY(35px) scale(0.6); opacity: 0; }
-      55% { transform: translateY(-10px) scale(1.15); opacity: 1; }
-      75% { transform: translateY(4px) scale(0.95); }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
+    /* Spend & Fuel */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .metric-box {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .metric-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+    .metric-val { font-family: var(--font-brand); font-size: 1.25rem; font-weight: 800; color: var(--text); }
+
+    /* Companion Drawer (Clean, No API Key Box) */
+    .companion-banner {
+      background: linear-gradient(135deg, rgba(255, 90, 126, 0.1), rgba(155, 114, 207, 0.15));
+      border: 1px solid rgba(255, 90, 126, 0.2);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .companion-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .companion-header-row h4 {
+      font-family: var(--font-bubble);
+      font-size: 1.3rem;
+      color: var(--primary);
+    }
+    .chat-bubble {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .chat-input-row { display: flex; gap: 8px; }
+    .chat-input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .chat-send-btn {
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      font-family: var(--font-brand);
+      cursor: pointer;
     }
 
-    @keyframes anchorSlideUp {
-      0% { opacity: 0; transform: translateY(20px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .bubble-sphere {
-      animation: bubbleInflate 1.8s cubic-bezier(0.28, 0.84, 0.42, 1) forwards;
-    }
-    .thisis-fade {
+    /* Settings Modal */
+    #settings-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 10000;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
       opacity: 0;
-      animation: fadeInSlideDown 0.8s ease-out 0.9s forwards;
+      visibility: hidden;
+      transition: all 0.3s ease;
     }
-    .letter-bounce {
-      opacity: 0;
-      animation: bounceLetter 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    #settings-modal.open { opacity: 1; visibility: visible; }
+    .modal-sheet {
+      width: 100%;
+      max-width: 480px;
+      background: var(--surface);
+      border-radius: 28px 28px 0 0;
+      padding: 24px 20px 36px 20px;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
-    .anchor-brand {
-      opacity: 0;
-      animation: anchorSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2.1s forwards;
+    #settings-modal.open .modal-sheet { transform: translateY(0); }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; }
+    .modal-head h3 { font-family: var(--font-brand); font-size: 1.15rem; font-weight: 800; }
+    .modal-close-btn { background: none; border: none; font-size: 1.3rem; color: var(--text-muted); cursor: pointer; }
+    .setting-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+    .setting-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      outline: none;
     }
-
-    /* Droplet Pop Animation */
-    @keyframes dropPulse {
-      0% { transform: scale(0.7); }
-      60% { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-    .drop-pop {
-      animation: dropPulse 0.25s ease-out;
+    .save-settings-btn {
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #FFF;
+      font-family: var(--font-brand);
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
-<body id="appBody" class="bg-pastel-bg text-pastel-text transition-colors duration-300 font-sans min-h-screen flex flex-col justify-between overflow-x-hidden">
+<body data-theme="pastel">
 
-  <!-- ==================== 1. OPENING ANIMATION: CONCEPT 1 (EXPANDING PLAYFUL BUBBLE) ==================== -->
-  <div id="introOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FFF9F3] px-6 transition-opacity duration-700">
-    <!-- Top Instant Skip Button -->
-    <button onclick="dismissIntro()" class="absolute top-6 right-6 text-xs font-semibold uppercase tracking-wider text-[#9E7385] hover:text-[#2D1B2E] transition-colors py-1.5 px-3 rounded-full border border-[#FFCAD7] bg-white/70 shadow-sm z-30">
-      Skip ✕
-    </button>
-
-    <!-- Expanding Bubble Container -->
-    <div class="relative w-full max-w-sm flex flex-col items-center justify-center">
-      <!-- Tactile Soap Bubble Background Card -->
-      <div class="bubble-sphere absolute w-72 h-72 md:w-80 md:h-80 bg-gradient-to-tr from-[#FFE4EE] via-[#FFF1F6] to-[#EEDBFF] shadow-bubble-lg border-2 border-white/80 pointer-events-none -z-10"></div>
-
-      <!-- Animation Content -->
-      <div class="flex flex-col items-center text-center z-10 px-4 py-8">
-        <!-- "This is" -->
-        <span class="thisis-fade text-sm md:text-base font-semibold uppercase tracking-widest text-[#9C657B] font-rounded mb-1">
-          This is
-        </span>
-
-        <!-- "Girl Math" in Bouncing 3D Bubble Letters -->
-        <div class="flex items-center justify-center gap-1 text-5xl md:text-6xl py-2 my-1 select-none">
-          <span class="letter-bounce bubble-text-pink" style="animation-delay: 1.1s;">G</span>
-          <span class="letter-bounce bubble-text-pink" style="animation-delay: 1.18s;">i</span>
-          <span class="letter-bounce bubble-text-pink" style="animation-delay: 1.26s;">r</span>
-          <span class="letter-bounce bubble-text-pink" style="animation-delay: 1.34s;">l</span>
-          <span class="w-3"></span>
-          <span class="letter-bounce bubble-text-lavender" style="animation-delay: 1.45s;">M</span>
-          <span class="letter-bounce bubble-text-lavender" style="animation-delay: 1.53s;">a</span>
-          <span class="letter-bounce bubble-text-lavender" style="animation-delay: 1.61s;">t</span>
-          <span class="letter-bounce bubble-text-lavender" style="animation-delay: 1.69s;">h</span>
-        </div>
-
-        <p class="thisis-fade text-xs md:text-sm font-rounded text-[#8C6575] mt-2 mb-6 font-semibold tracking-wide" style="animation-delay: 1.8s;">
-          Guilt-free calendar, hydration & wellness
-        </p>
-
-        <!-- "Buttjet" Anchored in Universal Plus Jakarta Sans -->
-        <div class="anchor-brand bg-white/95 backdrop-blur-md px-6 py-2.5 rounded-full shadow-sm border border-[#FFD3DF] flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#FF5A7E] animate-ping"></span>
-          <span class="font-sans font-extrabold text-xl tracking-tight text-[#2D1B2E]">Buttjet</span>
-        </div>
-      </div>
+  <!-- Logo Intro Screen (No Girl Math) -->
+  <div id="intro-screen">
+    <button class="intro-skip-btn" onclick="dismissIntro()">Skip ✕</button>
+    <div class="intro-logo-wrap">
+      <div class="sparkle s1"></div>
+      <div class="sparkle s2"></div>
+      <!-- Tactile Bubble SVG Emblem -->
+      <svg class="bubble-logo-svg" viewBox="0 0 160 160">
+        <defs>
+          <radialGradient id="bubbleGlow" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#FFEBF3" />
+            <stop offset="45%" stop-color="#FF9BBB" />
+            <stop offset="85%" stop-color="#C292E8" />
+            <stop offset="100%" stop-color="#8E54C7" />
+          </radialGradient>
+          <linearGradient id="highlightGleam" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.85" />
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <!-- Organic 3D Bubble Petals -->
+        <path d="M50,35 C70,25 90,25 110,35 C135,48 145,80 130,108 C118,130 92,138 68,132 C40,125 22,100 28,70 C32,52 38,40 50,35 Z" fill="url(#bubbleGlow)" />
+        <ellipse cx="65" cy="55" rx="30" ry="18" transform="rotate(-20 65 55)" fill="url(#highlightGleam)" />
+        <!-- Small Droplet Gleam Accent -->
+        <path d="M102,78 C102,72 108,65 108,65 C108,65 114,72 114,78 C114,82 111,85 108,85 C105,85 102,82 102,78 Z" fill="#FFFFFF" opacity="0.85" />
+      </svg>
+    </div>
+    <div class="intro-text-box">
+      <div class="intro-this-is">This is</div>
+      <div class="intro-brand-name">Buttjet</div>
     </div>
   </div>
 
-  <!-- ==================== 2. HEADER & NAVIGATION ==================== -->
-  <header class="sticky top-0 z-40 bg-white/85 dark:bg-electric-card/85 backdrop-blur-md border-b border-pastel-border dark:border-electric-border px-4 py-3">
-    <div class="max-w-md mx-auto flex items-center justify-between">
-      
-      <!-- Logo & Active Date Tag -->
-      <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-pastel-accent to-[#B272FA] flex items-center justify-center text-white shadow-md font-bubble text-lg font-bold">
-          B
+  <div class="app-viewport">
+    <!-- Header: Hey, {Name} -->
+    <header>
+      <div class="user-greeting" id="top-greeting">Hey, <span>Yentl</span> ✨</div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">🎨</button>
+        <button class="icon-btn" onclick="openSettings()" title="Settings & Profile">Y</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Calendar View -->
+      <section class="cal-panel">
+        <div class="cal-controls">
+          <div class="cal-month-name" id="cal-month-label">October 2026</div>
+          <button class="view-toggle-btn" id="view-toggle-btn" onclick="toggleCalView()">Grid View</button>
         </div>
-        <div>
-          <div class="flex items-center gap-1.5">
-            <h1 class="font-extrabold text-lg tracking-tight text-pastel-text dark:text-electric-text leading-none">
-              Buttjet
-            </h1>
-            <span id="cloudSyncIndicator" class="w-2 h-2 rounded-full bg-emerald-400" title="Cloud / Storage Synced"></span>
-          </div>
-          <span id="activeDateHeaderLabel" class="text-xs font-semibold text-pastel-subtext dark:text-electric-subtext">
-            Today
-          </span>
-        </div>
-      </div>
-
-      <!-- Action Buttons: Theme Toggle, Companion Trigger, Profile -->
-      <div class="flex items-center gap-1.5">
-        <!-- Companion Drawer Trigger -->
-        <button onclick="toggleCompanionDrawer()" class="p-2 rounded-full hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan transition-all" title="Ask Companion Sanctuary">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
-          </svg>
-        </button>
-
-        <!-- Dual Theme Toggle (Pastel <-> Electric) -->
-        <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle text-pastel-subtext dark:text-electric-subtext transition-all" title="Toggle Theme">
-          <svg id="themeIconSun" class="w-5 h-5 hidden dark:block text-electric-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
-          </svg>
-          <svg id="themeIconMoon" class="w-5 h-5 block dark:hidden text-[#765C78]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
-          </svg>
-        </button>
-
-        <!-- Profile / Settings Trigger -->
-        <button onclick="openProfileModal()" class="p-1 rounded-full border border-pastel-border dark:border-electric-border" title="Profile & Cloud Account">
-          <div id="userAvatarPill" class="w-7 h-7 rounded-full bg-pastel-accentLight dark:bg-electric-purple text-pastel-accent dark:text-white flex items-center justify-center font-bold text-xs">
-            U
-          </div>
-        </button>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- ==================== 3. HYBRID CALENDAR CONTROLLER ==================== -->
-  <section class="max-w-md mx-auto w-full px-4 pt-3 pb-1">
-    <!-- Month Title & View Switcher -->
-    <div class="flex items-center justify-between mb-2">
-      <div class="flex items-center gap-2">
-        <h2 id="currentMonthYearLabel" class="font-bold text-base text-pastel-text dark:text-electric-text">
-          October 2026
-        </h2>
-        <button onclick="jumpToToday()" class="text-xs bg-pastel-accentLight dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold px-2 py-0.5 rounded-full hover:opacity-85 transition-opacity">
-          Today
-        </button>
-      </div>
-
-      <!-- Toggle: Ribbon vs Grid View -->
-      <div class="flex items-center bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-xl p-0.5 shadow-sm text-xs font-semibold">
-        <button id="viewRibbonBtn" onclick="switchCalendarView('ribbon')" class="px-2.5 py-1 rounded-lg bg-pastel-accent text-white dark:bg-electric-accent transition-all">
-          Week
-        </button>
-        <button id="viewGridBtn" onclick="switchCalendarView('grid')" class="px-2.5 py-1 rounded-lg text-pastel-subtext dark:text-electric-subtext hover:text-pastel-text transition-all">
-          Grid
-        </button>
-      </div>
-    </div>
-
-    <!-- View A: Horizontal 7-Day Ribbon -->
-    <div id="calendarRibbonContainer" class="flex items-center justify-between gap-1 overflow-x-auto py-1 no-scrollbar">
-      <!-- Injected via JavaScript -->
-    </div>
-
-    <!-- View B: Full Month 7x5 Block Grid -->
-    <div id="calendarGridContainer" class="hidden bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-2xl p-3 shadow-sm mt-1">
-      <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-pastel-subtext dark:text-electric-subtext mb-2">
-        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-      </div>
-      <div id="calendarGridDays" class="grid grid-cols-7 gap-1">
-        <!-- 35 Day cells injected via JavaScript -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== 4. DAILY ACTIVE LEDGER (FOCUS CARDS) ==================== -->
-  <main class="max-w-md mx-auto w-full px-4 py-3 flex-1 flex flex-col gap-4">
-
-    <!-- Card 1: Dual-Tier Water Tracker -->
-    <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-3xl p-4 shadow-sm relative overflow-hidden">
-      <div class="flex items-center justify-between mb-2">
-        <div class="flex items-center gap-2">
-          <div class="p-1.5 rounded-xl bg-cyan-100 dark:bg-cyan-950 text-cyan-500">
-            <!-- Rounded Droplet Icon -->
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 2c-.6 0-1.1.3-1.4.8C7.5 4.6 4 10.3 4 13a6 6 0 1012 0c0-2.7-3.5-8.4-4.6-10.2A1.6 1.6 0 0010 2zm0 15a4 4 0 01-4-4c0-1.8 2.2-5.6 4-8.2 1.8 2.6 4 6.4 4 8.2a4 4 0 01-4 4z" clip-rule="evenodd"/>
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-bold text-sm text-pastel-text dark:text-electric-text">Today's Water</h3>
-            <p class="text-[11px] text-pastel-subtext dark:text-electric-subtext">Target: 8 glasses (2.0L)</p>
-          </div>
-        </div>
-
-        <!-- Decrement Button -->
-        <button onclick="adjustWater(-1)" class="w-8 h-8 rounded-full border border-pastel-border dark:border-electric-border flex items-center justify-center text-pastel-subtext hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle font-bold">
-          -
-        </button>
-      </div>
-
-      <!-- Primary Visual: Huge Display & Clickable Droplet Strip -->
-      <div class="flex items-baseline gap-2 mb-3">
-        <span id="waterDayCount" class="font-bubble text-4xl font-bold text-cyan-500 dark:text-electric-cyan">0</span>
-        <span class="text-sm font-semibold text-pastel-subtext dark:text-electric-subtext">/ 8 Glasses</span>
-      </div>
-
-      <div id="waterDropletsRow" class="grid grid-cols-8 gap-1.5 py-1">
-        <!-- Rendered via JS -->
-      </div>
-
-      <!-- Secondary Visual: Cumulative Lifetime Hydration -->
-      <div class="mt-3 pt-2.5 border-t border-pastel-border/60 dark:border-electric-border/60 flex items-center justify-between text-[11px] text-pastel-subtext dark:text-electric-subtext font-medium">
-        <span>Lifetime Journey:</span>
-        <span id="waterCumulativeCounter" class="font-bold text-pastel-text dark:text-electric-text">0 total glasses logged</span>
-      </div>
-    </div>
-
-    <!-- Card 2: Money Blueprint ("Girl Math" Safe Spend vs Expenses) -->
-    <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-3xl p-4 shadow-sm">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <div class="p-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-500">
-            <!-- Rounded Rupee/Wallet Icon -->
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.001-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-bold text-sm text-pastel-text dark:text-electric-text">Safe Spend & Joy Money</h3>
-            <p id="safeDailyCalculatedLabel" class="text-[11px] text-pastel-subtext dark:text-electric-subtext">Safe limit: ₹500/day</p>
-          </div>
-        </div>
-
-        <button onclick="openAddExpenseModal()" class="text-xs bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-full shadow-sm transition-transform active:scale-95">
-          + Add
-        </button>
-      </div>
-
-      <!-- Financial Metrics Strip -->
-      <div class="grid grid-cols-2 gap-2 mb-3 bg-pastel-cardSubtle dark:bg-electric-cardSubtle p-2.5 rounded-2xl">
-        <div>
-          <span class="text-[10px] uppercase font-bold text-pastel-subtext dark:text-electric-subtext">Spent Today</span>
-          <p id="dayTotalSpentDisplay" class="font-bubble text-xl font-bold text-pastel-text dark:text-electric-text">₹0</p>
-        </div>
-        <div>
-          <span class="text-[10px] uppercase font-bold text-pastel-subtext dark:text-electric-subtext">Remaining Safe</span>
-          <p id="dayRemainingSafeDisplay" class="font-bubble text-xl font-bold text-emerald-500">₹500</p>
-        </div>
-      </div>
-
-      <!-- Daily Expense Items Logged -->
-      <div id="dayExpensesList" class="flex flex-col gap-1.5 max-h-36 overflow-y-auto no-scrollbar">
-        <!-- Rendered via JS -->
-      </div>
-    </div>
-
-    <!-- Card 3: Categorized Meals & Fuel Ledger -->
-    <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-3xl p-4 shadow-sm">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <div class="p-1.5 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-500">
-            <!-- Fork & Bowl Rounded Icon -->
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.87c1.355 0 2.697.055 4.024.165C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-4.5H6" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-bold text-sm text-pastel-text dark:text-electric-text">Nourishment Ledger</h3>
-            <p class="text-[11px] text-pastel-subtext dark:text-electric-subtext">Mindful fuel, no guilt</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Categories Navigation -->
-      <div class="grid grid-cols-4 gap-1 mb-2.5">
-        <button onclick="selectMealCategory('breakfast')" id="mealTab-breakfast" class="py-1 text-xs font-bold rounded-xl bg-pastel-accent text-white">B-Fast</button>
-        <button onclick="selectMealCategory('lunch')" id="mealTab-lunch" class="py-1 text-xs font-bold rounded-xl bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-subtext">Lunch</button>
-        <button onclick="selectMealCategory('dinner')" id="mealTab-dinner" class="py-1 text-xs font-bold rounded-xl bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-subtext">Dinner</button>
-        <button onclick="selectMealCategory('snacks')" id="mealTab-snacks" class="py-1 text-xs font-bold rounded-xl bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-subtext">Snacks</button>
-      </div>
-
-      <!-- One-Tap Mumbai Pantry Quick-Chips -->
-      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 mb-2 text-xs">
-        <span class="text-[10px] font-bold text-pastel-subtext whitespace-nowrap">Quick:</span>
-        <button onclick="quickAddPantry('Sattu Chaas')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Chaas</button>
-        <button onclick="quickAddPantry('2 Boiled Eggs')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Eggs</button>
-        <button onclick="quickAddPantry('Dal Khichdi')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Khichdi</button>
-        <button onclick="quickAddPantry('Poha with Peanuts')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Poha</button>
-        <button onclick="quickAddPantry('Fresh Papaya / Apple')" class="px-2 py-0.5 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle border border-pastel-border dark:border-electric-border whitespace-nowrap hover:bg-pastel-accentLight">+ Fruit</button>
-      </div>
-
-      <!-- Meal Input Form -->
-      <div class="flex gap-2">
-        <input type="text" id="mealInputText" placeholder="Log your plate..." class="flex-1 bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-pastel-accent">
-        <button onclick="addCurrentMeal()" class="bg-pastel-accent dark:bg-electric-accent text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm">Log</button>
-      </div>
-
-      <!-- Current Category Meals List -->
-      <div id="currentCategoryMealList" class="flex flex-col gap-1 mt-2.5 text-xs">
-        <!-- Rendered via JS -->
-      </div>
-    </div>
-
-    <!-- Card 4: Scale & Physique -->
-    <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-3xl p-4 shadow-sm">
-      <div class="flex items-center justify-between mb-2">
-        <div class="flex items-center gap-2">
-          <div class="p-1.5 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-500">
-            <!-- Scale / Gauge Icon -->
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m9-9H3" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-bold text-sm text-pastel-text dark:text-electric-text">Scale & Check-In</h3>
-            <p id="targetWeightNote" class="text-[11px] text-pastel-subtext dark:text-electric-subtext">Goal: 62.0 kg</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <div class="flex items-baseline gap-1 bg-pastel-cardSubtle dark:bg-electric-cardSubtle px-3 py-2 rounded-2xl flex-1 border border-pastel-border dark:border-electric-border">
-          <input type="number" step="0.1" id="dailyWeightInput" placeholder="--.-" onchange="saveWeightForActiveDay()" class="bg-transparent font-bubble text-2xl font-bold w-20 outline-none text-pastel-text dark:text-electric-text">
-          <span class="text-xs font-semibold text-pastel-subtext">kg</span>
-        </div>
-        <input type="text" id="dailyWeightNote" placeholder="Notes (e.g. well-rested)" onchange="saveWeightForActiveDay()" class="flex-1 bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-2xl px-3 py-2 text-xs outline-none">
-      </div>
-    </div>
-
-    <!-- Card 5: Export & Backup Options -->
-    <div class="flex items-center justify-between gap-2 px-1 py-1 text-xs text-pastel-subtext dark:text-electric-subtext">
-      <button onclick="downloadJsonBackup()" class="flex items-center gap-1.5 hover:text-pastel-text transition-colors">
-        <span>📥 JSON Backup</span>
-      </button>
-      <button onclick="downloadCsvSummary()" class="flex items-center gap-1.5 hover:text-pastel-text transition-colors">
-        <span>📊 Export CSV</span>
-      </button>
-    </div>
-
-  </main>
-
-  <!-- ==================== 5. KIND AI COMPANION SANCTUARY (DRAWER) ==================== -->
-  <div id="companionDrawer" class="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-electric-card border-l border-pastel-border dark:border-electric-border z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
-    
-    <!-- Drawer Header -->
-    <div class="p-4 border-b border-pastel-border dark:border-electric-border flex items-center justify-between bg-pastel-cardSubtle dark:bg-electric-cardSubtle">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pastel-accent to-purple-400 flex items-center justify-center text-white text-xs font-bold shadow-sm">
-          ✨
-        </div>
-        <div>
-          <h3 class="font-bold text-sm text-pastel-text dark:text-electric-text">Companion Sanctuary</h3>
-          <p class="text-[10px] text-pastel-subtext dark:text-electric-subtext">Always kind, protective & gentle</p>
-        </div>
-      </div>
-      <button onclick="toggleCompanionDrawer()" class="p-1 rounded-full text-pastel-subtext hover:text-pastel-text">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    </div>
-
-    <!-- Quick Prompt Chips -->
-    <div class="px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-pastel-border/50 dark:border-electric-border/50 text-xs">
-      <button onclick="askCompanionPrompt('tired')" class="px-2.5 py-1 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold whitespace-nowrap text-[11px] border border-pastel-border dark:border-electric-border">
-        💖 I feel tired
-      </button>
-      <button onclick="askCompanionPrompt('snack')" class="px-2.5 py-1 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold whitespace-nowrap text-[11px] border border-pastel-border dark:border-electric-border">
-        🍲 5-min snack idea
-      </button>
-      <button onclick="askCompanionPrompt('okay')" class="px-2.5 py-1 rounded-full bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-accent dark:text-electric-cyan font-semibold whitespace-nowrap text-[11px] border border-pastel-border dark:border-electric-border">
-        🌸 Did I do okay today?
-      </button>
-    </div>
-
-    <!-- Live Gemini API Key Input (Optional) -->
-    <div class="px-4 py-2 bg-pastel-bg dark:bg-electric-bg border-b border-pastel-border/50 dark:border-electric-border/50 text-[11px] flex items-center justify-between">
-      <span class="text-pastel-subtext">Gemini Live Key:</span>
-      <input type="password" id="geminiApiKeyInput" placeholder="Optional AI key..." onchange="saveGeminiKey()" class="w-36 bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-lg px-2 py-0.5 text-xs outline-none">
-    </div>
-
-    <!-- Chat Message Feed -->
-    <div id="companionMessages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 text-xs leading-relaxed">
-      <div class="self-start max-w-[85%] bg-pastel-cardSubtle dark:bg-electric-cardSubtle p-3 rounded-2xl rounded-tl-none border border-pastel-border dark:border-electric-border text-pastel-text dark:text-electric-text">
-        Hello lovely! I am your Buttjet companion. Remember: you are doing beautifully, no matter what numbers appear on the scale or receipt today. How is your heart feeling right now?
-      </div>
-    </div>
-
-    <!-- Input Box -->
-    <div class="p-3 border-t border-pastel-border dark:border-electric-border bg-pastel-bg dark:bg-electric-bg">
-      <div class="flex gap-2">
-        <input type="text" id="companionInput" placeholder="Speak your mind or ask for gentle guidance..." onkeydown="if(event.key==='Enter') sendCompanionMessage()" class="flex-1 bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-pastel-accent">
-        <button onclick="sendCompanionMessage()" class="bg-pastel-accent dark:bg-electric-accent text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm">
-          Send
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== 6. ONBOARDING & PROFILE WIZARD (MODAL) ==================== -->
-  <div id="onboardingModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border w-full max-w-md rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-      
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="font-bubble text-2xl font-bold text-pastel-accent dark:text-electric-cyan">Welcome to Buttjet!</h2>
-          <p class="text-xs text-pastel-subtext dark:text-electric-subtext">Let's tailor your daily flow & preferences</p>
-        </div>
-        <button onclick="closeProfileModal()" class="text-pastel-subtext hover:text-pastel-text text-sm font-bold">✕</button>
-      </div>
-
-      <form id="onboardingForm" onsubmit="saveOnboardingProfile(event)" class="flex flex-col gap-3.5 text-xs">
         
-        <!-- Nickname -->
-        <div>
-          <label class="block font-bold mb-1">Preferred Name / Nickname</label>
-          <input type="text" id="obName" required placeholder="e.g. Dawn" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
+        <div class="ribbon-track" id="ribbon-container"></div>
+        <div class="month-grid" id="grid-container" style="display: none;"></div>
+      </section>
+
+      <!-- Dual-Tier Water Tracker -->
+      <section class="card">
+        <div class="card-title-row">
+          <div class="card-title">Daily Hydration</div>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Target: 8 Glasses</span>
         </div>
-
-        <!-- Gender -->
-        <div>
-          <label class="block font-bold mb-1">Gender</label>
-          <select id="obGender" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
-            <option value="Female">Female</option>
-            <option value="Male">Male</option>
-            <option value="Non-binary">Non-binary</option>
-            <option value="Prefer to self-describe">Prefer to self-describe</option>
-          </select>
+        
+        <div class="water-primary-num" id="daily-water-count">5 / 8 Glasses</div>
+        
+        <div class="water-droplets-row" id="droplets-row"></div>
+        
+        <div class="water-secondary-stat" id="lifetime-water-stat">
+          Total journey: 142 glasses logged across 18 days
         </div>
+      </section>
 
-        <!-- Weight Goals -->
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-bold mb-1">Starting Weight (kg)</label>
-            <input type="number" step="0.1" id="obStartWeight" placeholder="e.g. 68.5" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
-          </div>
-          <div>
-            <label class="block font-bold mb-1">Goal Weight (kg)</label>
-            <input type="number" step="0.1" id="obGoalWeight" placeholder="e.g. 62.0" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
-          </div>
+      <!-- Spend & Fuel Metrics -->
+      <section class="metrics-grid">
+        <div class="metric-box">
+          <div class="metric-label">Safe Daily Spend</div>
+          <div class="metric-val" id="safe-spend-val">₹650</div>
         </div>
-
-        <!-- Monthly Budget -->
-        <div>
-          <label class="block font-bold mb-1">Monthly Discretionary Budget (₹)</label>
-          <input type="number" id="obMonthlyBudget" placeholder="e.g. 15000" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
-          <span class="text-[10px] text-pastel-subtext">Calculates daily safe spending limit.</span>
+        <div class="metric-box">
+          <div class="metric-label">Logged Fuel</div>
+          <div class="metric-val" id="fuel-count-val">3 Meals</div>
         </div>
+      </section>
 
-        <!-- Date Format Preference -->
-        <div>
-          <label class="block font-bold mb-1">Date Display Format</label>
-          <select id="obDateFormat" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
-            <option value="DD/MM/YYYY">DD/MM/YYYY (e.g. 24/10/2026)</option>
-            <option value="MM/DD/YYYY">MM/DD/YYYY (e.g. 10/24/2026)</option>
-            <option value="YYYY-MM-DD">YYYY-MM-DD (e.g. 2026-10-24)</option>
-          </select>
+      <!-- Clean Companion Sanctuary (No API Key Box Here) -->
+      <section class="companion-banner">
+        <div class="companion-header-row">
+          <h4>Companion Sanctuary ✨</h4>
         </div>
-
-        <!-- Cloud Account & Firebase Sync -->
-        <div class="border-t border-pastel-border dark:border-electric-border pt-3 mt-1">
-          <label class="block font-bold mb-1.5">Cloud Sync & Account (Firebase)</label>
-          <div class="flex flex-col gap-2">
-            <div id="authStatusLine" class="text-xs text-pastel-subtext mb-1">
-              Currently operating in: <strong id="authStatusText">Guest Mode (Local)</strong>
-            </div>
-
-            <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2 py-2 px-3 border border-pastel-border dark:border-electric-border rounded-xl font-bold bg-white dark:bg-electric-cardSubtle hover:opacity-90">
-              <svg class="w-4 h-4" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-              </svg>
-              Sign in with Google
-            </button>
-
-            <button type="button" id="signOutBtn" onclick="handleSignOut()" class="hidden w-full py-1.5 text-xs text-rose-500 font-bold border border-rose-200 dark:border-rose-900 rounded-xl">
-              Sign Out
-            </button>
-          </div>
+        <div class="chat-bubble" id="companion-reply">
+          "Hey Yentl, I'm right here with you. Take a soft breath. What can I help nourish or lighten for you right now?"
         </div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input-field" class="chat-input" placeholder="Ask for meal ideas, check-in, comfort..." />
+          <button class="chat-send-btn" onclick="handleChatSend()">Send</button>
+        </div>
+      </section>
+    </main>
+  </div>
 
-        <button type="submit" class="mt-2 w-full bg-pastel-accent dark:bg-electric-accent text-white py-2.5 rounded-xl font-bold shadow-md hover:opacity-90">
-          Save Settings & Continue
-        </button>
+  <!-- Settings Sheet (Gemini Key resides safely here) -->
+  <div id="settings-modal" onclick="closeSettings(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <h3>App Settings</h3>
+        <button class="modal-close-btn" onclick="closeSettingsDirect()">✕</button>
+      </div>
 
-      </form>
+      <div>
+        <label class="setting-label">Your Display Name</label>
+        <input type="text" id="setting-name" class="setting-input" value="Yentl" style="margin-top:6px;" />
+      </div>
+
+      <div>
+        <label class="setting-label">Gemini Live Key (Saved Securely)</label>
+        <input type="password" id="setting-gemini-key" class="setting-input" placeholder="AIzaSy... or AQ..." style="margin-top:6px;" />
+        <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:4px;">Powers live empathetic replies and recipe ideas.</span>
+      </div>
+
+      <div>
+        <label class="setting-label">Date Format Preference</label>
+        <select id="setting-date-fmt" class="setting-input" style="margin-top:6px;">
+          <option value="DD/MM/YYYY">DD/MM/YYYY (e.g. 24/10/2026)</option>
+          <option value="MM/DD/YYYY">MM/DD/YYYY (e.g. 10/24/2026)</option>
+          <option value="YYYY-MM-DD">YYYY-MM-DD (e.g. 2026-10-24)</option>
+        </select>
+      </div>
+
+      <button class="save-settings-btn" onclick="saveSettings()">Save Preferences</button>
     </div>
   </div>
 
-  <!-- ==================== 7. ADD EXPENSE MODAL ==================== -->
-  <div id="expenseModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-electric-card border border-pastel-border dark:border-electric-border w-full max-w-sm rounded-3xl p-5 shadow-2xl">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="font-bold text-sm">Add Expense for Selected Date</h3>
-        <button onclick="closeAddExpenseModal()" class="text-pastel-subtext font-bold">✕</button>
-      </div>
-
-      <div class="flex flex-col gap-3 text-xs">
-        <div>
-          <label class="block font-bold mb-1">Amount (₹)</label>
-          <input type="number" id="newExpenseAmount" placeholder="e.g. 150" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 font-bold text-base outline-none">
-        </div>
-
-        <div>
-          <label class="block font-bold mb-1">Category Tag</label>
-          <div class="grid grid-cols-3 gap-1.5 mb-2">
-            <button type="button" onclick="setExpenseTag('Food')" class="expense-tag-btn py-1 px-2 rounded-lg border border-pastel-border dark:border-electric-border text-center bg-pastel-accent text-white">Food</button>
-            <button type="button" onclick="setExpenseTag('Travel')" class="expense-tag-btn py-1 px-2 rounded-lg border border-pastel-border dark:border-electric-border text-center">Travel</button>
-            <button type="button" onclick="setExpenseTag('Joy')" class="expense-tag-btn py-1 px-2 rounded-lg border border-pastel-border dark:border-electric-border text-center">Joy</button>
-          </div>
-          <input type="text" id="newExpenseDesc" placeholder="Description (e.g. Iced Latte)" class="w-full bg-pastel-bg dark:bg-electric-bg border border-pastel-border dark:border-electric-border rounded-xl px-3 py-2 outline-none">
-        </div>
-
-        <button onclick="saveNewExpense()" class="w-full bg-emerald-500 text-white py-2 rounded-xl font-bold shadow-sm mt-1">
-          Save to Day
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== JAVASCRIPT APPLICATION ENGINE ==================== -->
   <script>
-    /* ----------------------------------------------------
-       1. FIREBASE SDK INITIALIZATION
-    ---------------------------------------------------- */
-    const firebaseConfig = {
-      apiKey: "AIzaSyBQJvpuJkKZjOZO5ERBW5PFyiwAFRwOCg0",
-      authDomain: "buttjet-2026.firebaseapp.com",
-      projectId: "buttjet-2026",
-      storageBucket: "buttjet-2026.firebasestorage.app",
-      messagingSenderId: "810559143047",
-      appId: "1:810559143047:web:5420be0d1fd82ac2500c22",
-      measurementId: "G-1H7RPQW86C"
-    };
+    // State
+    let userName = localStorage.getItem('buttjet_name') || 'Yentl';
+    let geminiKey = localStorage.getItem('buttjet_gemini_key') || 'AQ.Ab8RN6K3D1aZ9BQmweZ_GqCMEI3TpzFmdwfOV688GqikRgsQeQ';
+    let selectedDate = new Date();
+    let currentView = 'ribbon';
+    let dailyGlasses = 5;
 
-    let auth = null;
-    let db = null;
-    let currentUser = null;
-
-    try {
-      firebase.initializeApp(firebaseConfig);
-      auth = firebase.auth();
-      db = firebase.firestore();
-    } catch (e) {
-      console.warn("Firebase initialized in local/offline fallback mode:", e);
-    }
-
-    /* ----------------------------------------------------
-       2. APPLICATION STATE
-    ---------------------------------------------------- */
-    const todayISO = new Date().toISOString().split('T')[0];
-    let activeDateISO = todayISO;
-    let calendarViewMode = 'ribbon'; // 'ribbon' or 'grid'
-    let currentMealCategory = 'breakfast';
-    let currentExpenseTag = 'Food';
-
-    // User Profile
-    let userProfile = {
-      name: 'Friend',
-      gender: 'Female',
-      startWeight: 68.0,
-      goalWeight: 62.0,
-      monthlyBudget: 15000,
-      dateFormat: 'DD/MM/YYYY',
-      theme: 'pastel',
-      geminiKey: ''
-    };
-
-    // Date-Indexed Storage: dayRecords[YYYY-MM-DD] = { water: 0, weight: null, weightNote: '', meals: {breakfast:[], lunch:[], dinner:[], snacks:[]}, expenses: [] }
-    let dayRecords = {};
-
-    /* ----------------------------------------------------
-       3. LIFECYCLE & STARTUP
-    ---------------------------------------------------- */
-    window.addEventListener('DOMContentLoaded', () => {
-      loadLocalData();
-      initAuthListener();
-      applyTheme(userProfile.theme);
-      checkFirstLaunch();
-      renderCalendar();
-      renderActiveDateLedger();
-      setupMidnightRollover();
-    });
-
-    // Opening Animation: Concept 1 Auto-Fade after 3.2s
-    function checkFirstLaunch() {
-      if (sessionStorage.getItem('buttjet_bubble_intro_seen')) {
-        document.getElementById('introOverlay').style.display = 'none';
-      } else {
-        setTimeout(() => {
-          dismissIntro();
-        }, 3400);
-      }
-    }
-
+    // Intro Dismiss
     function dismissIntro() {
-      const overlay = document.getElementById('introOverlay');
-      overlay.style.opacity = '0';
-      sessionStorage.setItem('buttjet_bubble_intro_seen', 'true');
-      setTimeout(() => {
-        overlay.style.display = 'none';
-      }, 700);
-    }
-
-    // Daily Midnight Rollover: automatically switch active date to new day
-    function setupMidnightRollover() {
-      setInterval(() => {
-        const checkToday = new Date().toISOString().split('T')[0];
-        if (checkToday !== todayISO) {
-          window.location.reload();
-        }
-      }, 60000);
-    }
-
-    /* ----------------------------------------------------
-       4. LOCAL & CLOUD STORAGE ENGINE
-    ---------------------------------------------------- */
-    function loadLocalData() {
-      try {
-        const savedProfile = localStorage.getItem('buttjet_profile');
-        if (savedProfile) {
-          userProfile = JSON.parse(savedProfile);
-        } else {
-          // Trigger first time onboarding modal after intro
-          setTimeout(() => { openProfileModal(); }, 1200);
-        }
-
-        const savedDays = localStorage.getItem('buttjet_days');
-        if (savedDays) dayRecords = JSON.parse(savedDays);
-
-        if (userProfile.geminiKey) {
-          document.getElementById('geminiApiKeyInput').value = userProfile.geminiKey;
-        }
-      } catch (err) {
-        console.error("Local data load warning:", err);
+      const intro = document.getElementById('intro-screen');
+      if (intro) {
+        intro.style.opacity = '0';
+        intro.style.visibility = 'hidden';
+        setTimeout(() => intro.remove(), 800);
       }
     }
+    setTimeout(dismissIntro, 3400);
 
-    function saveState() {
-      localStorage.setItem('buttjet_profile', JSON.stringify(userProfile));
-      localStorage.setItem('buttjet_days', JSON.stringify(dayRecords));
-
-      // Firestore cloud sync if logged in
-      if (currentUser && db) {
-        db.collection('users').doc(currentUser.uid).set({
-          profile: userProfile,
-          days: dayRecords,
-          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).then(() => {
-          document.getElementById('cloudSyncIndicator').className = "w-2 h-2 rounded-full bg-emerald-400";
-        }).catch(err => {
-          console.warn("Firestore sync pending:", err);
-          document.getElementById('cloudSyncIndicator').className = "w-2 h-2 rounded-full bg-amber-400";
-        });
-      }
-    }
-
-    /* ----------------------------------------------------
-       5. FIREBASE AUTH & GOOGLE SIGN-IN
-    ---------------------------------------------------- */
-    function initAuthListener() {
-      if (!auth) return;
-      auth.onAuthStateChanged(user => {
-        currentUser = user;
-        const statusText = document.getElementById('authStatusText');
-        const signOutBtn = document.getElementById('signOutBtn');
-        const avatar = document.getElementById('userAvatarPill');
-
-        if (user) {
-          statusText.innerText = user.displayName || user.email;
-          signOutBtn.classList.remove('hidden');
-          avatar.innerText = (user.displayName || user.email || 'U')[0].toUpperCase();
-
-          // Sync remote cloud data
-          db.collection('users').doc(user.uid).get().then(doc => {
-            if (doc.exists) {
-              const remote = doc.data();
-              if (remote.profile) userProfile = { ...userProfile, ...remote.profile };
-              if (remote.days) dayRecords = { ...dayRecords, ...remote.days };
-              saveState();
-              applyTheme(userProfile.theme);
-              renderCalendar();
-              renderActiveDateLedger();
-            }
-          });
-        } else {
-          statusText.innerText = "Guest Mode (Local)";
-          signOutBtn.classList.add('hidden');
-          avatar.innerText = "G";
-        }
-      });
-    }
-
-    function loginWithGoogle() {
-      if (!auth) {
-        alert("Firebase is operating in offline mode. Please check connection.");
-        return;
-      }
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(err => {
-        console.error("Auth sign-in issue:", err);
-        alert("Domain authentication notice: Please ensure yentldawn.github.io is in your Firebase Authorized Domains.");
-      });
-    }
-
-    function handleSignOut() {
-      if (auth) auth.signOut();
-    }
-
-    /* ----------------------------------------------------
-       6. DUAL THEMES (PASTEL vs ELECTRIC)
-    ---------------------------------------------------- */
+    // Theme Toggle
     function toggleTheme() {
-      const newTheme = userProfile.theme === 'pastel' ? 'electric' : 'pastel';
-      applyTheme(newTheme);
+      const b = document.body;
+      b.setAttribute('data-theme', b.getAttribute('data-theme') === 'pastel' ? 'electric' : 'pastel');
     }
 
-    function applyTheme(theme) {
-      userProfile.theme = theme;
-      const body = document.getElementById('appBody');
-      if (theme === 'electric') {
-        document.documentElement.classList.add('dark');
-        body.classList.remove('bg-pastel-bg', 'text-pastel-text');
-        body.classList.add('bg-electric-bg', 'text-electric-text');
-      } else {
-        document.documentElement.classList.remove('dark');
-        body.classList.remove('bg-electric-bg', 'text-electric-text');
-        body.classList.add('bg-pastel-bg', 'text-pastel-text');
+    // Settings Modal
+    function openSettings() {
+      document.getElementById('setting-name').value = userName;
+      document.getElementById('setting-gemini-key').value = geminiKey;
+      document.getElementById('settings-modal').classList.add('open');
+    }
+    function closeSettingsDirect() {
+      document.getElementById('settings-modal').classList.remove('open');
+    }
+    function closeSettings(e) {
+      if (e.target.id === 'settings-modal') closeSettingsDirect();
+    }
+    function saveSettings() {
+      userName = document.getElementById('setting-name').value.trim() || 'Yentl';
+      geminiKey = document.getElementById('setting-gemini-key').value.trim();
+      localStorage.setItem('buttjet_name', userName);
+      localStorage.setItem('buttjet_gemini_key', geminiKey);
+      document.getElementById('top-greeting').innerHTML = `Hey, <span>${userName}</span> ✨`;
+      closeSettingsDirect();
+    }
+
+    // Hydration Droplets
+    function renderDroplets() {
+      const row = document.getElementById('droplets-row');
+      row.innerHTML = '';
+      for (let i = 1; i <= 8; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'drop-btn ' + (i <= dailyGlasses ? 'filled' : '');
+        btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
+        btn.onclick = () => {
+          dailyGlasses = i;
+          document.getElementById('daily-water-count').innerText = `${dailyGlasses} / 8 Glasses`;
+          renderDroplets();
+        };
+        row.appendChild(btn);
       }
-      saveState();
     }
 
-    /* ----------------------------------------------------
-       7. HYBRID CALENDAR (RIBBON & FULL MONTH BLOCK GRID)
-    ---------------------------------------------------- */
-    function switchCalendarView(mode) {
-      calendarViewMode = mode;
-      const ribbonCont = document.getElementById('calendarRibbonContainer');
-      const gridCont = document.getElementById('calendarGridContainer');
-      const ribbonBtn = document.getElementById('viewRibbonBtn');
-      const gridBtn = document.getElementById('viewGridBtn');
-
-      if (mode === 'grid') {
-        ribbonCont.classList.add('hidden');
-        gridCont.classList.remove('hidden');
-        gridBtn.className = "px-2.5 py-1 rounded-lg bg-pastel-accent text-white dark:bg-electric-accent transition-all";
-        ribbonBtn.className = "px-2.5 py-1 rounded-lg text-pastel-subtext dark:text-electric-subtext hover:text-pastel-text";
+    // Calendar Toggle & Render
+    function toggleCalView() {
+      const ribbon = document.getElementById('ribbon-container');
+      const grid = document.getElementById('grid-container');
+      const btn = document.getElementById('view-toggle-btn');
+      if (currentView === 'ribbon') {
+        currentView = 'grid';
+        ribbon.style.display = 'none';
+        grid.style.display = 'grid';
+        btn.innerText = 'Ribbon View';
+        renderGrid();
       } else {
-        gridCont.classList.add('hidden');
-        ribbonCont.classList.remove('hidden');
-        ribbonBtn.className = "px-2.5 py-1 rounded-lg bg-pastel-accent text-white dark:bg-electric-accent transition-all";
-        gridBtn.className = "px-2.5 py-1 rounded-lg text-pastel-subtext dark:text-electric-subtext hover:text-pastel-text";
+        currentView = 'ribbon';
+        ribbon.style.display = 'flex';
+        grid.style.display = 'none';
+        btn.innerText = 'Grid View';
+        renderRibbon();
       }
-      renderCalendar();
     }
 
-    function jumpToToday() {
-      activeDateISO = todayISO;
-      renderCalendar();
-      renderActiveDateLedger();
-    }
-
-    function selectDate(isoString) {
-      activeDateISO = isoString;
-      renderCalendar();
-      renderActiveDateLedger();
-    }
-
-    function formatDateDisplay(isoString) {
-      const [year, month, day] = isoString.split('-');
-      if (userProfile.dateFormat === 'MM/DD/YYYY') return `${month}/${day}/${year}`;
-      if (userProfile.dateFormat === 'YYYY-MM-DD') return `${year}-${month}-${day}`;
-      return `${day}/${month}/${year}`;
-    }
-
-    function renderCalendar() {
-      const activeObj = new Date(activeDateISO);
-      const year = activeObj.getFullYear();
-      const month = activeObj.getMonth();
-
-      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      document.getElementById('currentMonthYearLabel').innerText = `${monthNames[month]} ${year}`;
-      document.getElementById('activeDateHeaderLabel').innerText = (activeDateISO === todayISO) ? `Today (${formatDateDisplay(activeDateISO)})` : formatDateDisplay(activeDateISO);
-
-      // Render View A: 7-Day Ribbon
-      const ribbon = document.getElementById('calendarRibbonContainer');
+    function renderRibbon() {
+      const ribbon = document.getElementById('ribbon-container');
       ribbon.innerHTML = '';
-
-      for (let offset = -3; offset <= 3; offset++) {
-        const d = new Date(activeObj);
-        d.setDate(activeObj.getDate() + offset);
-        const iso = d.toISOString().split('T')[0];
-        const dayNum = d.getDate();
-        const dayAbbr = d.toLocaleDateString('en-US', { weekday: 'short' });
-        const isActive = (iso === activeDateISO);
-        const record = dayRecords[iso] || {};
-
-        const chip = document.createElement('button');
-        chip.onclick = () => selectDate(iso);
-        chip.className = `flex-1 min-w-[44px] py-2 px-1 rounded-2xl flex flex-col items-center justify-center transition-all ${
-          isActive 
-            ? 'bg-pastel-accent text-white dark:bg-electric-accent shadow-md scale-105' 
-            : 'bg-white dark:bg-electric-card text-pastel-subtext dark:text-electric-subtext border border-pastel-border dark:border-electric-border'
-        }`;
-
-        const hasWater = (record.water || 0) > 0;
-        const hasFood = record.meals && Object.values(record.meals).some(arr => arr.length > 0);
-        const hasSpend = (record.expenses || []).length > 0;
-
+      const dows = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      for (let i = -3; i <= 3; i++) {
+        const d = new Date(selectedDate);
+        d.setDate(d.getDate() + i);
+        const chip = document.createElement('div');
+        chip.className = 'ribbon-chip ' + (i === 0 ? 'active' : '');
         chip.innerHTML = `
-          <span class="text-[10px] font-semibold uppercase opacity-80">${dayAbbr}</span>
-          <span class="text-sm font-bold font-bubble my-0.5">${dayNum}</span>
-          <div class="flex items-center gap-0.5 mt-0.5">
-            <span class="w-1.5 h-1.5 rounded-full ${hasWater ? (isActive ? 'bg-white' : 'bg-cyan-400') : 'opacity-0'}"></span>
-            <span class="w-1.5 h-1.5 rounded-full ${hasFood ? (isActive ? 'bg-white' : 'bg-amber-400') : 'opacity-0'}"></span>
-            <span class="w-1.5 h-1.5 rounded-full ${hasSpend ? (isActive ? 'bg-white' : 'bg-emerald-400') : 'opacity-0'}"></span>
-          </div>
+          <div class="chip-dow">${dows[d.getDay()]}</div>
+          <div class="chip-num">${d.getDate()}</div>
+          <div class="chip-pips"><div class="pip"></div><div class="pip"></div></div>
         `;
         ribbon.appendChild(chip);
       }
-
-      // Render View B: Full Month 7x5 Grid
-      const gridDays = document.getElementById('calendarGridDays');
-      gridDays.innerHTML = '';
-
-      const firstDayOfMonth = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-      for (let i = 0; i < firstDayOfMonth; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = "h-9 rounded-xl opacity-20";
-        gridDays.appendChild(emptyCell);
-      }
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const cellDate = new Date(year, month, day);
-        const iso = cellDate.toISOString().split('T')[0];
-        const isActive = (iso === activeDateISO);
-        const isCurrentToday = (iso === todayISO);
-        const record = dayRecords[iso] || {};
-
-        const dayBtn = document.createElement('button');
-        dayBtn.onclick = () => selectDate(iso);
-        dayBtn.className = `h-9 rounded-xl flex flex-col items-center justify-center text-xs font-bold relative transition-all ${
-          isActive 
-            ? 'bg-pastel-accent text-white dark:bg-electric-accent shadow-sm' 
-            : isCurrentToday
-              ? 'border-2 border-pastel-accent dark:border-electric-cyan text-pastel-accent dark:text-electric-cyan'
-              : 'hover:bg-pastel-cardSubtle dark:hover:bg-electric-cardSubtle text-pastel-text dark:text-electric-text'
-        }`;
-
-        const hasWater = (record.water || 0) >= 8;
-        dayBtn.innerHTML = `
-          <span>${day}</span>
-          ${hasWater ? `<span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-cyan-400'} absolute bottom-1"></span>` : ''}
-        `;
-        gridDays.appendChild(dayBtn);
-      }
     }
 
-    /* ----------------------------------------------------
-       8. DAILY ACTIVE LEDGER (CARD METRICS)
-    ---------------------------------------------------- */
-    function getActiveDayRecord() {
-      if (!dayRecords[activeDateISO]) {
-        dayRecords[activeDateISO] = {
-          water: 0,
-          weight: null,
-          weightNote: '',
-          meals: { breakfast: [], lunch: [], dinner: [], snacks: [] },
-          expenses: []
-        };
-      }
-      return dayRecords[activeDateISO];
-    }
-
-    function renderActiveDateLedger() {
-      const rec = getActiveDayRecord();
-
-      // 1. Water Tracker
-      document.getElementById('waterDayCount').innerText = rec.water || 0;
-      const dropletsRow = document.getElementById('waterDropletsRow');
-      dropletsRow.innerHTML = '';
-
-      for (let i = 1; i <= 8; i++) {
-        const isFilled = (rec.water || 0) >= i;
-        const dropBtn = document.createElement('button');
-        dropBtn.onclick = () => setWaterDirect(i);
-        dropBtn.className = `h-9 rounded-xl flex items-center justify-center transition-transform active:scale-90 ${
-          isFilled 
-            ? 'bg-cyan-400 text-white shadow-sm drop-pop' 
-            : 'bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-cyan-200 border border-pastel-border dark:border-electric-border'
-        }`;
-        dropBtn.innerHTML = `
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 2c-.6 0-1.1.3-1.4.8C7.5 4.6 4 10.3 4 13a6 6 0 1012 0c0-2.7-3.5-8.4-4.6-10.2A1.6 1.6 0 0010 2z" clip-rule="evenodd"/>
-          </svg>
-        `;
-        dropletsRow.appendChild(dropBtn);
-      }
-
-      // Secondary Cumulative Water Total
-      let totalGlassesAllTime = 0;
-      let activeHydraDays = 0;
-      Object.values(dayRecords).forEach(d => {
-        if (d.water && d.water > 0) {
-          totalGlassesAllTime += d.water;
-          activeHydraDays++;
-        }
+    function renderGrid() {
+      const grid = document.getElementById('grid-container');
+      grid.innerHTML = '';
+      const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+      days.forEach(d => {
+        const h = document.createElement('div');
+        h.className = 'grid-dow';
+        h.innerText = d;
+        grid.appendChild(h);
       });
-      document.getElementById('waterCumulativeCounter').innerText = `${totalGlassesAllTime} total glasses logged across ${activeHydraDays} days`;
-
-      // 2. Safe Daily Spend Blueprint
-      const dailySafeLimit = Math.round((userProfile.monthlyBudget || 15000) / 30);
-      document.getElementById('safeDailyCalculatedLabel').innerText = `Safe limit: ₹${dailySafeLimit}/day`;
-
-      let daySpent = 0;
-      (rec.expenses || []).forEach(item => daySpent += Number(item.amount || 0));
-      const remainingSafe = dailySafeLimit - daySpent;
-
-      document.getElementById('dayTotalSpentDisplay').innerText = `₹${daySpent}`;
-      const remEl = document.getElementById('dayRemainingSafeDisplay');
-      remEl.innerText = `₹${remainingSafe}`;
-      remEl.className = `font-bubble text-xl font-bold ${remainingSafe >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
-
-      const expenseListEl = document.getElementById('dayExpensesList');
-      expenseListEl.innerHTML = '';
-      if (!rec.expenses || rec.expenses.length === 0) {
-        expenseListEl.innerHTML = `<span class="text-[11px] text-pastel-subtext italic">No expenses logged yet today.</span>`;
-      } else {
-        rec.expenses.forEach((item, idx) => {
-          const row = document.createElement('div');
-          row.className = "flex items-center justify-between py-1 border-b border-pastel-border/40 dark:border-electric-border/40 text-xs";
-          row.innerHTML = `
-            <div class="flex items-center gap-1.5">
-              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-pastel-cardSubtle dark:bg-electric-cardSubtle">${item.tag || 'Food'}</span>
-              <span>${item.desc || 'Expense'}</span>
-            </div>
-            <div class="flex items-center gap-2 font-bold">
-              <span>₹${item.amount}</span>
-              <button onclick="removeExpense(${idx})" class="text-rose-400 hover:text-rose-600">✕</button>
-            </div>
-          `;
-          expenseListEl.appendChild(row);
-        });
-      }
-
-      // 3. Scale & Check-in
-      document.getElementById('dailyWeightInput').value = rec.weight || '';
-      document.getElementById('dailyWeightNote').value = rec.weightNote || '';
-      document.getElementById('targetWeightNote').innerText = `Goal: ${userProfile.goalWeight || 62.0} kg`;
-
-      // 4. Meals Category
-      renderCurrentCategoryMeals();
-    }
-
-    /* Water Actions */
-    function adjustWater(delta) {
-      const rec = getActiveDayRecord();
-      rec.water = Math.max(0, (rec.water || 0) + delta);
-      if (rec.water === 8) {
-        confetti({ particleCount: 35, spread: 65, origin: { y: 0.8 } });
-      }
-      saveState();
-      renderActiveDateLedger();
-      renderCalendar();
-    }
-
-    function setWaterDirect(index) {
-      const rec = getActiveDayRecord();
-      rec.water = (rec.water === index) ? index - 1 : index;
-      if (rec.water === 8) {
-        confetti({ particleCount: 40, spread: 70, origin: { y: 0.7 } });
-      }
-      saveState();
-      renderActiveDateLedger();
-      renderCalendar();
-    }
-
-    /* Weight Actions */
-    function saveWeightForActiveDay() {
-      const rec = getActiveDayRecord();
-      rec.weight = parseFloat(document.getElementById('dailyWeightInput').value) || null;
-      rec.weightNote = document.getElementById('dailyWeightNote').value.trim();
-      saveState();
-    }
-
-    /* Meals Actions */
-    function selectMealCategory(cat) {
-      currentMealCategory = cat;
-      ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(c => {
-        const btn = document.getElementById(`mealTab-${c}`);
-        if (c === cat) {
-          btn.className = "py-1 text-xs font-bold rounded-xl bg-pastel-accent dark:bg-electric-accent text-white";
-        } else {
-          btn.className = "py-1 text-xs font-bold rounded-xl bg-pastel-cardSubtle dark:bg-electric-cardSubtle text-pastel-subtext";
-        }
-      });
-      renderCurrentCategoryMeals();
-    }
-
-    function renderCurrentCategoryMeals() {
-      const rec = getActiveDayRecord();
-      const listEl = document.getElementById('currentCategoryMealList');
-      listEl.innerHTML = '';
-      const items = (rec.meals && rec.meals[currentMealCategory]) || [];
-
-      if (items.length === 0) {
-        listEl.innerHTML = `<span class="text-[11px] text-pastel-subtext italic">No items logged under ${currentMealCategory}.</span>`;
-        return;
-      }
-
-      items.forEach((meal, idx) => {
-        const chip = document.createElement('div');
-        chip.className = "flex items-center justify-between bg-pastel-cardSubtle dark:bg-electric-cardSubtle px-2.5 py-1.5 rounded-xl border border-pastel-border/50 dark:border-electric-border/50";
-        chip.innerHTML = `
-          <span>${meal}</span>
-          <button onclick="removeMealItem('${currentMealCategory}', ${idx})" class="text-pastel-subtext hover:text-rose-500 font-bold ml-2">✕</button>
-        `;
-        listEl.appendChild(chip);
-      });
-    }
-
-    function addCurrentMeal() {
-      const input = document.getElementById('mealInputText');
-      const val = input.value.trim();
-      if (!val) return;
-      const rec = getActiveDayRecord();
-      if (!rec.meals) rec.meals = { breakfast: [], lunch: [], dinner: [], snacks: [] };
-      if (!rec.meals[currentMealCategory]) rec.meals[currentMealCategory] = [];
-      rec.meals[currentMealCategory].push(val);
-      input.value = '';
-      saveState();
-      renderCurrentCategoryMeals();
-      renderCalendar();
-    }
-
-    function quickAddPantry(dishName) {
-      const rec = getActiveDayRecord();
-      if (!rec.meals) rec.meals = { breakfast: [], lunch: [], dinner: [], snacks: [] };
-      if (!rec.meals[currentMealCategory]) rec.meals[currentMealCategory] = [];
-      rec.meals[currentMealCategory].push(dishName);
-      saveState();
-      renderCurrentCategoryMeals();
-      renderCalendar();
-    }
-
-    function removeMealItem(category, idx) {
-      const rec = getActiveDayRecord();
-      if (rec.meals && rec.meals[category]) {
-        rec.meals[category].splice(idx, 1);
-        saveState();
-        renderCurrentCategoryMeals();
-        renderCalendar();
+      for (let i = 1; i <= 31; i++) {
+        const c = document.createElement('div');
+        c.className = 'grid-cell ' + (i === selectedDate.getDate() ? 'active' : '');
+        c.innerText = i;
+        grid.appendChild(c);
       }
     }
 
-    /* Expenses Actions */
-    function openAddExpenseModal() {
-      document.getElementById('expenseModal').classList.remove('hidden');
-    }
-    function closeAddExpenseModal() {
-      document.getElementById('expenseModal').classList.add('hidden');
-    }
-    function setExpenseTag(tag) {
-      currentExpenseTag = tag;
-      document.querySelectorAll('.expense-tag-btn').forEach(btn => {
-        btn.classList.toggle('bg-pastel-accent', btn.innerText.includes(tag));
-        btn.classList.toggle('text-white', btn.innerText.includes(tag));
-      });
-    }
-    function saveNewExpense() {
-      const amount = parseFloat(document.getElementById('newExpenseAmount').value);
-      const desc = document.getElementById('newExpenseDesc').value.trim();
-      if (!amount || amount <= 0) return;
-
-      const rec = getActiveDayRecord();
-      if (!rec.expenses) rec.expenses = [];
-      rec.expenses.push({ amount, desc, tag: currentExpenseTag });
-
-      document.getElementById('newExpenseAmount').value = '';
-      document.getElementById('newExpenseDesc').value = '';
-      closeAddExpenseModal();
-      saveState();
-      renderActiveDateLedger();
-      renderCalendar();
-    }
-    function removeExpense(idx) {
-      const rec = getActiveDayRecord();
-      rec.expenses.splice(idx, 1);
-      saveState();
-      renderActiveDateLedger();
-      renderCalendar();
-    }
-
-    /* ----------------------------------------------------
-       9. ONBOARDING & PROFILE MODAL
-    ---------------------------------------------------- */
-    function openProfileModal() {
-      document.getElementById('obName').value = userProfile.name || '';
-      document.getElementById('obGender').value = userProfile.gender || 'Female';
-      document.getElementById('obStartWeight').value = userProfile.startWeight || '';
-      document.getElementById('obGoalWeight').value = userProfile.goalWeight || '';
-      document.getElementById('obMonthlyBudget').value = userProfile.monthlyBudget || 15000;
-      document.getElementById('obDateFormat').value = userProfile.dateFormat || 'DD/MM/YYYY';
-      document.getElementById('onboardingModal').classList.remove('hidden');
-    }
-
-    function closeProfileModal() {
-      document.getElementById('onboardingModal').classList.add('hidden');
-    }
-
-    function saveOnboardingProfile(e) {
-      e.preventDefault();
-      userProfile.name = document.getElementById('obName').value.trim() || 'Friend';
-      userProfile.gender = document.getElementById('obGender').value;
-      userProfile.startWeight = parseFloat(document.getElementById('obStartWeight').value) || 68.0;
-      userProfile.goalWeight = parseFloat(document.getElementById('obGoalWeight').value) || 62.0;
-      userProfile.monthlyBudget = parseFloat(document.getElementById('obMonthlyBudget').value) || 15000;
-      userProfile.dateFormat = document.getElementById('obDateFormat').value;
-
-      saveState();
-      closeProfileModal();
-      renderCalendar();
-      renderActiveDateLedger();
-    }
-
-    /* ----------------------------------------------------
-       10. KIND AI COMPANION SANCTUARY
-    ---------------------------------------------------- */
-    function toggleCompanionDrawer() {
-      const drawer = document.getElementById('companionDrawer');
-      drawer.classList.toggle('translate-x-full');
-    }
-
-    function saveGeminiKey() {
-      userProfile.geminiKey = document.getElementById('geminiApiKeyInput').value.trim();
-      saveState();
-    }
-
-    function askCompanionPrompt(type) {
-      if (type === 'tired') {
-        appendCompanionMsg("I feel so tired today.", true);
-        respondKindCompanion("I hear you completely. Please lower any high expectations you placed on yourself today. It's completely okay to do the bare minimum, sip a glass of warm water, and rest without feeling an ounce of guilt. You are doing enough simply by resting.");
-      } else if (type === 'snack') {
-        appendCompanionMsg("Can you give me a comforting 5-min snack idea?", true);
-        respondKindCompanion("How about a quick glass of Sattu Chaas with a pinch of roasted cumin, or a small warm bowl of curd with a tiny drizzle of honey? Light on your stomach, deeply soothing, and takes 2 minutes.");
-      } else if (type === 'okay') {
-        appendCompanionMsg("Did I do okay today?", true);
-        respondKindCompanion(`You showed up for yourself today, ${userProfile.name}. Every drop of water, every mindful pause, and every step counts. Progress is never a straight line, and you are doing so much better than you give yourself credit for! 🌸`);
-      }
-    }
-
-    async function sendCompanionMessage() {
-      const input = document.getElementById('companionInput');
+    // Live AI Sanctuary
+    async function handleChatSend() {
+      const input = document.getElementById('chat-input-field');
+      const box = document.getElementById('companion-reply');
       const text = input.value.trim();
       if (!text) return;
 
-      appendCompanionMsg(text, true);
       input.value = '';
+      box.innerText = "Thinking gently with you...";
 
-      // If user provided a Gemini API Key, call Gemini 1.5 Flash
-      if (userProfile.geminiKey) {
-        try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userProfile.geminiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{
-                  text: `You are the Buttjet AI Wellness & Guilt-free Companion. User name: ${userProfile.name}. Always be emotionally kind, protective, gentle, and encouraging. Never lecture, scold, or cause guilt about food or budget numbers. Respond kindly to: "${text}"`
-                }]
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(geminiKey)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `You are the emotionally supportive AI Companion in the Buttjet app talking to ${userName}. Always be protective, kind, gentle, and practical. Keep responses under 3 sentences unless giving a recipe.\n\nUser: ${text}`
               }]
-            })
-          });
-          const data = await res.json();
-          if (data.candidates && data.candidates[0].content.parts[0].text) {
-            respondKindCompanion(data.candidates[0].content.parts[0].text);
-            return;
-          }
-        } catch (err) {
-          console.warn("Live Gemini request notice:", err);
-        }
-      }
+            }]
+          })
+        });
 
-      // Built-in Kind Empathy Engine
-      setTimeout(() => {
-        const lower = text.toLowerCase();
-        if (lower.includes('stress') || lower.includes('anxious') || lower.includes('worry')) {
-          respondKindCompanion("Take a long, deep breath right where you are. Remember that feelings are temporary visitors, not permanent truths. Be kind to yourself today.");
-        } else if (lower.includes('spent') || lower.includes('money') || lower.includes('cost')) {
-          respondKindCompanion("Numbers are simply information to guide us, never a measure of your worth. Money exists to bring you safety and joy. Take it one gentle day at a time.");
+        const data = await res.json();
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+          box.innerText = data.candidates[0].content.parts[0].text;
         } else {
-          respondKindCompanion(`I'm cheering for you, ${userProfile.name}. Whatever you are navigating right now, take it one small breath and one sip of water at a time. I'm right here in your corner! 💖`);
+          box.innerText = `I'm right here with you, ${userName}. Take a slow breath, sip a little water, and let's take it one step at a time.`;
         }
-      }, 550);
+      } catch (err) {
+        box.innerText = `I'm right here with you, ${userName}. Take a slow breath, sip a little water, and let's take it one step at a time.`;
+      }
     }
 
-    function appendCompanionMsg(text, isUser = false) {
-      const container = document.getElementById('companionMessages');
-      const msg = document.createElement('div');
-      msg.className = isUser
-        ? "self-end max-w-[85%] bg-pastel-accent dark:bg-electric-accent text-white p-3 rounded-2xl rounded-tr-none text-xs"
-        : "self-start max-w-[85%] bg-pastel-cardSubtle dark:bg-electric-cardSubtle p-3 rounded-2xl rounded-tl-none border border-pastel-border dark:border-electric-border text-pastel-text dark:text-electric-text text-xs";
-      msg.innerText = text;
-      container.appendChild(msg);
-      container.scrollTop = container.scrollHeight;
-    }
-
-    function respondKindCompanion(text) {
-      appendCompanionMsg(text, false);
-    }
-
-    /* ----------------------------------------------------
-       11. EXPORT & BACKUP ENGINE
-    ---------------------------------------------------- */
-    function downloadJsonBackup() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
-        profile: userProfile,
-        days: dayRecords,
-        exportedAt: new Date().toISOString()
-      }, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `buttjet_backup_${todayISO}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-
-    function downloadCsvSummary() {
-      let csvContent = "data:text/csv;charset=utf-8,Date,WaterGlasses,WeightKg,WeightNote,TotalSpentINR\n";
-      Object.keys(dayRecords).sort().forEach(date => {
-        const d = dayRecords[date];
-        let spent = 0;
-        (d.expenses || []).forEach(e => spent += Number(e.amount || 0));
-        csvContent += `${date},${d.water || 0},${d.weight || ''},"${(d.weightNote || '').replace(/"/g, '""')}",${spent}\n`;
-      });
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `buttjet_trends_${todayISO}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    }
+    // Init
+    document.getElementById('top-greeting').innerHTML = `Hey, <span>${userName}</span> ✨`;
+    renderRibbon();
+    renderDroplets();
   </script>
 </body>
 </html>
