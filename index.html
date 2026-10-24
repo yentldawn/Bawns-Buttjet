@@ -65,7 +65,7 @@
       background: var(--bg);
     }
 
-    /* Animated Logo Intro Screen */
+    /* Logo Intro Screen */
     #intro-screen {
       position: fixed;
       inset: 0;
@@ -358,7 +358,7 @@
       padding-top: 8px;
     }
 
-    /* Spend & Fuel */
+    /* Spend & Fuel Metrics */
     .metrics-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -373,7 +373,7 @@
     .metric-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
     .metric-val { font-family: var(--font-brand); font-size: 1.25rem; font-weight: 800; color: var(--text); }
 
-    /* Companion Drawer (Clean, No API Key Box) */
+    /* Companion Sanctuary */
     .companion-banner {
       background: linear-gradient(135deg, rgba(255, 90, 126, 0.1), rgba(155, 114, 207, 0.15));
       border: 1px solid rgba(255, 90, 126, 0.2);
@@ -400,6 +400,7 @@
       padding: 12px;
       font-size: 0.88rem;
       line-height: 1.5;
+      white-space: pre-wrap;
     }
     .chat-input-row { display: flex; gap: 8px; }
     .chat-input {
@@ -480,13 +481,12 @@
 </head>
 <body data-theme="pastel">
 
-  <!-- Logo Intro Screen (No Girl Math) -->
+  <!-- Logo Intro Screen -->
   <div id="intro-screen">
     <button class="intro-skip-btn" onclick="dismissIntro()">Skip ✕</button>
     <div class="intro-logo-wrap">
       <div class="sparkle s1"></div>
       <div class="sparkle s2"></div>
-      <!-- Tactile Bubble SVG Emblem -->
       <svg class="bubble-logo-svg" viewBox="0 0 160 160">
         <defs>
           <radialGradient id="bubbleGlow" cx="35%" cy="30%" r="75%">
@@ -500,10 +500,8 @@
             <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
           </linearGradient>
         </defs>
-        <!-- Organic 3D Bubble Petals -->
         <path d="M50,35 C70,25 90,25 110,35 C135,48 145,80 130,108 C118,130 92,138 68,132 C40,125 22,100 28,70 C32,52 38,40 50,35 Z" fill="url(#bubbleGlow)" />
         <ellipse cx="65" cy="55" rx="30" ry="18" transform="rotate(-20 65 55)" fill="url(#highlightGleam)" />
-        <!-- Small Droplet Gleam Accent -->
         <path d="M102,78 C102,72 108,65 108,65 C108,65 114,72 114,78 C114,82 111,85 108,85 C105,85 102,82 102,78 Z" fill="#FFFFFF" opacity="0.85" />
       </svg>
     </div>
@@ -563,14 +561,12 @@
         </div>
       </section>
 
-      <!-- Clean Companion Sanctuary (No API Key Box Here) -->
+      <!-- Companion Sanctuary -->
       <section class="companion-banner">
         <div class="companion-header-row">
           <h4>Companion Sanctuary ✨</h4>
         </div>
-        <div class="chat-bubble" id="companion-reply">
-          "Hey Yentl, I'm right here with you. Take a soft breath. What can I help nourish or lighten for you right now?"
-        </div>
+        <div class="chat-bubble" id="companion-reply">Hey Yentl, I'm right here with you. Take a soft breath. What can I help nourish or lighten for you right now?</div>
         <div class="chat-input-row">
           <input type="text" id="chat-input-field" class="chat-input" placeholder="Ask for meal ideas, check-in, comfort..." />
           <button class="chat-send-btn" onclick="handleChatSend()">Send</button>
@@ -579,7 +575,7 @@
     </main>
   </div>
 
-  <!-- Settings Sheet (Gemini Key resides safely here) -->
+  <!-- Settings Sheet -->
   <div id="settings-modal" onclick="closeSettings(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-head">
@@ -593,9 +589,9 @@
       </div>
 
       <div>
-        <label class="setting-label">Gemini Live Key (Saved Securely)</label>
-        <input type="password" id="setting-gemini-key" class="setting-input" placeholder="AIzaSy... or AQ..." style="margin-top:6px;" />
-        <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:4px;">Powers live empathetic replies and recipe ideas.</span>
+        <label class="setting-label">Gemini Live Key (Auth Key)</label>
+        <input type="password" id="setting-gemini-key" class="setting-input" placeholder="AQ.Ab8RN6..." style="margin-top:6px;" />
+        <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:4px;">Securely saved in local storage.</span>
       </div>
 
       <div>
@@ -612,14 +608,16 @@
   </div>
 
   <script>
-    // State
+    // Config: Exact Auth Key from Google AI Studio
+    const DEFAULT_AUTH_KEY = "AQ.Ab8RN6JIybenTl2UpyI6seCf4uaPisHPwWHX9Fh8xt7TceY-xQ";
+
     let userName = localStorage.getItem('buttjet_name') || 'Yentl';
-    let geminiKey = localStorage.getItem('buttjet_gemini_key') || 'AQ.Ab8RN6K3D1aZ9BQmweZ_GqCMEI3TpzFmdwfOV688GqikRgsQeQ';
+    let geminiKey = localStorage.getItem('buttjet_gemini_key') || DEFAULT_AUTH_KEY;
     let selectedDate = new Date();
     let currentView = 'ribbon';
     let dailyGlasses = 5;
 
-    // Intro Dismiss
+    // Dismiss Intro
     function dismissIntro() {
       const intro = document.getElementById('intro-screen');
       if (intro) {
@@ -650,7 +648,7 @@
     }
     function saveSettings() {
       userName = document.getElementById('setting-name').value.trim() || 'Yentl';
-      geminiKey = document.getElementById('setting-gemini-key').value.trim();
+      geminiKey = document.getElementById('setting-gemini-key').value.trim() || DEFAULT_AUTH_KEY;
       localStorage.setItem('buttjet_name', userName);
       localStorage.setItem('buttjet_gemini_key', geminiKey);
       document.getElementById('top-greeting').innerHTML = `Hey, <span>${userName}</span> ✨`;
@@ -674,7 +672,7 @@
       }
     }
 
-    // Calendar Toggle & Render
+    // Calendar Toggle & Ribbon/Grid
     function toggleCalView() {
       const ribbon = document.getElementById('ribbon-container');
       const grid = document.getElementById('grid-container');
@@ -730,7 +728,7 @@
       }
     }
 
-    // Live AI Sanctuary
+    // AI Companion Call (Using Auth Header Structure)
     async function handleChatSend() {
       const input = document.getElementById('chat-input-field');
       const box = document.getElementById('companion-reply');
@@ -741,21 +739,28 @@
       box.innerText = "Thinking gently with you...";
 
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(geminiKey)}`, {
+        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': geminiKey,
+            'Authorization': `Bearer ${geminiKey}`
+          },
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `You are the emotionally supportive AI Companion in the Buttjet app talking to ${userName}. Always be protective, kind, gentle, and practical. Keep responses under 3 sentences unless giving a recipe.\n\nUser: ${text}`
+                text: `You are the emotionally supportive AI Companion in the Buttjet app talking to ${userName}. Always be protective, kind, gentle, and practical. Keep responses under 3 sentences unless giving a recipe or practical routine.\n\nUser: ${text}`
               }]
             }]
           })
         });
 
         const data = await res.json();
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
+        
+        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
           box.innerText = data.candidates[0].content.parts[0].text;
+        } else if (data.error) {
+          box.innerText = `Notice: ${data.error.message || 'Key authorization issue'}`;
         } else {
           box.innerText = `I'm right here with you, ${userName}. Take a slow breath, sip a little water, and let's take it one step at a time.`;
         }
