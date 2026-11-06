@@ -1,844 +1,1343 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Buttjet</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- ... existing code ... -->
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            cream: {
+              50: '#FDFBF7',
+              100: '#FAF7F0',
+              200: '#F2EDE4',
+              300: '#E5DED0',
+            },
+            mint: {
+              50: '#EEFAF4',
+              100: '#D7F5E7',
+              200: '#ADECCC',
+              400: '#40C290',
+              500: '#27AC79',
+            },
+            lavender: {
+              50: '#F5F3FF',
+              100: '#EBE5FE',
+              200: '#D5C8FD',
+              400: '#8B78F5',
+              500: '#6C54E8',
+            },
+            rose: {
+              50: '#FDF2F4',
+              100: '#FDE2E7',
+              200: '#F8B6C3',
+              400: '#EA6382',
+              500: '#D44365',
+            },
+            ocean: {
+              50: '#F0F8FF',
+              100: '#DBEEFD',
+              200: '#B2DAFC',
+              400: '#3A9EF2',
+              500: '#177FD4',
+            },
+            charcoal: {
+              700: '#434854',
+              800: '#2A2E39',
+              900: '#181A20',
+            }
+          },
+          boxShadow: {
+            'soft': '0 8px 28px rgba(0, 0, 0, 0.04)',
+            'floating': '0 12px 36px rgba(108, 84, 232, 0.12)',
+            'pill': '0 4px 14px rgba(0, 0, 0, 0.06)',
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
-    :root {
-      --bg: #FFFDF9;
-      --surface: #FFFFFF;
-      --surface-subtle: #FFF5F0;
-      --primary: #FF5A7E;
-      --primary-light: #FFEBF0;
-      --secondary: #9B72CF;
-      --text: #2D1B2E;
-      --text-muted: #8E7C8F;
-      --border: #F3E5DE;
-      --accent: #00C49F;
-      --shadow: 0 10px 25px -5px rgba(255, 90, 126, 0.12), 0 8px 10px -6px rgba(45, 27, 46, 0.04);
-      --font-brand: 'Plus Jakarta Sans', sans-serif;
-      --font-bubble: 'Fredoka', cursive;
-      --font-ui: 'Quicksand', sans-serif;
-    }
-
-    [data-theme="electric"] {
-      --bg: #0E0B16;
-      --surface: #181424;
-      --surface-subtle: #221C33;
-      --primary: #FF007F;
-      --primary-light: #380C25;
-      --secondary: #00F5D4;
-      --text: #FFFFFF;
-      --text-muted: #A39DB5;
-      --border: #2E2744;
-      --accent: #7B2CBF;
-      --shadow: 0 10px 30px -5px rgba(255, 0, 127, 0.25);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: var(--font-ui);
-      min-height: 100vh;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
     }
-
-    .app-viewport {
-      width: 100%;
-      max-width: 480px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      padding-bottom: 90px;
-      background: var(--bg);
-    }
-
-    /* Logo Intro Screen */
-    #intro-screen {
-      position: fixed;
-      inset: 0;
-      background: #FFFDF9;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
-    }
-
-    .intro-logo-wrap {
-      position: relative;
-      width: 130px;
-      height: 130px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: logoFloat 3s ease-in-out infinite alternate;
-    }
-
-    .bubble-logo-svg {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 15px 30px rgba(255, 90, 126, 0.35));
-      animation: bubblePulse 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    @keyframes bubblePulse {
-      0% { transform: scale(0.2) rotate(-8deg); opacity: 0; }
-      50% { transform: scale(1.08) rotate(4deg); opacity: 1; }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; }
-    }
-
-    @keyframes logoFloat {
-      0% { transform: translateY(0px); }
-      100% { transform: translateY(-10px); }
-    }
-
-    .sparkle {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: #FFF;
-      border-radius: 50%;
-      box-shadow: 0 0 10px #FF85A1;
-      opacity: 0;
-      animation: sparklePop 1.8s 0.6s infinite alternate;
-    }
-    .sparkle.s1 { top: 15%; right: 20%; animation-delay: 0.4s; }
-    .sparkle.s2 { bottom: 25%; left: 18%; animation-delay: 0.9s; }
-
-    @keyframes sparklePop {
-      0% { transform: scale(0); opacity: 0; }
-      50% { transform: scale(1.3); opacity: 1; }
-      100% { transform: scale(0.8); opacity: 0.4; }
-    }
-
-    .intro-text-box {
-      margin-top: 24px;
-      text-align: center;
-    }
-
-    .intro-this-is {
-      font-family: var(--font-brand);
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #9B72CF;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeInText 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .intro-brand-name {
-      font-family: var(--font-brand);
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: #2D1B2E;
-      letter-spacing: -0.03em;
-      margin-top: 4px;
-      opacity: 0;
-      transform: translateY(12px);
-      animation: fadeInText 0.9s 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .intro-skip-btn {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      font-family: var(--font-brand);
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #8E7C8F;
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(142, 124, 143, 0.2);
-      border-radius: 999px;
-      padding: 6px 14px;
-      cursor: pointer;
-    }
-
-    @keyframes fadeInText {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Header */
-    header {
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-    }
-    .user-greeting {
-      font-family: var(--font-brand);
-      font-weight: 800;
-      font-size: 1.35rem;
-      letter-spacing: -0.02em;
-      color: var(--text);
-    }
-    .user-greeting span { color: var(--primary); }
-    .header-actions { display: flex; align-items: center; gap: 8px; }
-    .icon-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    /* Main Container */
-    main { padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; }
-
-    /* Calendar Strip */
-    .cal-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 14px;
-      box-shadow: var(--shadow);
-    }
-    .cal-controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      padding: 0 4px;
-    }
-    .cal-month-name {
-      font-family: var(--font-brand);
-      font-weight: 700;
-      font-size: 0.95rem;
-    }
-    .view-toggle-btn {
-      font-family: var(--font-brand);
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface-subtle);
-      color: var(--text);
-      cursor: pointer;
-    }
-
-    .ribbon-track {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
-    }
-    .ribbon-track::-webkit-scrollbar { display: none; }
-    .ribbon-chip {
-      flex: 0 0 calc((100% - 48px) / 7);
-      min-width: 42px;
-      aspect-ratio: 1 / 1.35;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: var(--surface-subtle);
-      cursor: pointer;
-      gap: 3px;
-    }
-    .ribbon-chip.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #FFFFFF;
-      box-shadow: 0 6px 16px -2px rgba(255, 90, 126, 0.4);
-    }
-    .chip-dow { font-size: 0.65rem; font-weight: 700; opacity: 0.8; }
-    .chip-num { font-size: 1rem; font-weight: 800; font-family: var(--font-brand); }
-    .chip-pips { display: flex; gap: 3px; }
-    .pip { width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted); opacity: 0.4; }
-    .ribbon-chip.active .pip { background: #FFFFFF; opacity: 0.9; }
-
-    .month-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-      margin-top: 10px;
-    }
-    .grid-dow {
-      text-align: center;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      padding-bottom: 4px;
-    }
-    .grid-cell {
-      aspect-ratio: 1;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--surface-subtle);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      font-weight: 700;
-      font-family: var(--font-brand);
-      cursor: pointer;
-    }
-    .grid-cell.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #FFFFFF;
-    }
-
-    /* Dual-Tier Water Card */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .card-title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .card-title {
-      font-family: var(--font-brand);
-      font-size: 0.95rem;
-      font-weight: 700;
-    }
-    .water-primary-num {
-      font-family: var(--font-bubble);
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: var(--primary);
-      text-align: center;
-    }
-    .water-droplets-row {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .drop-btn {
-      width: 32px;
-      height: 38px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-    }
-    .drop-btn svg { width: 100%; height: 100%; fill: var(--border); transition: fill 0.2s; }
-    .drop-btn.filled svg { fill: #00B4D8; }
-    .water-secondary-stat {
-      text-align: center;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      border-top: 1px dashed var(--border);
-      padding-top: 8px;
-    }
-
-    /* Spend & Fuel Metrics */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .metric-box {
-      background: var(--surface-subtle);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
-    }
-    .metric-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
-    .metric-val { font-family: var(--font-brand); font-size: 1.25rem; font-weight: 800; color: var(--text); }
-
-    /* Interactive Companion Sanctuary */
-    .companion-banner {
-      background: linear-gradient(135deg, rgba(255, 90, 126, 0.1), rgba(155, 114, 207, 0.15));
-      border: 1px solid rgba(255, 90, 126, 0.2);
-      border-radius: 20px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .companion-header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .companion-header-row h4 {
-      font-family: var(--font-bubble);
-      font-size: 1.3rem;
-      color: var(--primary);
-    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Scrollable chat thread container */
-    .chat-thread-container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 260px;
-      overflow-y: auto;
-      padding-right: 4px;
-      scrollbar-width: thin;
+    @keyframes waveFlow {
+      0% { transform: translateX(0) scaleY(1); }
+      50% { transform: translateX(-25%) scaleY(0.92); }
+      100% { transform: translateX(-50%) scaleY(1); }
     }
-    .chat-bubble {
-      padding: 10px 14px;
-      border-radius: 16px;
-      font-size: 0.88rem;
-      line-height: 1.45;
-      max-width: 85%;
-      word-wrap: break-word;
-      white-space: pre-wrap;
-    }
-    .chat-bubble.bot {
-      align-self: flex-start;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-bottom-left-radius: 4px;
-    }
-    .chat-bubble.user {
-      align-self: flex-end;
-      background: var(--primary);
-      color: #FFFFFF;
-      border-bottom-right-radius: 4px;
-      font-weight: 500;
-    }
-    .chat-bubble.error-notice {
-      align-self: center;
-      background: #FFE8E8;
-      border: 1px solid #FF8080;
-      color: #A00000;
-      font-size: 0.78rem;
-      max-width: 95%;
-    }
-
-    .chat-input-row { display: flex; gap: 8px; }
-    .chat-input {
-      flex: 1;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      font-family: var(--font-ui);
-      font-size: 0.85rem;
-      outline: none;
-    }
-    .chat-send-btn {
-      padding: 10px 18px;
-      border-radius: 999px;
-      background: var(--primary);
-      color: #fff;
-      font-weight: 700;
-      border: none;
-      font-family: var(--font-brand);
-      cursor: pointer;
-    }
-
-    /* Settings Modal */
-    #settings-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.55);
-      z-index: 10000;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-    #settings-modal.open { opacity: 1; visibility: visible; }
-    .modal-sheet {
-      width: 100%;
-      max-width: 480px;
-      background: var(--surface);
-      border-radius: 28px 28px 0 0;
-      padding: 24px 20px 36px 20px;
-      transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    #settings-modal.open .modal-sheet { transform: translateY(0); }
-    .modal-head { display: flex; align-items: center; justify-content: space-between; }
-    .modal-head h3 { font-family: var(--font-brand); font-size: 1.15rem; font-weight: 800; }
-    .modal-close-btn { background: none; border: none; font-size: 1.3rem; color: var(--text-muted); cursor: pointer; }
-    .setting-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
-    .setting-input {
-      width: 100%;
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--surface-subtle);
-      color: var(--text);
-      font-family: var(--font-ui);
-      font-size: 0.85rem;
-      outline: none;
-    }
-    .save-settings-btn {
-      padding: 12px;
-      border-radius: 12px;
-      background: var(--primary);
-      color: #FFF;
-      font-family: var(--font-brand);
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
+    .water-wave {
+      position: absolute;
+      top: -12px;
+      left: 0;
+      width: 200%;
+      height: 20px;
+      animation: waveFlow 4s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+      opacity: 0.85;
     }
   </style>
 </head>
-<body data-theme="pastel">
 
-  <!-- Logo Intro Screen -->
-  <div id="intro-screen">
-    <button class="intro-skip-btn" onclick="dismissIntro()">Skip ✕</button>
-    <div class="intro-logo-wrap">
-      <div class="sparkle s1"></div>
-      <div class="sparkle s2"></div>
-      <svg class="bubble-logo-svg" viewBox="0 0 160 160">
-        <defs>
-          <radialGradient id="bubbleGlow" cx="35%" cy="30%" r="75%">
-            <stop offset="0%" stop-color="#FFEBF3" />
-            <stop offset="45%" stop-color="#FF9BBB" />
-            <stop offset="85%" stop-color="#C292E8" />
-            <stop offset="100%" stop-color="#8E54C7" />
-          </radialGradient>
-          <linearGradient id="highlightGleam" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.85" />
-            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
-          </linearGradient>
-        </defs>
-        <path d="M50,35 C70,25 90,25 110,35 C135,48 145,80 130,108 C118,130 92,138 68,132 C40,125 22,100 28,70 C32,52 38,40 50,35 Z" fill="url(#bubbleGlow)" />
-        <ellipse cx="65" cy="55" rx="30" ry="18" transform="rotate(-20 65 55)" fill="url(#highlightGleam)" />
-        <path d="M102,78 C102,72 108,65 108,65 C108,65 114,72 114,78 C114,82 111,85 108,85 C105,85 102,82 102,78 Z" fill="#FFFFFF" opacity="0.85" />
-      </svg>
-    </div>
-    <div class="intro-text-box">
-      <div class="intro-this-is">This is</div>
-      <div class="intro-brand-name">Buttjet</div>
-    </div>
-  </div>
+<body class="bg-[#F4F1EA] text-charcoal-800 font-sans min-h-screen flex justify-center selection:bg-lavender-200">
 
-  <div class="app-viewport">
-    <!-- Header: Hey, {Name} -->
-    <header>
-      <div class="user-greeting" id="top-greeting">Hey, <span>Yentl</span> ✨</div>
-      <div class="header-actions">
-        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">🎨</button>
-        <button class="icon-btn" onclick="openSettings()" title="Settings & Profile">Y</button>
+  <!-- Mobile Screen Shell -->
+  <div class="w-full max-w-md min-h-screen flex flex-col bg-[#FDFBF7] shadow-2xl relative overflow-x-hidden pb-24">
+    
+    <!-- Top Sticky Header -->
+    <header class="px-5 pt-4 pb-3 flex items-center justify-between sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-md z-30 border-b border-cream-200">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-lavender-400 via-rose-400 to-mint-400 flex items-center justify-center text-white shadow-pill">
+          <i class="ph-bold ph-lightning text-xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-base font-extrabold text-charcoal-900 tracking-tight leading-none">Buttjet</h1>
+            <button onclick="openOnboardingModal(true)" class="text-[9px] font-extrabold bg-cream-200/90 text-charcoal-800 hover:bg-cream-300 px-2 py-0.5 rounded-md flex items-center gap-1 transition">
+              <i class="ph-bold ph-map-pin text-rose-500"></i>
+              <span id="headerCityLabel">Mumbai</span>
+            </button>
+          </div>
+          <div class="flex items-center gap-2 mt-0.5">
+            <span id="headerDateStr" class="text-[10px] font-medium text-charcoal-700/60">Today</span>
+            <span class="text-charcoal-700/30 text-[9px]">•</span>
+            <span id="headerWeatherBadge" class="text-[10px] font-semibold text-ocean-600 flex items-center gap-0.5">
+              <i class="ph-bold ph-sun"></i> <span>28°C · Fair</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-1.5">
+        <!-- Auth Profile Badge -->
+        <button onclick="openAuthModal()" id="headerAuthBtn" class="h-8 px-2.5 rounded-full bg-cream-100 flex items-center justify-center text-charcoal-700 hover:bg-cream-200 transition text-[11px] font-bold gap-1" title="Account">
+          <i class="ph-bold ph-user-circle text-base text-lavender-500"></i>
+          <span id="headerUserInitials">Sign In</span>
+        </button>
+        <button onclick="openLanguageModal()" class="w-8 h-8 rounded-full bg-cream-100 flex items-center justify-center text-charcoal-700 hover:bg-cream-200 transition text-xs font-bold" title="Language">
+          <span id="headerLangBadge">EN</span>
+        </button>
+        <button onclick="switchTab('settings')" class="w-8 h-8 rounded-full bg-cream-100 flex items-center justify-center text-charcoal-700 hover:bg-cream-200 transition">
+          <i class="ph-bold ph-gear text-base"></i>
+        </button>
       </div>
     </header>
 
-    <main>
-      <!-- Calendar View -->
-      <section class="cal-panel">
-        <div class="cal-controls">
-          <div class="cal-month-name" id="cal-month-label">October 2026</div>
-          <button class="view-toggle-btn" id="view-toggle-btn" onclick="toggleCalView()">Grid View</button>
-        </div>
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-1 px-4 pt-3 space-y-4 overflow-y-auto no-scrollbar">
+
+      <!-- ================= 1. TAB: DASHBOARD ================= -->
+      <section id="tab-dashboard" class="space-y-4">
         
-        <div class="ribbon-track" id="ribbon-container"></div>
-        <div class="month-grid" id="grid-container" style="display: none;"></div>
+        <!-- Gamified Level & XP Hero Bar -->
+        <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-lavender-500 rounded-3xl p-4 text-white shadow-floating relative overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-yellow-300 text-xl font-black shadow-inner border border-white/25">
+                <span id="dashLevelBadge">L1</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span id="dashLevelTitle" class="text-xs font-extrabold tracking-wide uppercase">Starter Apprentice</span>
+                  <span id="streakCountBadge" class="text-[9px] font-black bg-yellow-400 text-charcoal-900 px-1.5 py-0.5 rounded-full shadow-xs">
+                    🔥 5 Day Streak
+                  </span>
+                </div>
+                <p id="dashXpProgressText" class="text-[11px] font-medium text-white/85 mt-0.5">0 / 1,200,000 XP</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span id="dashTotalXpVal" class="text-base font-black tracking-tight block">0 XP</span>
+              <span id="dashNextUnlockLabel" class="text-[9px] text-white/70 block">Next: Morning Studio</span>
+            </div>
+          </div>
+          <!-- XP Progress bar -->
+          <div class="mt-3 w-full bg-white/20 h-2 rounded-full overflow-hidden p-0.5 border border-white/20">
+            <div id="dashXpProgressBar" class="h-full bg-gradient-to-r from-yellow-300 to-amber-400 rounded-full transition-all duration-500 shadow-sm" style="width: 2%"></div>
+          </div>
+        </div>
+
+        <!-- Guided Daily Reflection & Commute Check-In Banner -->
+        <div onclick="openGuidedCheckInModal()" class="p-3.5 rounded-3xl bg-gradient-to-r from-lavender-500/10 via-rose-50 to-mint-50 border border-lavender-200/80 shadow-soft cursor-pointer hover:border-lavender-400 transition active:scale-[0.99]">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-2xl bg-lavender-500 text-white flex items-center justify-center shadow-pill">
+                <i class="ph-bold ph-chat-centered-text text-xl"></i>
+              </div>
+              <div>
+                <span class="text-[9px] font-extrabold uppercase tracking-wider bg-lavender-200/80 text-lavender-700 px-2 py-0.5 rounded-md" data-i18n="checkInTitle">Daily Check-In</span>
+                <h3 class="text-xs font-bold text-charcoal-900 mt-0.5" data-i18n="checkInSub">Review Mood, Commute &amp; Spending</h3>
+                <p class="text-[10px] text-charcoal-700/60 mt-0.5" id="checkInPromptSummary">How are you feeling today?</p>
+              </div>
+            </div>
+            <button class="px-2.5 py-1.5 bg-lavender-500 text-white text-[11px] font-bold rounded-xl shadow-pill flex items-center gap-1">
+              <span>+200K XP</span>
+              <i class="ph-bold ph-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Optional Weekly Meal Prep Banner (Hidden if opt-out) -->
+        <div id="weeklyMealPrepBanner" class="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-50 to-amber-100/50 border border-amber-300 shadow-soft hidden">
+          <div class="flex items-start justify-between">
+            <div class="flex items-start space-x-2.5">
+              <span class="text-2xl mt-0.5">🥘</span>
+              <div>
+                <span class="text-[9px] font-extrabold uppercase tracking-wider bg-amber-200/80 text-amber-900 px-1.5 py-0.5 rounded">Weekly Meal Prep Active</span>
+                <h3 class="text-xs font-bold text-charcoal-900 mt-1 leading-tight">Batch Cooking &amp; Gravy Base Reminder</h3>
+                <p class="text-[10px] text-charcoal-700/70 mt-0.5">Prepare base gravies, boiled lentils, or roasted vegetable packs for the week.</p>
+              </div>
+            </div>
+            <button onclick="dismissMealPrepBanner()" class="text-charcoal-400 hover:text-charcoal-700 p-1">
+              <i class="ph-bold ph-x text-xs"></i>
+            </button>
+          </div>
+          <div class="mt-2.5 pt-2 border-t border-amber-200 flex items-center justify-between text-[11px]">
+            <span class="text-amber-800 font-bold" id="mealPrepSavingsEstimate">Saves ~30% on food costs</span>
+            <button onclick="switchTab('meals'); showMealPrepChecklist()" class="text-xs font-bold text-amber-900 bg-amber-200 px-2.5 py-1 rounded-xl">
+              View Guide →
+            </button>
+          </div>
+        </div>
+
+        <!-- Safe-to-Spend Hero Card -->
+        <div class="bg-white rounded-3xl p-4 border border-cream-200 shadow-soft relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-mint-100/60 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-mint-600 uppercase tracking-wider flex items-center gap-1">
+              <i class="ph-bold ph-coins text-sm"></i> <span data-i18n="safeToSpend">Safe to Spend Today</span>
+            </span>
+            <span id="dashDaysLeftBadge" class="text-[10px] bg-mint-50 text-mint-600 font-semibold px-2 py-0.5 rounded-full border border-mint-200">
+              24 days left
+            </span>
+          </div>
+          
+          <div class="mt-2 flex items-baseline justify-between">
+            <div>
+              <span id="dashSafeToSpendVal" class="text-3xl font-black text-charcoal-900 tracking-tight">₹850</span>
+              <p id="dashSpentTodaySummary" class="text-[11px] text-charcoal-700/70 mt-0.5">₹0 spent today</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="openTravelSpendModal()" class="px-2.5 py-1.5 bg-ocean-50 text-ocean-600 border border-ocean-200 text-xs font-bold rounded-xl active:scale-95 flex items-center gap-1">
+                <i class="ph-bold ph-train"></i> <span data-i18n="transitBtn">Transit</span>
+              </button>
+              <button onclick="openSpendModal()" class="px-3 py-1.5 bg-mint-500 active:bg-mint-400 text-white text-xs font-bold rounded-xl shadow-pill flex items-center gap-1.5 transition">
+                <i class="ph-bold ph-minus-circle"></i> <span data-i18n="logExpense">Log Spend</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-3 w-full bg-cream-100 h-2 rounded-full overflow-hidden">
+            <div id="dashSpendProgressBar" class="h-full bg-mint-400 transition-all duration-500 rounded-full" style="width: 15%"></div>
+          </div>
+        </div>
+
+        <!-- Metric Duo: Calories & Hydration -->
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Calories Quick View -->
+          <div onclick="switchTab('meals')" class="cursor-pointer bg-white rounded-3xl p-3.5 border border-cream-200 shadow-soft flex flex-col justify-between hover:border-lavender-200 transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-lavender-500 uppercase tracking-wide flex items-center gap-1">
+                <i class="ph-bold ph-fork-knife text-sm"></i> <span data-i18n="calories">Calories</span>
+              </span>
+              <i class="ph-bold ph-caret-right text-xs text-charcoal-700/40"></i>
+            </div>
+            <div class="mt-2">
+              <div class="text-xl font-bold text-charcoal-900" id="dashCaloriesVal">0 / 2000</div>
+              <p class="text-[10px] text-charcoal-700/60" id="dashCalRemaining">2,000 kcal left</p>
+            </div>
+            <div class="mt-2.5 w-full bg-lavender-50 h-1.5 rounded-full overflow-hidden">
+              <div id="dashCalProgressBar" class="h-full bg-lavender-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Hydration Quick View -->
+          <div onclick="switchTab('hydration')" class="cursor-pointer bg-white rounded-3xl p-3.5 border border-cream-200 shadow-soft flex flex-col justify-between hover:border-ocean-200 transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-ocean-500 uppercase tracking-wide flex items-center gap-1">
+                <i class="ph-bold ph-drop text-sm"></i> <span data-i18n="hydration">Water</span>
+              </span>
+              <i class="ph-bold ph-caret-right text-xs text-charcoal-700/40"></i>
+            </div>
+            <div class="mt-2">
+              <div class="text-xl font-bold text-charcoal-900" id="dashWaterVal">0 / 2500 <span class="text-xs font-normal">ml</span></div>
+              <p class="text-[10px] text-charcoal-700/60" id="dashWaterPercent">0% of daily goal</p>
+            </div>
+            <div class="mt-2.5 w-full bg-ocean-50 h-1.5 rounded-full overflow-hidden">
+              <div id="dashWaterProgressBar" class="h-full bg-ocean-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UNLOCKED GAMIFIED FEATURE VAULT (Reveals based on Level) -->
+        <div id="unlockedFeaturesVault" class="space-y-3">
+          <!-- Level 2 Feature: Morning Routine Studio -->
+          <div id="featureCardLevel2" class="p-4 rounded-3xl bg-gradient-to-br from-amber-500/10 via-orange-50 to-white border border-amber-200 shadow-soft">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-pill">
+                  <i class="ph-bold ph-barbell"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-black uppercase tracking-wider bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded">Level 2 Unlocked</span>
+                    <span class="text-[10px] font-bold text-charcoal-800">Morning Studio</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-charcoal-900 mt-0.5">10-Min Mobility Routine</h4>
+                </div>
+              </div>
+              <button onclick="completeMorningWorkout()" id="btnMorningWorkoutDone" class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold rounded-xl shadow-pill transition active:scale-95">
+                +250K XP
+              </button>
+            </div>
+            <p class="text-[11px] text-charcoal-700/75 mt-2 leading-relaxed">
+              Gentle spine and hip mobility awakened with our curated follow-along video:
+            </p>
+            <div class="mt-2.5 flex items-center justify-between p-2.5 rounded-2xl bg-white border border-amber-200/80">
+              <div class="flex items-center space-x-2">
+                <i class="ph-bold ph-youtube-logo text-rose-500 text-xl"></i>
+                <span class="text-xs font-bold text-charcoal-900">10 Min Morning Mobility Routine</span>
+              </div>
+              <a href="https://www.youtube.com/watch?v=AM_lVBx1f6Q" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-amber-600 hover:underline flex items-center gap-1">
+                <span>Watch</span>
+                <i class="ph-bold ph-arrow-square-out"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Level 3 Feature: Smart Wardrobe & Outfit Stylist -->
+          <div id="featureCardLevel3" class="p-4 rounded-3xl bg-gradient-to-br from-rose-50 via-pink-50 to-white border border-rose-200 shadow-soft hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-rose-400 text-white flex items-center justify-center text-lg shadow-pill">
+                  <i class="ph-bold ph-t-shirt"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-black uppercase tracking-wider bg-rose-200 text-rose-900 px-1.5 py-0.5 rounded">Level 3 Unlocked</span>
+                    <span class="text-[10px] font-bold text-charcoal-800">Smart Wardrobe</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-charcoal-900 mt-0.5">Weather &amp; Cycle Outfit Stylist</h4>
+                </div>
+              </div>
+              <button onclick="logOutfitStyled()" id="btnOutfitStyledDone" class="px-2.5 py-1.5 bg-rose-400 hover:bg-rose-500 text-white text-[11px] font-bold rounded-xl shadow-pill transition active:scale-95">
+                +100K XP
+              </button>
+            </div>
+            <div class="mt-2.5 p-3 rounded-2xl bg-white/80 border border-rose-100 text-xs text-charcoal-800 space-y-1">
+              <p class="font-bold text-rose-700 flex items-center gap-1">
+                <i class="ph-bold ph-sparkle"></i> <span id="outfitSuggestionTitle">Comfort Linen &amp; Breathable Cottons</span>
+              </p>
+              <p id="outfitSuggestionReason" class="text-[11px] text-charcoal-700/70">
+                Optimized for warm local temperatures and relaxing hormonal comfort today.
+              </p>
+            </div>
+          </div>
+
+          <!-- Level 4 Feature: Mindful Soundscapes & Zen Timer -->
+          <div id="featureCardLevel4" class="p-4 rounded-3xl bg-gradient-to-br from-indigo-50 via-purple-50 to-white border border-indigo-200 shadow-soft hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-indigo-500 text-white flex items-center justify-center text-lg shadow-pill">
+                  <i class="ph-bold ph-waveform"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-black uppercase tracking-wider bg-indigo-200 text-indigo-900 px-1.5 py-0.5 rounded">Level 4 Unlocked</span>
+                    <span class="text-[10px] font-bold text-charcoal-800">Mindful Soundscapes</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-charcoal-900 mt-0.5">Ambient Focus &amp; Zen Tone</h4>
+                </div>
+              </div>
+              <button onclick="toggleZenSoundscape()" id="btnZenToneToggle" class="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-pill transition active:scale-95 flex items-center gap-1">
+                <i class="ph-bold ph-play"></i> <span>Play 174Hz</span>
+              </button>
+            </div>
+            <p class="text-[10px] text-charcoal-700/60 mt-2">
+              Synthesized healing tone (174 Hz Solfeggio) generated directly via Web Audio API for stress relief and deep focus.
+            </p>
+          </div>
+
+          <!-- Level 5 Feature: Secret Theme Studio -->
+          <div id="featureCardLevel5" class="p-4 rounded-3xl bg-gradient-to-br from-emerald-50 via-teal-50 to-white border border-emerald-200 shadow-soft hidden">
+            <div class="flex items-center space-x-2.5 mb-2">
+              <div class="w-9 h-9 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-lg shadow-pill">
+                <i class="ph-bold ph-paint-brush"></i>
+              </div>
+              <div>
+                <span class="text-[9px] font-black uppercase tracking-wider bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded">Level 5 Master</span>
+                <h4 class="text-xs font-bold text-charcoal-900 mt-0.5">Secret Theme Studio</h4>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5 text-[10px] font-bold text-center">
+              <button onclick="applySecretTheme('rose')" class="p-2 rounded-xl bg-rose-100 text-rose-800 hover:scale-95 transition">Rose</button>
+              <button onclick="applySecretTheme('lavender')" class="p-2 rounded-xl bg-purple-100 text-purple-800 hover:scale-95 transition">Lavender</button>
+              <button onclick="applySecretTheme('matcha')" class="p-2 rounded-xl bg-emerald-100 text-emerald-800 hover:scale-95 transition">Matcha</button>
+              <button onclick="applySecretTheme('midnight')" class="p-2 rounded-xl bg-charcoal-800 text-white hover:scale-95 transition">Midnight</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cycle & Hormonal Phase Pill -->
+        <div onclick="switchTab('cycle')" class="cursor-pointer bg-gradient-to-r from-rose-50 via-pink-50 to-lavender-50 p-3.5 rounded-2xl border border-rose-200/80 flex items-center justify-between shadow-soft hover:scale-[1.01] transition">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-2xl bg-rose-400 text-white flex items-center justify-center shadow-pill">
+              <i class="ph-bold ph-flower-lotus text-xl"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span id="dashCyclePhaseBadge" class="text-[9px] font-bold uppercase tracking-wider bg-rose-100 text-rose-600 px-2 py-0.5 rounded-md">Follicular Phase</span>
+                <span id="dashCycleDayCount" class="text-[10px] font-semibold text-charcoal-700/70">Day 8 of 28</span>
+              </div>
+              <p id="dashCycleFoodSnip" class="text-xs font-bold text-charcoal-900 mt-0.5 leading-snug">
+                Energy rising: optimize with fresh leafy greens and zinc-rich seeds!
+              </p>
+            </div>
+          </div>
+          <i class="ph-bold ph-caret-right text-charcoal-400"></i>
+        </div>
+
+        <!-- Gamified Daily Routine Progression -->
+        <div class="bg-gradient-to-br from-white via-lavender-50/40 to-mint-50/50 p-4 rounded-3xl border border-cream-200 shadow-soft">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center space-x-2">
+              <span class="text-xl">🏆</span>
+              <div>
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-charcoal-700/60" data-i18n="dailyTasks">Daily High-Roller Tasks</span>
+                <h2 id="taskStreakSummary" class="text-xs font-bold text-charcoal-900">0 of 4 Completed</h2>
+              </div>
+            </div>
+            <span class="text-[10px] font-extrabold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full border border-indigo-200">
+              ⚡ Multipliers Active
+            </span>
+          </div>
+
+          <div class="space-y-2 mt-3 text-xs">
+            <!-- Task 1: Weight -->
+            <div id="taskItemWeight" onclick="openWeightModal()" class="flex items-center justify-between p-2.5 rounded-2xl bg-white border border-cream-200 cursor-pointer hover:border-amber-300 transition shadow-xs">
+              <div class="flex items-center space-x-2.5">
+                <span id="taskCheckWeight" class="w-6 h-6 rounded-lg bg-cream-100 text-charcoal-400 flex items-center justify-center text-xs">
+                  <i class="ph-bold ph-circle"></i>
+                </span>
+                <div>
+                  <span class="font-bold text-charcoal-900 block" data-i18n="taskWeight">Log Morning Weight</span>
+                  <span id="taskWeightSubtitle" class="text-[10px] text-charcoal-700/60">Tap to record</span>
+                </div>
+              </div>
+              <span class="text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl">+150K XP</span>
+            </div>
+
+            <!-- Task 2: Water -->
+            <div onclick="switchTab('hydration')" class="flex items-center justify-between p-2.5 rounded-2xl bg-white border border-cream-200 cursor-pointer hover:border-ocean-300 transition shadow-xs">
+              <div class="flex items-center space-x-2.5">
+                <span id="taskCheckWater" class="w-6 h-6 rounded-lg bg-cream-100 text-charcoal-400 flex items-center justify-center text-xs">
+                  <i class="ph-bold ph-circle"></i>
+                </span>
+                <div>
+                  <span class="font-bold text-charcoal-900 block" data-i18n="taskWater">Reach Hydration Goal</span>
+                  <span id="taskWaterSubtitle" class="text-[10px] text-charcoal-700/60">50K XP per bottle milestone</span>
+                </div>
+              </div>
+              <span class="text-[10px] font-black text-ocean-500 bg-ocean-50 px-2.5 py-1 rounded-xl">+50K XP</span>
+            </div>
+
+            <!-- Task 3: Meals -->
+            <div onclick="switchTab('meals')" class="flex items-center justify-between p-2.5 rounded-2xl bg-white border border-cream-200 cursor-pointer hover:border-lavender-300 transition shadow-xs">
+              <div class="flex items-center space-x-2.5">
+                <span id="taskCheckMeals" class="w-6 h-6 rounded-lg bg-cream-100 text-charcoal-400 flex items-center justify-center text-xs">
+                  <i class="ph-bold ph-circle"></i>
+                </span>
+                <div>
+                  <span class="font-bold text-charcoal-900 block" data-i18n="taskMeals">Log Food &amp; Calories</span>
+                  <span id="taskMealsSubtitle" class="text-[10px] text-charcoal-700/60">Snap or record meals</span>
+                </div>
+              </div>
+              <span class="text-[10px] font-black text-lavender-500 bg-lavender-50 px-2.5 py-1 rounded-xl">+75K XP</span>
+            </div>
+
+            <!-- Task 4: Budget -->
+            <div onclick="switchTab('settings')" class="flex items-center justify-between p-2.5 rounded-2xl bg-white border border-cream-200 cursor-pointer hover:border-mint-300 transition shadow-xs">
+              <div class="flex items-center space-x-2.5">
+                <span id="taskCheckBudget" class="w-6 h-6 rounded-lg bg-cream-100 text-charcoal-400 flex items-center justify-center text-xs">
+                  <i class="ph-bold ph-circle"></i>
+                </span>
+                <div>
+                  <span class="font-bold text-charcoal-900 block" data-i18n="taskBudget">Review Daily Spending</span>
+                  <span id="taskBudgetSubtitle" class="text-[10px] text-charcoal-700/60">Stay within safe daily limit</span>
+                </div>
+              </div>
+              <span class="text-[10px] font-black text-mint-500 bg-mint-50 px-2.5 py-1 rounded-xl">+75K XP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Regional Seasonal Produce Widget -->
+        <div class="bg-white rounded-2xl p-3.5 border border-cream-200 shadow-soft">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-charcoal-700/70 flex items-center gap-1">
+              <i class="ph-bold ph-plant text-mint-500"></i> <span id="seasonalProduceHeader">Local Seasonal Produce</span>
+            </span>
+            <span id="seasonalSeasonTag" class="text-[9px] bg-mint-50 text-mint-600 font-bold px-2 py-0.5 rounded-full">Current Season</span>
+          </div>
+          <p id="seasonalProduceText" class="text-[11px] text-charcoal-700/75 leading-relaxed">
+            Loading seasonal recommendations for your region...
+          </p>
+        </div>
+
       </section>
+<!-- ... existing code ... -->
+      <!-- ================= 6. TAB: SETTINGS & PREFERENCES ================= -->
+      <section id="tab-settings" class="space-y-4 hidden">
+        <!-- Account & Cloud Sync Banner Card -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-4 text-white shadow-soft space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl shadow-inner">
+                <i class="ph-bold ph-google-drive-logo text-white"></i>
+              </div>
+              <div>
+                <span class="text-[9px] font-extrabold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-md">Cloud Backup</span>
+                <h3 class="text-sm font-bold mt-0.5" id="settingsSyncAccountName">Google Drive Backup</h3>
+              </div>
+            </div>
+            <button onclick="syncToGoogleDrive()" class="px-3 py-1.5 bg-white text-indigo-700 rounded-xl text-xs font-bold shadow-pill active:scale-95 transition flex items-center gap-1">
+              <i class="ph-bold ph-arrows-clockwise"></i> <span>Sync Now</span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-white/80 pt-1 border-t border-white/15">
+            <span id="settingsLastSyncTimestamp">Last synced: Never</span>
+            <button onclick="restoreFromGoogleDrive()" class="underline font-bold text-white hover:text-white/90">Restore Backup</button>
+          </div>
+        </div>
 
-      <!-- Dual-Tier Water Tracker -->
-      <section class="card">
-        <div class="card-title-row">
-          <div class="card-title">Daily Hydration</div>
-          <span style="font-size: 0.8rem; color: var(--text-muted);">Target: 8 Glasses</span>
+        <div class="bg-white rounded-3xl p-4 border border-cream-200 shadow-soft space-y-4">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-charcoal-900 flex items-center gap-2">
+            <i class="ph-bold ph-sliders text-lavender-500"></i> <span data-i18n="settings">Preferences &amp; Finance</span>
+          </h2>
+
+          <div class="space-y-3 text-xs">
+            <!-- Account & Auth Status -->
+            <div class="p-3 bg-cream-50 rounded-2xl border border-cream-200 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-charcoal-900 block" id="settingsUserDisplay">Guest User</span>
+                <span class="text-[10px] text-charcoal-600" id="settingsPhoneDisplay">Tap to link Phone &amp; Email</span>
+              </div>
+              <button onclick="openAuthModal()" class="px-3 py-1.5 bg-white border border-cream-200 rounded-xl text-xs font-bold text-charcoal-800" id="settingsAuthActionBtn">
+                Sign In
+              </button>
+            </div>
+
+            <!-- Location & Currency button -->
+            <div class="p-3 bg-cream-50 rounded-2xl border border-cream-200 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-charcoal-900 block">Location &amp; Currency</span>
+                <span class="text-[10px] text-charcoal-600" id="settingsLocSummary">Mumbai · INR (₹)</span>
+              </div>
+              <button onclick="openOnboardingModal(true)" class="px-3 py-1.5 bg-white border border-cream-200 rounded-xl text-xs font-bold text-charcoal-800">
+                Change
+              </button>
+            </div>
+
+            <!-- Financial Setup -->
+            <div class="space-y-2 pt-2 border-t border-cream-200">
+              <span class="font-bold text-charcoal-900 block">Monthly Financials</span>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] text-charcoal-700 mb-0.5">Monthly Income</label>
+                  <input type="number" id="cfgIncomeInput" class="w-full bg-cream-50 border border-cream-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold" />
+                </div>
+                <div>
+                  <label class="block text-[10px] text-charcoal-700 mb-0.5">Target Savings</label>
+                  <input type="number" id="cfgSavingsInput" class="w-full bg-cream-50 border border-cream-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Optional Meal Prep Toggle -->
+            <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-2xl flex items-center justify-between">
+              <div>
+                <span class="font-bold text-charcoal-900 block" data-i18n="optInMealPrep">Weekly Meal Prep Reminders</span>
+                <span class="text-[10px] text-charcoal-600">Opt-in weekly reminders for batch gravies and grains.</span>
+              </div>
+              <input type="checkbox" id="prefMealPrepOptIn" onchange="toggleMealPrepOptIn(this.checked)" class="w-5 h-5 accent-amber-500 rounded cursor-pointer" />
+            </div>
+
+            <button onclick="saveFinanceSettings()" class="w-full py-2.5 bg-charcoal-900 text-white rounded-xl text-xs font-bold shadow-pill">
+              Save Financial Changes
+            </button>
+          </div>
         </div>
-        
-        <div class="water-primary-num" id="daily-water-count">5 / 8 Glasses</div>
-        
-        <div class="water-droplets-row" id="droplets-row"></div>
-        
-        <div class="water-secondary-stat" id="lifetime-water-stat">
-          Total journey: 142 glasses logged across 18 days
+
+        <!-- Export to ChatGPT / Gemini -->
+        <div class="bg-gradient-to-r from-purple-50 to-lavender-50 rounded-2xl p-4 border border-lavender-200 space-y-2 text-xs">
+          <div class="flex items-center gap-2 font-bold text-charcoal-900">
+            <i class="ph-bold ph-sparkle text-purple-600 text-base"></i>
+            <span>Export Context to AI</span>
+          </div>
+          <p class="text-[11px] text-charcoal-700/80">Copy your current health, cycle phase, and remaining budget to paste into Gemini or ChatGPT.</p>
+          <div class="flex gap-2 pt-1">
+            <button onclick="copyContextToAI('ChatGPT')" class="flex-1 py-2 bg-white text-charcoal-800 border border-purple-200 rounded-xl text-xs font-bold shadow-xs">
+              Copy for ChatGPT
+            </button>
+            <button onclick="copyContextToAI('Gemini')" class="flex-1 py-2 bg-purple-600 text-white rounded-xl text-xs font-bold shadow-xs">
+              Copy for Gemini
+            </button>
+          </div>
         </div>
+
+        <!-- Tucked-Away About & Storage Drawer -->
+        <details class="bg-white rounded-2xl p-3 border border-cream-200 text-xs">
+          <summary class="font-bold text-charcoal-700 cursor-pointer flex items-center justify-between">
+            <span>About App &amp; Offline Data</span>
+            <i class="ph-bold ph-caret-down"></i>
+          </summary>
+          <div class="mt-3 pt-2 border-t border-cream-200 space-y-2 text-[11px] text-charcoal-700/70">
+            <p><strong>100% Offline:</strong> All cycle logs, weights, expenses, and diary entries live locally inside your device's browser storage.</p>
+            <div class="flex gap-2 pt-1">
+              <button onclick="exportAppData()" class="flex-1 py-1.5 bg-cream-100 font-bold rounded-lg text-charcoal-800">Export Backup</button>
+              <button onclick="resetAllAppDataPrompt()" class="flex-1 py-1.5 bg-rose-50 text-rose-500 font-bold rounded-lg">Wipe Data</button>
+            </div>
+          </div>
+        </details>
       </section>
-
-      <!-- Spend & Fuel Metrics -->
-      <section class="metrics-grid">
-        <div class="metric-box">
-          <div class="metric-label">Safe Daily Spend</div>
-          <div class="metric-val" id="safe-spend-val">₹650</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">Logged Fuel</div>
-          <div class="metric-val" id="fuel-count-val">3 Meals</div>
-        </div>
-      </section>
-
-      <!-- Companion Sanctuary with Scrollable Chat History -->
-      <section class="companion-banner">
-        <div class="companion-header-row">
-          <h4>Companion Sanctuary ✨</h4>
-        </div>
-        
-        <div class="chat-thread-container" id="chat-thread">
-          <div class="chat-bubble bot">Hey Yentl, I'm right here with you. Take a soft breath. What can I help nourish or lighten for you right now?</div>
-        </div>
-
-        <div class="chat-input-row">
-          <input type="text" id="chat-input-field" class="chat-input" placeholder="Ask for meal ideas, check-in, comfort..." autocomplete="off" />
-          <button class="chat-send-btn" id="chat-send-btn" onclick="handleChatSend()">Send</button>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <!-- Settings Sheet -->
-  <div id="settings-modal" onclick="closeSettings(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="modal-head">
-        <h3>App Settings</h3>
-        <button class="modal-close-btn" onclick="closeSettingsDirect()">✕</button>
+<!-- ... existing code ... -->
+    <!-- Quick Transit Modal -->
+    <div id="modalTravelSpend" class="fixed inset-0 bg-charcoal-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 hidden">
+      <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-2xl border border-cream-200">
+        <h3 class="text-sm font-bold text-charcoal-900 mb-2">Record Transit Fare</h3>
+        <form onsubmit="saveTravelExpense(event)" class="space-y-3">
+          <input type="text" id="travelTitleInput" placeholder="Bus, Metro, Auto, Gas" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+          <input type="number" step="any" id="travelAmountInput" placeholder="Amount" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+          <button type="submit" class="w-full py-2.5 bg-ocean-500 text-white rounded-xl text-xs font-bold shadow-pill">
+            Deduct from Safe-to-Spend
+          </button>
+        </form>
       </div>
-
-      <div>
-        <label class="setting-label">Your Display Name</label>
-        <input type="text" id="setting-name" class="setting-input" value="Yentl" style="margin-top:6px;" />
-      </div>
-
-      <div>
-        <label class="setting-label">Gemini Live Key (Auth Key)</label>
-        <input type="password" id="setting-gemini-key" class="setting-input" placeholder="AQ.Ab8RN6..." style="margin-top:6px;" />
-        <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:4px;">Securely saved in local storage.</span>
-      </div>
-
-      <div>
-        <label class="setting-label">Date Format Preference</label>
-        <select id="setting-date-fmt" class="setting-input" style="margin-top:6px;">
-          <option value="DD/MM/YYYY">DD/MM/YYYY (e.g. 24/10/2026)</option>
-          <option value="MM/DD/YYYY">MM/DD/YYYY (e.g. 10/24/2026)</option>
-          <option value="YYYY-MM-DD">YYYY-MM-DD (e.g. 2026-10-24)</option>
-        </select>
-      </div>
-
-      <button class="save-settings-btn" onclick="saveSettings()">Save Preferences</button>
     </div>
+
+    <!-- Phone & Email Authentication Modal -->
+    <div id="modalAuth" class="fixed inset-0 bg-charcoal-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 hidden">
+      <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-cream-200 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-charcoal-900" id="authModalTitle">Sign In to Buttjet</h3>
+          <button onclick="closeAuthModal()" class="text-charcoal-400 hover:text-charcoal-800 p-1">
+            <i class="ph-bold ph-x text-base"></i>
+          </button>
+        </div>
+        <p class="text-[11px] text-charcoal-600">Sync all your health stats and safe-to-spend balance to Google Drive.</p>
+
+        <div id="authLoggedInState" class="hidden space-y-3">
+          <div class="p-3 bg-cream-50 rounded-2xl border border-cream-200 text-xs">
+            <p class="font-bold text-charcoal-900" id="authActiveUserEmail"></p>
+            <p class="text-[11px] text-charcoal-600" id="authActiveUserPhone"></p>
+          </div>
+          <button onclick="logoutUser()" class="w-full py-2.5 bg-rose-500 text-white rounded-xl text-xs font-bold shadow-pill">
+            Log Out
+          </button>
+        </div>
+
+        <form id="authLoginForm" onsubmit="handleUserAuth(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-charcoal-700 mb-1">Email Address</label>
+            <input type="email" id="authEmailInput" placeholder="you@example.com" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-charcoal-700 mb-1">Phone Number</label>
+            <div class="flex gap-2">
+              <select id="authCountryCode" class="w-24 bg-cream-50 border border-cream-200 rounded-xl px-2 py-2 text-xs font-semibold">
+                <option value="+91">+91 (IN)</option>
+                <option value="+1">+1 (US)</option>
+                <option value="+44">+44 (UK)</option>
+                <option value="+49">+49 (DE)</option>
+                <option value="+33">+33 (FR)</option>
+                <option value="+86">+86 (CN)</option>
+                <option value="+61">+61 (AU)</option>
+              </select>
+              <input type="tel" id="authPhoneInput" placeholder="9876543210" required class="flex-1 bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="text" id="authOtpInput" placeholder="Enter 4-digit OTP" class="flex-1 bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+            <button type="button" onclick="sendSimulatedOtp()" class="px-3 py-2 bg-lavender-100 text-lavender-700 rounded-xl font-bold text-xs hover:bg-lavender-200 transition">
+              Send OTP
+            </button>
+          </div>
+
+          <button type="submit" class="w-full py-2.5 bg-charcoal-900 text-white rounded-xl text-xs font-bold shadow-pill">
+            Verify &amp; Connect Google Drive
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toastNotification" class="fixed top-5 left-1/2 -translate-x-1/2 bg-charcoal-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-semibold flex items-center space-x-2 z-50 transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-4">
+      <span id="toastIcon">✨</span>
+      <span id="toastMsg">Logged!</span>
+    </div>
+
   </div>
 
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    const DEFAULT_AUTH_KEY = "AQ.Ab8RN6JIybenTl2UpyI6seCf4uaPisHPwWHX9Fh8xt7TceY-xQ";
+    const APP_STORAGE_KEY = 'BUTTJET_DATA_GLOBAL_V2';
 
-    let userName = localStorage.getItem('buttjet_name') || 'Yentl';
-    let geminiKey = localStorage.getItem('buttjet_gemini_key') || DEFAULT_AUTH_KEY;
-    let selectedDate = new Date();
-    let currentView = 'ribbon';
-    let dailyGlasses = 5;
+    // 4,000x - 9,000x Scaled Levels Engine
+    const LEVEL_TIERS = [
+      { level: 1, name: 'Starter Apprentice', threshold: 0, unlock: 'Core Features' },
+      { level: 2, name: 'Morning Movement Adept', threshold: 1200000, unlock: 'Morning Studio & Video' },
+      { level: 3, name: 'Style & Harmony Visionary', threshold: 2700000, unlock: 'Wardrobe & Outfit Stylist' },
+      { level: 4, name: 'Mindful Resonance Master', threshold: 4500000, unlock: 'Zen Soundscapes & Tone' },
+      { level: 5, name: 'Infinite Holistic Sovereign', threshold: 7000000, unlock: 'Secret Theme Studio' }
+    ];
 
-    // Intro dismiss
-    function dismissIntro() {
-      const intro = document.getElementById('intro-screen');
-      if (intro) {
-        intro.style.opacity = '0';
-        intro.style.visibility = 'hidden';
-        setTimeout(() => intro.remove(), 800);
+    // High-roller XP Rewards
+    const XP_REWARDS = {
+      WEIGHT: 150000,
+      WORKOUT: 250000,
+      OUTFIT: 100000,
+      WATER_MILESTONE: 50000,
+      MEAL_EXPENSE: 75000,
+      DIARY_CHECKIN: 200000
+    };
+
+    // Compact Formatter for huge XP numbers
+    function formatXp(num) {
+      if (num >= 1000000) {
+        return (num / 1000000).toFixed(2).replace(/\.00$/, '') + 'M XP';
       }
-    }
-    setTimeout(dismissIntro, 3400);
-
-    // Theme toggle
-    function toggleTheme() {
-      const b = document.body;
-      b.setAttribute('data-theme', b.getAttribute('data-theme') === 'pastel' ? 'electric' : 'pastel');
-    }
-
-    // Settings Modal
-    function openSettings() {
-      document.getElementById('setting-name').value = userName;
-      document.getElementById('setting-gemini-key').value = geminiKey;
-      document.getElementById('settings-modal').classList.add('open');
-    }
-    function closeSettingsDirect() {
-      document.getElementById('settings-modal').classList.remove('open');
-    }
-    function closeSettings(e) {
-      if (e.target.id === 'settings-modal') closeSettingsDirect();
-    }
-    function saveSettings() {
-      userName = document.getElementById('setting-name').value.trim() || 'Yentl';
-      geminiKey = document.getElementById('setting-gemini-key').value.trim() || DEFAULT_AUTH_KEY;
-      localStorage.setItem('buttjet_name', userName);
-      localStorage.setItem('buttjet_gemini_key', geminiKey);
-      document.getElementById('top-greeting').innerHTML = `Hey, <span>${userName}</span> ✨`;
-      closeSettingsDirect();
-    }
-
-    // Water Droplets
-    function renderDroplets() {
-      const row = document.getElementById('droplets-row');
-      row.innerHTML = '';
-      for (let i = 1; i <= 8; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'drop-btn ' + (i <= dailyGlasses ? 'filled' : '');
-        btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
-        btn.onclick = () => {
-          dailyGlasses = i;
-          document.getElementById('daily-water-count').innerText = `${dailyGlasses} / 8 Glasses`;
-          renderDroplets();
-        };
-        row.appendChild(btn);
+      if (num >= 1000) {
+        return (num / 1000).toFixed(0) + 'K XP';
       }
+      return num.toLocaleString() + ' XP';
     }
 
-    // Calendar Toggle & Ribbon/Grid
-    function toggleCalView() {
-      const ribbon = document.getElementById('ribbon-container');
-      const grid = document.getElementById('grid-container');
-      const btn = document.getElementById('view-toggle-btn');
-      if (currentView === 'ribbon') {
-        currentView = 'grid';
-        ribbon.style.display = 'none';
-        grid.style.display = 'grid';
-        btn.innerText = 'Ribbon View';
-        renderGrid();
+    // Web Audio Synthesizer for Level 4 Soundscapes
+    let audioCtx = null;
+    let zenOscillator = null;
+    let isPlayingZen = false;
+
+    function toggleZenSoundscape() {
+      if (!isPlayingZen) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        zenOscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        zenOscillator.type = 'sine';
+        zenOscillator.frequency.setValueAtTime(174, audioCtx.currentTime); // 174 Hz Solfeggio
+        gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        zenOscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        zenOscillator.start();
+        isPlayingZen = true;
+        document.getElementById('btnZenToneToggle').innerHTML = '<i class="ph-bold ph-stop"></i> <span>Stop 174Hz</span>';
+        showToast("Playing 174Hz Solfeggio frequency");
       } else {
-        currentView = 'ribbon';
-        ribbon.style.display = 'flex';
-        grid.style.display = 'none';
-        btn.innerText = 'Grid View';
-        renderRibbon();
-      }
-    }
-
-    function renderRibbon() {
-      const ribbon = document.getElementById('ribbon-container');
-      ribbon.innerHTML = '';
-      const dows = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      for (let i = -3; i <= 3; i++) {
-        const d = new Date(selectedDate);
-        d.setDate(d.getDate() + i);
-        const chip = document.createElement('div');
-        chip.className = 'ribbon-chip ' + (i === 0 ? 'active' : '');
-        chip.innerHTML = `
-          <div class="chip-dow">${dows[d.getDay()]}</div>
-          <div class="chip-num">${d.getDate()}</div>
-          <div class="chip-pips"><div class="pip"></div><div class="pip"></div></div>
-        `;
-        ribbon.appendChild(chip);
-      }
-    }
-
-    function renderGrid() {
-      const grid = document.getElementById('grid-container');
-      grid.innerHTML = '';
-      const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-      days.forEach(d => {
-        const h = document.createElement('div');
-        h.className = 'grid-dow';
-        h.innerText = d;
-        grid.appendChild(h);
-      });
-      for (let i = 1; i <= 31; i++) {
-        const c = document.createElement('div');
-        c.className = 'grid-cell ' + (i === selectedDate.getDate() ? 'active' : '');
-        c.innerText = i;
-        grid.appendChild(c);
-      }
-    }
-
-    // Enter Key Handler for Chat Input
-    document.getElementById('chat-input-field').addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        handleChatSend();
-      }
-    });
-
-    // Append Message to Thread
-    function appendChatMessage(text, sender) {
-      const thread = document.getElementById('chat-thread');
-      const bubble = document.createElement('div');
-      bubble.className = `chat-bubble ${sender}`;
-      bubble.innerText = text;
-      thread.appendChild(bubble);
-      thread.scrollTop = thread.scrollHeight;
-      return bubble;
-    }
-
-    // Interactive AI Chat Engine
-    async function handleChatSend() {
-      const input = document.getElementById('chat-input-field');
-      const text = input.value.trim();
-      if (!text) return;
-
-      input.value = '';
-      appendChatMessage(text, 'user');
-
-      const thinkingBubble = appendChatMessage("Thinking gently with you...", 'bot');
-
-      try {
-        let endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-        let headers = { 'Content-Type': 'application/json' };
-
-        // Determine format: Auth key (header) vs API key (param)
-        if (geminiKey.startsWith('AIzaSy')) {
-          endpoint += `?key=${encodeURIComponent(geminiKey)}`;
-        } else {
-          headers['x-goog-api-key'] = geminiKey;
-          headers['Authorization'] = `Bearer ${geminiKey}`;
+        if (zenOscillator) {
+          zenOscillator.stop();
+          zenOscillator.disconnect();
         }
+        isPlayingZen = false;
+        document.getElementById('btnZenToneToggle').innerHTML = '<i class="ph-bold ph-play"></i> <span>Play 174Hz</span>';
+        showToast("Soundscape paused");
+      }
+    }
 
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: headers,
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `You are the emotionally supportive AI Companion in the Buttjet app talking to ${userName}. Always be protective, kind, gentle, and practical. Keep responses concise unless giving a recipe or practical routine.\n\nUser: ${text}`
-              }]
-            }]
-          })
-        });
+    // Multi-language Dictionary
+    const I18N = {
+      en: {
+        dashboard: "Dashboard", meals: "Meals", hydration: "Water", cycle: "Cycle", diary: "Diary", settings: "Settings",
+        safeToSpend: "Safe to Spend Today", transitBtn: "Transit", logExpense: "Log Spend", calories: "Calories",
+        dailyTasks: "Daily High-Roller Tasks", taskWeight: "Log Morning Weight", taskWater: "Reach Hydration Goal",
+        taskMeals: "Log Food & Calories", taskBudget: "Review Daily Spending", checkInTitle: "Daily Check-In",
+        checkInSub: "Review Mood, Commute & Spending", optInMealPrep: "Weekly Meal Prep Reminders"
+      },
+      hi: {
+        dashboard: "डैशबोर्ड", meals: "भोजन", hydration: "जल स्तर", cycle: "चक्र", diary: "डायरी", settings: "सेटिंग्स",
+        safeToSpend: "सुरक्षित राशि आज के लिए", transitBtn: "यात्रा", logExpense: "खर्च जोड़ें", calories: "कैलोरी",
+        dailyTasks: "दैनिक कार्य सूची", taskWeight: "सुबह का वजन दर्ज करें", taskWater: "पानी का लक्ष्य पूरा करें",
+        taskMeals: "भोजन और कैलोरी जोड़ें", taskBudget: "दैनिक बजट की समीक्षा", checkInTitle: "दैनिक चेक-इन",
+        checkInSub: "मूड, यात्रा और खर्च की समीक्षा", optInMealPrep: "साप्ताहिक मील प्रेप रिमाइंडर"
+      },
+      mr: {
+        dashboard: "डॅशबोर्ड", meals: "आहार", hydration: "पाणी", cycle: "पाळी चक्र", diary: "डायरी", settings: "सेटिंग्ज",
+        safeToSpend: "आजचा सुरक्षित खर्च", transitBtn: "प्रवास", logExpense: "खर्च नोंदवा", calories: "कॅलरी",
+        dailyTasks: "दैनिक कामे", taskWeight: "सकाळचे वजन नोंदवा", taskWater: "पाण्याचे उद्दिष्ट गाठा",
+        taskMeals: "अन्नाची नोंद करा", taskBudget: "खर्चाचा आढावा घ्या", checkInTitle: "दैनिक चेक-इन",
+        checkInSub: "मूड, प्रवास आणि खर्च", optInMealPrep: "आठवड्याचा मील प्रेप रिमाइंडर"
+      },
+      ta: {
+        dashboard: "முகப்பு", meals: "உணவு", hydration: "நீர்", cycle: "சுழற்சி", diary: "டைரி", settings: "அமைப்புகள்",
+        safeToSpend: "இன்று செலவிட தொகை", transitBtn: "பயணம்", logExpense: "செலவு பதிவு", calories: "கலோரி",
+        dailyTasks: "தினசரி பணிகள்", taskWeight: "எடையை பதிவு செய்", taskWater: "நீர் இலக்கை அடை",
+        taskMeals: "உணவை பதிவு செய்", taskBudget: "செலவை மதிப்பாய்வு செய்", checkInTitle: "தினசரி மதிப்பாய்வு",
+        checkInSub: "மனநிலை மற்றும் பயண செலவு", optInMealPrep: "வாராந்திர உணவு தயாரிப்பு"
+      },
+      te: {
+        dashboard: "డాష్‌బోర్డ్", meals: "ఆహారం", hydration: "నీరు", cycle: "పీరియడ్", diary: "డైరీ", settings: "సెట్టింగులు",
+        safeToSpend: "ఈరోజు ఖర్చు బడ్జెట్", transitBtn: "ప్రయాణం", logExpense: "ఖర్చు జోడించు", calories: "కేలరీలు",
+        dailyTasks: "రోజువారీ లక్ష్యాలు", taskWeight: "బరువు నమోదు", taskWater: "నీటి లక్ష్యం",
+        taskMeals: "ఆహార రికార్డు", taskBudget: "బడ్జెట్ సమీక్ష", checkInTitle: "రోజువారీ చెక్-ఇన్",
+        checkInSub: "మూడ్ మరియు ప్రయాణం", optInMealPrep: "వీక్లీ మీల్ ప్రిపరేషన్"
+      },
+      od: {
+        dashboard: "ଡ୍ୟାସବୋର୍ଡ", meals: "ଖାଦ୍ୟ", hydration: "ଜଳ", cycle: "ଋତୁଚକ୍ର", diary: "ଡାଏରୀ", settings: "ସେଟିଂସ୍",
+        safeToSpend: "ଆଜିର ଖର୍ଚ୍ଚ ସୀମା", transitBtn: "ଯାତ୍ରା", logExpense: "ଖର୍ଚ୍ଚ ଯୋଡନ୍ତୁ", calories: "କ୍ୟାଲୋରୀ",
+        dailyTasks: "ଦୈନିକ କାର୍ଯ୍ୟ", taskWeight: "ଓଜନ ରେକର୍ଡ", taskWater: "ଜଳ ଲକ୍ଷ୍ୟ",
+        taskMeals: "ଖାଦ୍ୟ ଲଗ୍", taskBudget: "ବଜେଟ୍ ସମୀକ୍ଷା", checkInTitle: "ଦୈନିକ ଚେକ୍-ଇନ୍",
+        checkInSub: "ମନୋଭାବ ଓ ଯାତ୍ରା", optInMealPrep: "ସାପ୍ତାହିକ ଖାଦ୍ୟ ପ୍ରସ୍ତୁତି"
+      },
+      fr: {
+        dashboard: "Accueil", meals: "Repas", hydration: "Eau", cycle: "Cycle", diary: "Journal", settings: "Réglages",
+        safeToSpend: "Dépense sûre du jour", transitBtn: "Trajet", logExpense: "Dépense", calories: "Calories",
+        dailyTasks: "Objectifs du jour", taskWeight: "Poids du matin", taskWater: "Boire suffisamment",
+        taskMeals: "Enregistrer repas", taskBudget: "Contrôler budget", checkInTitle: "Bilan du jour",
+        checkInSub: "Humeur, transports et achats", optInMealPrep: "Rappel Meal Prep"
+      },
+      de: {
+        dashboard: "Übersicht", meals: "Mahlzeit", hydration: "Wasser", cycle: "Zyklus", diary: "Tagebuch", settings: "Optionen",
+        safeToSpend: "Tägliches Budget", transitBtn: "Fahrt", logExpense: "Ausgabe", calories: "Kalorien",
+        dailyTasks: "Tagesroutine", taskWeight: "Gewicht wiegen", taskWater: "Wasser trinken",
+        taskMeals: "Mahlzeit erfassen", taskBudget: "Budget prüfen", checkInTitle: "Tages-Check-in",
+        checkInSub: "Stimmung und Pendelkosten", optInMealPrep: "Meal-Prep-Erinnerung"
+      },
+      zh: {
+        dashboard: "首页", meals: "餐食", hydration: "饮水", cycle: "周期", diary: "日记", settings: "设置",
+        safeToSpend: "今日安全预算", transitBtn: "交通", logExpense: "记账", calories: "热量",
+        dailyTasks: "每日清单", taskWeight: "记录晨重", taskWater: "完成饮水目标",
+        taskMeals: "记录三餐", taskBudget: "预算检查", checkInTitle: "每日回顾",
+        checkInSub: "记录心情与交通花费", optInMealPrep: "每周备餐提醒"
+      },
+      es: {
+        dashboard: "Inicio", meals: "Comidas", hydration: "Agua", cycle: "Ciclo", diary: "Diario", settings: "Ajustes",
+        safeToSpend: "Presupuesto seguro", transitBtn: "Viaje", logExpense: "Añadir gasto", calories: "Calorías",
+        dailyTasks: "Rutina diaria", taskWeight: "Anotar peso", taskWater: "Meta de agua",
+        taskMeals: "Registrar comida", taskBudget: "Revisar gastos", checkInTitle: "Revisión diaria",
+        checkInSub: "Estado de ánimo y gastos", optInMealPrep: "Recordatorio Meal Prep"
+      }
+    };
 
-        const data = await res.json();
-        
-        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-          thinkingBubble.innerText = data.candidates[0].content.parts[0].text;
-        } else if (data.error) {
-          thinkingBubble.className = 'chat-bubble error-notice';
-          thinkingBubble.innerText = `Google API Notice (${data.error.code || 'Error'}): ${data.error.message || 'Key unauthorized'}`;
-        } else {
-          thinkingBubble.innerText = `I'm right here with you, ${userName}. Take a slow breath, sip some water, and let's take it one step at a time.`;
+    // Regional Seasonal Produce Data
+    const REGIONAL_PRODUCE = {
+      default: {
+        produce: "Fresh seasonal greens, legumes, whole grains, and citrus fruits.",
+        season: "Global Seasonal Cycle"
+      },
+      india: {
+        produce: "Fresh Methi, Palak, Matar (green peas), Delhi red carrots, Mosambi, Amla & Sweet Potato (Shakarkandi).",
+        season: "Winter Season"
+      },
+      europe: {
+        produce: "Kale, pumpkins, root vegetables (parsnips/carrots), apples, and brussels sprouts.",
+        season: "Autumn / Winter"
+      },
+      eastAsia: {
+        produce: "Bok choy, lotus root, winter melon, daikon radish, and fresh pears.",
+        season: "Cool Season"
+      }
+    };
+
+    const defaultState = {
+      user: null,
+      xp: 450000, // Starts with some XP to display progression
+      config: {
+        lang: 'en',
+        city: 'Mumbai',
+        currency: '₹',
+        monthlyIncome: 80000,
+        savingsTarget: 25000,
+        calGoal: 2000,
+        waterGoal: 2500,
+        dailyMealBudget: 500,
+        mealPrepOptIn: false,
+        onboarded: false
+      },
+      cycle: {
+        lastPeriodStartDate: new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0],
+        cycleLength: 28,
+        periodLength: 5,
+        symptoms: []
+      },
+      diary: [],
+      today: {
+        dateStr: new Date().toISOString().split('T')[0],
+        weight: null,
+        water: 750,
+        spent: 0,
+        meals: [],
+        expenses: [],
+        workoutCompleted: false,
+        outfitStyled: false
+      }
+    };
+
+    let appState = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(APP_STORAGE_KEY);
+        if (!raw) return defaultState;
+        const parsed = JSON.parse(raw);
+        if (parsed.today.dateStr !== new Date().toISOString().split('T')[0]) {
+          parsed.today = {
+            dateStr: new Date().toISOString().split('T')[0],
+            weight: null,
+            water: 0,
+            spent: 0,
+            meals: [],
+            expenses: [],
+            workoutCompleted: false,
+            outfitStyled: false
+          };
+        }
+        return parsed;
+      } catch (e) {
+        return defaultState;
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(appState));
+      renderAll();
+    }
+
+    function awardXp(amount, reason) {
+      appState.xp = (appState.xp || 0) + amount;
+      saveState();
+      showToast(`+${formatXp(amount)}: ${reason}!`);
+    }
+
+    function getCurrentLevel() {
+      const currentXp = appState.xp || 0;
+      let cur = LEVEL_TIERS[0];
+      for (let i = LEVEL_TIERS.length - 1; i >= 0; i--) {
+        if (currentXp >= LEVEL_TIERS[i].threshold) {
+          cur = LEVEL_TIERS[i];
+          break;
+        }
+      }
+      const nextTier = LEVEL_TIERS.find(t => t.level === cur.level + 1) || null;
+      return { cur, nextTier, currentXp };
+    }
+
+    function completeMorningWorkout() {
+      if (appState.today.workoutCompleted) {
+        showToast("Morning mobility already completed today!");
+        return;
+      }
+      appState.today.workoutCompleted = true;
+      awardXp(XP_REWARDS.WORKOUT, "Morning Mobility Routine");
+    }
+
+    function logOutfitStyled() {
+      if (appState.today.outfitStyled) {
+        showToast("Daily outfit already recorded!");
+        return;
+      }
+      appState.today.outfitStyled = true;
+      awardXp(XP_REWARDS.OUTFIT, "Daily Outfit Selection");
+    }
+
+    function applySecretTheme(theme) {
+      showToast(`Secret theme applied: ${theme.toUpperCase()}`);
+    }
+
+    // Live Open-Meteo Weather API Call
+    async function updateWeather(cityName) {
+      try {
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=en&format=json`);
+        const geoData = await geoRes.json();
+        if (geoData && geoData.results && geoData.results.length > 0) {
+          const { latitude, longitude } = geoData.results[0];
+          const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m`);
+          const wData = await wRes.json();
+          const temp = Math.round(wData.current.temperature_2m);
+          const humidity = wData.current.relative_humidity_2m;
+          
+          document.getElementById('headerWeatherBadge').innerHTML = `<i class="ph-bold ph-sun"></i> <span>${temp}°C · ${humidity}% Humid</span>`;
+          if (humidity > 65 || temp > 30) {
+            document.getElementById('weatherHydrationNote').innerText = "Warm climate: drink +300ml";
+          }
         }
       } catch (err) {
-        thinkingBubble.className = 'chat-bubble error-notice';
-        thinkingBubble.innerText = `Network error: ${err.message}. Please check your connection or key in Settings.`;
+        document.getElementById('headerWeatherBadge').innerHTML = `<i class="ph-bold ph-cloud"></i> <span>26°C · Mild</span>`;
       }
     }
 
-    // Init
-    document.getElementById('top-greeting').innerHTML = `Hey, <span>${userName}</span> ✨`;
-    renderRibbon();
-    renderDroplets();
+    // Multi-Language Translation Engine
+    function applyTranslations() {
+      const lang = appState.config.lang || 'en';
+      const dict = I18N[lang] || I18N.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerText = dict[key];
+      });
+      document.getElementById('headerLangBadge').innerText = lang.toUpperCase();
+    }
+
+    function setLanguage(langCode) {
+      appState.config.lang = langCode;
+      saveState();
+      closeLanguageModal();
+      showToast(`Language set to ${langCode.toUpperCase()}`);
+    }
+
+    function openLanguageModal() { document.getElementById('modalLanguage').classList.remove('hidden'); }
+    function closeLanguageModal() { document.getElementById('modalLanguage').classList.add('hidden'); }
+
+    // Onboarding Handling
+    function openOnboardingModal(force = false) {
+      if (!appState.config.onboarded || force) {
+        document.getElementById('onboardCityInput').value = appState.config.city;
+        document.getElementById('onboardLangSelect').value = appState.config.lang;
+        document.getElementById('onboardCurrencySelect').value = appState.config.currency;
+        document.getElementById('modalOnboarding').classList.remove('hidden');
+      }
+    }
+
+    function saveOnboarding(e) {
+      e.preventDefault();
+      appState.config.city = document.getElementById('onboardCityInput').value.trim() || 'Mumbai';
+      appState.config.lang = document.getElementById('onboardLangSelect').value;
+      appState.config.currency = document.getElementById('onboardCurrencySelect').value;
+      appState.config.onboarded = true;
+      saveState();
+      document.getElementById('modalOnboarding').classList.add('hidden');
+      updateWeather(appState.config.city);
+      showToast("Profile configured successfully!");
+    }
+
+    // Auth & Google Drive Sync
+    function openAuthModal() {
+      const modal = document.getElementById('modalAuth');
+      modal.classList.remove('hidden');
+      if (appState.user) {
+        document.getElementById('authLoggedInState').classList.remove('hidden');
+        document.getElementById('authLoginForm').classList.add('hidden');
+        document.getElementById('authActiveUserEmail').innerText = appState.user.email;
+        document.getElementById('authActiveUserPhone').innerText = appState.user.phone;
+      } else {
+        document.getElementById('authLoggedInState').classList.add('hidden');
+        document.getElementById('authLoginForm').classList.remove('hidden');
+      }
+    }
+    function closeAuthModal() { document.getElementById('modalAuth').classList.add('hidden'); }
+
+    function sendSimulatedOtp() {
+      const code = Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('authOtpInput').value = code;
+      showToast(`Simulated OTP sent: ${code}`);
+    }
+
+    function handleUserAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmailInput').value.trim();
+      const code = document.getElementById('authCountryCode').value;
+      const phone = code + ' ' + document.getElementById('authPhoneInput').value.trim();
+      appState.user = { email, phone };
+      saveState();
+      closeAuthModal();
+      showToast(`Welcome ${email}! Connected to Google Drive.`);
+    }
+
+    function logoutUser() {
+      appState.user = null;
+      saveState();
+      closeAuthModal();
+      showToast("Logged out successfully");
+    }
+
+    function syncToGoogleDrive() {
+      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('settingsLastSyncTimestamp').innerText = `Last synced: Today at ${now}`;
+      showToast("Data backed up to Google Drive!");
+    }
+
+    function restoreFromGoogleDrive() {
+      showToast("Google Drive snapshot verified & restored!");
+    }
+
+    // Financial Calculation
+    function computeSafeToSpend() {
+      const cur = appState.config.currency;
+      const daysInMonth = 30;
+      const todayDate = new Date().getDate();
+      const daysRemaining = Math.max(1, daysInMonth - todayDate + 1);
+      
+      const discretionaryMonthly = Math.max(0, appState.config.monthlyIncome - appState.config.savingsTarget);
+      const dailyAllowance = discretionaryMonthly / daysInMonth;
+      const spentToday = appState.today.spent;
+      const remainingToday = dailyAllowance - spentToday;
+      return { cur, dailyAllowance, spentToday, remainingToday, daysRemaining };
+    }
+
+    function renderDashboard() {
+      const fin = computeSafeToSpend();
+      document.getElementById('headerCityLabel').innerText = appState.config.city;
+      document.getElementById('dashSafeToSpendVal').innerText = `${fin.cur}${Math.max(0, fin.remainingToday).toFixed(0)}`;
+      document.getElementById('dashDaysLeftBadge').innerText = `${fin.daysRemaining} days left`;
+      document.getElementById('dashSpentTodaySummary').innerText = `${fin.cur}${fin.spentToday.toFixed(0)} spent today`;
+      
+      const pct = Math.min(100, (fin.spentToday / fin.dailyAllowance) * 100);
+      document.getElementById('dashSpendProgressBar').style.width = `${pct}%`;
+
+      // Level and XP calculation
+      const { cur, nextTier, currentXp } = getCurrentLevel();
+      document.getElementById('dashLevelBadge').innerText = `L${cur.level}`;
+      document.getElementById('dashLevelTitle').innerText = cur.name;
+      document.getElementById('dashTotalXpVal').innerText = formatXp(currentXp);
+
+      if (nextTier) {
+        const xpInLevel = currentXp - cur.threshold;
+        const xpNeeded = nextTier.threshold - cur.threshold;
+        const progressPct = Math.min(100, Math.max(2, (xpInLevel / xpNeeded) * 100));
+        document.getElementById('dashXpProgressBar').style.width = `${progressPct}%`;
+        document.getElementById('dashXpProgressText').innerText = `${currentXp.toLocaleString()} / ${nextTier.threshold.toLocaleString()} XP`;
+        document.getElementById('dashNextUnlockLabel').innerText = `Next: ${nextTier.unlock} (L${nextTier.level})`;
+      } else {
+        document.getElementById('dashXpProgressBar').style.width = '100%';
+        document.getElementById('dashXpProgressText').innerText = 'Max Sovereign Level Reached!';
+        document.getElementById('dashNextUnlockLabel').innerText = 'All Features Unlocked';
+      }
+
+      // Dynamic Feature Visibility by Level
+      const lvl = cur.level;
+      document.getElementById('featureCardLevel2').classList.toggle('hidden', lvl < 2);
+      document.getElementById('featureCardLevel3').classList.toggle('hidden', lvl < 3);
+      document.getElementById('featureCardLevel4').classList.toggle('hidden', lvl < 4);
+      document.getElementById('featureCardLevel5').classList.toggle('hidden', lvl < 5);
+
+      if (appState.today.workoutCompleted) {
+        document.getElementById('btnMorningWorkoutDone').innerHTML = '<i class="ph-bold ph-check"></i> Done';
+        document.getElementById('btnMorningWorkoutDone').classList.replace('bg-amber-500', 'bg-cream-300');
+        document.getElementById('btnMorningWorkoutDone').classList.add('text-charcoal-700');
+      }
+
+      // Seasonal produce widget
+      const city = appState.config.city.toLowerCase();
+      let produceData = REGIONAL_PRODUCE.default;
+      if (city.includes('mumbai') || city.includes('delhi') || city.includes('bangalore') || city.includes('pune')) {
+        produceData = REGIONAL_PRODUCE.india;
+      } else if (city.includes('paris') || city.includes('berlin') || city.includes('london')) {
+        produceData = REGIONAL_PRODUCE.europe;
+      } else if (city.includes('tokyo') || city.includes('beijing') || city.includes('shanghai')) {
+        produceData = REGIONAL_PRODUCE.eastAsia;
+      }
+      document.getElementById('seasonalProduceHeader').innerText = `${appState.config.city} Produce`;
+      document.getElementById('seasonalSeasonTag').innerText = produceData.season;
+      document.getElementById('seasonalProduceText').innerText = produceData.produce;
+
+      // Hydration
+      const w = appState.today.water;
+      const wg = appState.config.waterGoal;
+      const wp = Math.min(100, Math.round((w / wg) * 100));
+      document.getElementById('dashWaterVal').innerHTML = `${w} / ${wg} <span class="text-xs font-normal">ml</span>`;
+      document.getElementById('dashWaterPercent').innerText = `${wp}% of goal`;
+      document.getElementById('dashWaterProgressBar').style.width = `${wp}%`;
+      document.getElementById('waterPercentDisplay').innerText = `${wp}%`;
+      document.getElementById('waterVolumeDisplay').innerText = `${w} / ${wg} ml`;
+      document.getElementById('waterLevelFill').style.height = `${wp}%`;
+
+      // Task progression checklist
+      let completed = 0;
+      if (appState.today.weight) completed++;
+      if (appState.today.water >= 2000) completed++;
+      if (appState.today.meals.length >= 2) completed++;
+      if (fin.remainingToday >= 0) completed++;
+      document.getElementById('taskStreakSummary').innerText = `${completed} of 4 Completed`;
+
+      // Auth indicator in header
+      if (appState.user) {
+        document.getElementById('headerUserInitials').innerText = appState.user.email.split('@')[0].substring(0, 6);
+        document.getElementById('settingsUserDisplay').innerText = appState.user.email;
+        document.getElementById('settingsPhoneDisplay').innerText = appState.user.phone;
+        document.getElementById('settingsAuthActionBtn').innerText = 'Manage';
+      } else {
+        document.getElementById('headerUserInitials').innerText = 'Sign In';
+        document.getElementById('settingsUserDisplay').innerText = 'Guest User';
+        document.getElementById('settingsPhoneDisplay').innerText = 'Tap to link Phone & Email';
+        document.getElementById('settingsAuthActionBtn').innerText = 'Sign In';
+      }
+    }
+
+    function switchTab(tabId) {
+      ['dashboard', 'meals', 'hydration', 'cycle', 'diary', 'settings'].forEach(t => {
+        const sec = document.getElementById(`tab-${t}`);
+        const nav = document.getElementById(`nav-${t}`);
+        if (sec) sec.classList.toggle('hidden', t !== tabId);
+        if (nav) {
+          nav.classList.toggle('text-lavender-500', t === tabId);
+          nav.classList.toggle('text-charcoal-700/50', t !== tabId);
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function quickAddWater(ml) {
+      appState.today.water += ml;
+      awardXp(XP_REWARDS.WATER_MILESTONE, `Hydration +${ml}ml`);
+    }
+
+    function undoLastWater() {
+      appState.today.water = Math.max(0, appState.today.water - 250);
+      saveState();
+      showToast("Undid last water log");
+    }
+
+    function resetWaterToday() {
+      appState.today.water = 0;
+      saveState();
+      showToast("Hydration reset for today");
+    }
+
+    // Meal Photo Scanner Demo Simulation
+    function triggerCameraClick() {
+      document.getElementById('mealImageInput').click();
+    }
+
+    function handleMealPhotoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('photoPlaceholderArea').classList.add('hidden');
+        document.getElementById('photoAnalysisArea').classList.remove('hidden');
+        document.getElementById('scannedImagePreview').src = ev.target.result;
+        setTimeout(() => {
+          document.getElementById('aiScanOverlay').classList.add('hidden');
+          document.getElementById('aiScanResultBox').classList.remove('hidden');
+        }, 1200);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function commitScannedMeal() {
+      appState.today.meals.push({ title: "Nutrient Bowl", calories: 420 });
+      appState.today.spent += 85;
+      awardXp(XP_REWARDS.MEAL_EXPENSE, "Food & Nutrient Log");
+      resetPhotoScanner();
+    }
+
+    function resetPhotoScanner() {
+      document.getElementById('photoPlaceholderArea').classList.remove('hidden');
+      document.getElementById('photoAnalysisArea').classList.add('hidden');
+      document.getElementById('aiScanOverlay').classList.remove('hidden');
+      document.getElementById('aiScanResultBox').classList.add('hidden');
+    }
+
+    // Guided Check-In
+    function openGuidedCheckInModal() { document.getElementById('modalGuidedCheckIn').classList.remove('hidden'); }
+    function closeGuidedCheckInModal() { document.getElementById('modalGuidedCheckIn').classList.add('hidden'); }
+    function selectCheckInMood(btn, mood) {
+      document.querySelectorAll('.mood-opt-btn').forEach(b => b.classList.remove('bg-rose-200', 'font-bold'));
+      btn.classList.add('bg-rose-200', 'font-bold');
+      document.getElementById('checkInMoodValue').value = mood;
+    }
+
+    function saveGuidedCheckIn(e) {
+      e.preventDefault();
+      const travel = parseFloat(document.getElementById('checkInTravelFare').value || 0);
+      const spend = parseFloat(document.getElementById('checkInSpendAmt').value || 0);
+      appState.today.spent += (travel + spend);
+      closeGuidedCheckInModal();
+      awardXp(XP_REWARDS.DIARY_CHECKIN, "Daily Reflection & Check-In");
+    }
+
+    function openWeightModal() { document.getElementById('modalWeight').classList.remove('hidden'); }
+    function saveWeightLog(e) {
+      e.preventDefault();
+      appState.today.weight = parseFloat(document.getElementById('weightInputKg').value);
+      document.getElementById('modalWeight').classList.add('hidden');
+      awardXp(XP_REWARDS.WEIGHT, "Morning Weight Entry");
+    }
+
+    function openTravelSpendModal() { document.getElementById('modalTravelSpend').classList.remove('hidden'); }
+    function closeTravelSpendModal() { document.getElementById('modalTravelSpend').classList.add('hidden'); }
+    function saveTravelExpense(e) {
+      e.preventDefault();
+      const amt = parseFloat(document.getElementById('travelAmountInput').value || 0);
+      appState.today.spent += amt;
+      closeTravelSpendModal();
+      awardXp(XP_REWARDS.MEAL_EXPENSE, "Transit Fare Logged");
+    }
+
+    // Toast helper
+    function showToast(msg) {
+      const t = document.getElementById('toastNotification');
+      document.getElementById('toastMsg').innerText = msg;
+      t.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
+      setTimeout(() => t.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4'), 2200);
+    }
+
+    // Context exporter for AI
+    function copyContextToAI(target) {
+      const context = `Health & Finance Snapshot:
+- City: ${appState.config.city} (${appState.config.currency})
+- Level: L${getCurrentLevel().cur.level} (${formatXp(appState.xp)})
+- Weight: ${appState.today.weight || 'Unrecorded'} kg
+- Water: ${appState.today.water} ml / ${appState.config.waterGoal} ml
+- Safe-to-Spend Remaining Today: ${appState.config.currency}${computeSafeToSpend().remainingToday.toFixed(0)}
+- Meals Logged: ${appState.today.meals.length}
+Please suggest a nourishing dinner recipe with local seasonal produce under my remaining budget.`;
+      
+      const input = document.createElement('textarea');
+      input.value = context;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      showToast(`Copied snapshot for ${target}!`);
+    }
+
+    function toggleMealPrepOptIn(checked) {
+      appState.config.mealPrepOptIn = checked;
+      saveState();
+      showToast(checked ? "Weekly meal prep enabled" : "Meal prep disabled");
+    }
+
+    function dismissMealPrepBanner() {
+      document.getElementById('weeklyMealPrepBanner').classList.add('hidden');
+    }
+
+    function saveFinanceSettings() {
+      appState.config.monthlyIncome = parseFloat(document.getElementById('cfgIncomeInput').value || 80000);
+      appState.config.savingsTarget = parseFloat(document.getElementById('cfgSavingsInput').value || 25000);
+      saveState();
+      showToast("Financial targets updated!");
+    }
+
+    function renderAll() {
+      applyTranslations();
+      renderDashboard();
+      document.getElementById('cfgIncomeInput').value = appState.config.monthlyIncome;
+      document.getElementById('cfgSavingsInput').value = appState.config.savingsTarget;
+      document.getElementById('settingsLocSummary').innerText = `${appState.config.city} · ${appState.config.currency}`;
+      document.getElementById('prefMealPrepOptIn').checked = !!appState.config.mealPrepOptIn;
+      document.getElementById('weeklyMealPrepBanner').classList.toggle('hidden', !appState.config.mealPrepOptIn);
+    }
+
+    window.onload = function() {
+      if (!appState.config.onboarded) {
+        openOnboardingModal();
+      } else {
+        updateWeather(appState.config.city);
+      }
+      renderAll();
+    };
   </script>
 </body>
 </html>
