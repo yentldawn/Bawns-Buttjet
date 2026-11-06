@@ -104,17 +104,17 @@
 <body class="bg-[#F4F1EA] text-charcoal-800 font-sans min-h-screen flex justify-center selection:bg-lavender-200">
 
   <!-- Mobile Screen Shell -->
-  <div class="w-full max-w-md min-h-screen flex flex-col bg-[#FDFBF7] shadow-2xl relative overflow-x-hidden pb-24">
+  <div class="w-full max-w-md min-h-screen flex flex-col bg-[#FDFBF7] shadow-2xl relative overflow-x-hidden pb-28">
     
     <!-- Top Sticky Header -->
     <header class="px-5 pt-4 pb-3 flex items-center justify-between sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-md z-30 border-b border-cream-200">
       <div class="flex items-center space-x-2.5">
-        <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-lavender-400 via-rose-400 to-mint-400 flex items-center justify-center text-white shadow-pill">
+        <div onclick="switchTab('dashboard')" class="cursor-pointer w-9 h-9 rounded-2xl bg-gradient-to-tr from-lavender-400 via-rose-400 to-mint-400 flex items-center justify-center text-white shadow-pill">
           <i class="ph-bold ph-lightning text-xl"></i>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <h1 class="text-base font-extrabold text-charcoal-900 tracking-tight leading-none">Buttjet</h1>
+            <h1 onclick="switchTab('dashboard')" class="cursor-pointer text-base font-extrabold text-charcoal-900 tracking-tight leading-none">Buttjet</h1>
             <button onclick="openOnboardingModal(true)" class="text-[9px] font-extrabold bg-cream-200/90 text-charcoal-800 hover:bg-cream-300 px-2 py-0.5 rounded-md flex items-center gap-1 transition">
               <i class="ph-bold ph-map-pin text-rose-500"></i>
               <span id="headerCityLabel">Mumbai</span>
@@ -132,16 +132,42 @@
 
       <div class="flex items-center space-x-1.5">
         <!-- Auth Profile Badge -->
-        <button onclick="openAuthModal()" id="headerAuthBtn" class="h-8 px-2.5 rounded-full bg-cream-100 flex items-center justify-center text-charcoal-700 hover:bg-cream-200 transition text-[11px] font-bold gap-1" title="Account">
+        <button onclick="openAuthModal()" id="headerAuthBtn" class="h-8 px-2.5 rounded-full bg-cream-100 flex items-center justify-center text-charcoal-700 hover:bg-cream-200 transition text-[11px] font-bold gap-1">
           <i class="ph-bold ph-user-circle text-base text-lavender-500"></i>
           <span id="headerUserInitials">Sign In</span>
         </button>
+
         <button onclick="openLanguageModal()" class="w-8 h-8 rounded-full bg-cream-100 flex items-center justify-center text-charcoal-700 hover:bg-cream-200 transition text-xs font-bold" title="Language">
           <span id="headerLangBadge">EN</span>
         </button>
-        <button onclick="switchTab('settings')" class="w-8 h-8 rounded-full bg-cream-100 flex items-center justify-center text-charcoal-700 hover:bg-cream-200 transition">
-          <i class="ph-bold ph-gear text-base"></i>
-        </button>
+
+        <!-- Three Dots Quick Menu -->
+        <div class="relative">
+          <button onclick="toggleQuickMenu()" class="w-8 h-8 rounded-full bg-cream-100 flex items-center justify-center text-charcoal-700 hover:bg-cream-200 transition">
+            <i class="ph-bold ph-dots-three-vertical text-base"></i>
+          </button>
+          <div id="quickMenuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-cream-200 rounded-2xl shadow-xl py-1.5 z-50 text-xs font-semibold text-charcoal-800">
+            <button onclick="switchTab('dashboard')" class="w-full text-left px-3.5 py-2 hover:bg-cream-100 flex items-center gap-2">
+              <i class="ph-bold ph-house text-lavender-500"></i> Home Dashboard
+            </button>
+            <button onclick="switchTab('meals')" class="w-full text-left px-3.5 py-2 hover:bg-cream-100 flex items-center gap-2">
+              <i class="ph-bold ph-fork-knife text-rose-500"></i> Meals &amp; Nutrition
+            </button>
+            <button onclick="switchTab('hydration')" class="w-full text-left px-3.5 py-2 hover:bg-cream-100 flex items-center gap-2">
+              <i class="ph-bold ph-drop text-ocean-500"></i> Water Tracker
+            </button>
+            <button onclick="switchTab('cycle')" class="w-full text-left px-3.5 py-2 hover:bg-cream-100 flex items-center gap-2">
+              <i class="ph-bold ph-flower-lotus text-pink-500"></i> Cycle Sync
+            </button>
+            <button onclick="switchTab('diary')" class="w-full text-left px-3.5 py-2 hover:bg-cream-100 flex items-center gap-2">
+              <i class="ph-bold ph-book-bookmark text-amber-500"></i> Personal Diary
+            </button>
+            <div class="h-px bg-cream-200 my-1"></div>
+            <button onclick="switchTab('settings')" class="w-full text-left px-3.5 py-2 hover:bg-cream-100 flex items-center gap-2">
+              <i class="ph-bold ph-gear text-charcoal-600"></i> Settings &amp; Backup
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -217,7 +243,7 @@
           </div>
           <div class="mt-2.5 pt-2 border-t border-amber-200 flex items-center justify-between text-[11px]">
             <span class="text-amber-800 font-bold" id="mealPrepSavingsEstimate">Saves ~30% on food costs</span>
-            <button onclick="switchTab('meals'); showMealPrepChecklist()" class="text-xs font-bold text-amber-900 bg-amber-200 px-2.5 py-1 rounded-xl">
+            <button onclick="switchTab('meals')" class="text-xs font-bold text-amber-900 bg-amber-200 px-2.5 py-1 rounded-xl">
               View Guide →
             </button>
           </div>
@@ -292,7 +318,7 @@
           </div>
         </div>
 
-        <!-- UNLOCKED GAMIFIED FEATURE VAULT (Reveals based on Level) -->
+        <!-- UNLOCKED GAMIFIED FEATURE VAULT -->
         <div id="unlockedFeaturesVault" class="space-y-3">
           <!-- Level 2 Feature: Morning Routine Studio -->
           <div id="featureCardLevel2" class="p-4 rounded-3xl bg-gradient-to-br from-amber-500/10 via-orange-50 to-white border border-amber-200 shadow-soft">
@@ -508,7 +534,165 @@
         </div>
 
       </section>
-<!-- ... existing code ... -->
+
+      <!-- ================= 2. TAB: MEALS & FUEL ================= -->
+      <section id="tab-meals" class="space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 border border-cream-200 shadow-soft">
+          <h2 class="text-sm font-bold text-charcoal-900 flex items-center gap-1.5 mb-2">
+            <i class="ph-bold ph-camera text-lavender-500 text-base"></i>
+            <span>Photo Food &amp; Nutrient Scanner</span>
+          </h2>
+          <p class="text-[11px] text-charcoal-600 mb-3">Snap a photo of your meal to estimate calories and macro balances.</p>
+          
+          <input type="file" accept="image/*" id="mealImageInput" class="hidden" onchange="handleMealPhotoUpload(event)" />
+          
+          <div id="photoPlaceholderArea" onclick="triggerCameraClick()" class="border-2 border-dashed border-lavender-200 bg-lavender-50/50 rounded-2xl p-6 text-center cursor-pointer hover:bg-lavender-50 transition">
+            <i class="ph-bold ph-camera-plus text-3xl text-lavender-400 mb-1"></i>
+            <span class="text-xs font-bold text-lavender-700 block">Tap to Snap Meal Photo</span>
+            <span class="text-[10px] text-charcoal-500">Simulates AI portion and calorie analysis</span>
+          </div>
+
+          <div id="photoAnalysisArea" class="hidden space-y-3">
+            <img id="scannedImagePreview" class="w-full h-40 object-cover rounded-2xl border border-cream-200" src="" alt="Scanned Meal" />
+            <div id="aiScanOverlay" class="text-center py-2 text-xs font-bold text-lavender-600 flex items-center justify-center gap-1.5">
+              <i class="ph-bold ph-spinner animate-spin"></i> Analyzing ingredients &amp; calories...
+            </div>
+            <div id="aiScanResultBox" class="hidden bg-cream-50 p-3 rounded-2xl border border-cream-200 text-xs space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-charcoal-900">Estimated Meal: ~420 kcal</span>
+                <span class="text-[10px] font-extrabold text-mint-600 bg-mint-50 px-2 py-0.5 rounded-full">High Protein</span>
+              </div>
+              <p class="text-[11px] text-charcoal-600">Rich in folate, complex carbohydrates, and iron. Well-synced for your cycle phase.</p>
+              <div class="flex gap-2 pt-1">
+                <button onclick="commitScannedMeal()" class="flex-1 py-2 bg-lavender-500 text-white rounded-xl font-bold text-xs shadow-pill">
+                  Log This Meal (+75K XP)
+                </button>
+                <button onclick="resetPhotoScanner()" class="px-3 py-2 bg-cream-200 text-charcoal-700 rounded-xl font-bold text-xs">
+                  Retake
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manual Meal Logging -->
+        <div class="bg-white rounded-3xl p-4 border border-cream-200 shadow-soft space-y-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-charcoal-800">Quick Manual Meal Log</h3>
+          <form onsubmit="handleManualMealLog(event)" class="space-y-2 text-xs">
+            <input type="text" id="manualMealTitle" placeholder="Meal name (e.g., Dal Khichdi, Salad)" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 font-semibold" />
+            <div class="grid grid-cols-2 gap-2">
+              <input type="number" id="manualMealCal" placeholder="Calories (kcal)" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 font-semibold" />
+              <input type="number" id="manualMealCost" placeholder="Cost (₹)" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 font-semibold" />
+            </div>
+            <button type="submit" class="w-full py-2 bg-charcoal-900 text-white rounded-xl font-bold text-xs shadow-pill">
+              Add Meal to Daily Fuel
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ================= 3. TAB: HYDRATION ================= -->
+      <section id="tab-hydration" class="space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-5 border border-cream-200 shadow-soft text-center">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-ocean-600 bg-ocean-50 px-2.5 py-1 rounded-full">
+            Daily Water Target
+          </span>
+          
+          <div class="mt-4 flex justify-center">
+            <div class="relative w-32 h-52 rounded-3xl border-4 border-ocean-300 overflow-hidden bg-ocean-50/40 flex flex-col justify-end shadow-inner">
+              <div id="waterLevelFill" class="w-full bg-gradient-to-t from-ocean-500 to-ocean-300 transition-all duration-700 relative" style="height: 30%;">
+                <div class="water-wave bg-ocean-300/60"></div>
+              </div>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span id="waterPercentDisplay" class="text-2xl font-black text-charcoal-900">30%</span>
+                <span id="waterVolumeDisplay" class="text-[10px] font-bold text-charcoal-700/80">750 / 2500 ml</span>
+              </div>
+            </div>
+          </div>
+
+          <p id="weatherHydrationNote" class="text-[11px] text-ocean-600 mt-3 font-semibold">Stay refreshed throughout the day</p>
+
+          <div class="grid grid-cols-3 gap-2 mt-4">
+            <button onclick="quickAddWater(150)" class="py-2.5 bg-ocean-50 hover:bg-ocean-100 text-ocean-700 font-bold text-xs rounded-xl border border-ocean-200 transition">
+              +150 ml
+            </button>
+            <button onclick="quickAddWater(250)" class="py-2.5 bg-ocean-100 hover:bg-ocean-200 text-ocean-800 font-bold text-xs rounded-xl border border-ocean-300 transition">
+              +250 ml
+            </button>
+            <button onclick="quickAddWater(500)" class="py-2.5 bg-ocean-500 hover:bg-ocean-600 text-white font-bold text-xs rounded-xl shadow-pill transition">
+              +500 ml
+            </button>
+          </div>
+
+          <div class="flex justify-between items-center mt-3 pt-3 border-t border-cream-200 text-[11px]">
+            <button onclick="undoLastWater()" class="text-charcoal-500 hover:text-charcoal-800 font-semibold">
+              <i class="ph-bold ph-arrow-u-up-left"></i> Undo -250ml
+            </button>
+            <button onclick="resetWaterToday()" class="text-rose-500 hover:text-rose-700 font-semibold">
+              Reset Today
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. TAB: CYCLE & HORMONES ================= -->
+      <section id="tab-cycle" class="space-y-4 hidden">
+        <div class="bg-gradient-to-r from-rose-50 to-pink-50 rounded-3xl p-4 border border-rose-200 shadow-soft">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[9px] font-extrabold uppercase tracking-wider bg-rose-200 text-rose-800 px-2 py-0.5 rounded">Hormonal Rhythm</span>
+              <h2 class="text-sm font-bold text-charcoal-900 mt-1">Follicular Phase (Days 6–13)</h2>
+              <p class="text-[11px] text-charcoal-600 mt-0.5">Estrogen rises, energy surges. Perfect time for creative focus and fresh foods.</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-rose-400 text-white flex items-center justify-center text-2xl shadow-pill">
+              🌸
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-4 border border-cream-200 shadow-soft space-y-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-charcoal-800">Cycle-Synced Nutrition Recommendations</h3>
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-cream-50 border border-cream-200">
+              <strong class="text-rose-700 block mb-0.5">Focus Nutrients:</strong>
+              <p class="text-[11px] text-charcoal-700">Zinc, vitamin C, fermented foods (curd, kefir), and sprouted moong for estrogen metabolism.</p>
+            </div>
+            <div class="p-2.5 rounded-xl bg-cream-50 border border-cream-200">
+              <strong class="text-rose-700 block mb-0.5">Seed Cycling Protocol:</strong>
+              <p class="text-[11px] text-charcoal-700">1 tbsp pumpkin seeds + 1 tbsp ground flaxseeds daily during days 1–14.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. TAB: DIARY & JOURNAL ================= -->
+      <section id="tab-diary" class="space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 border border-cream-200 shadow-soft space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-charcoal-900 flex items-center gap-1.5">
+              <i class="ph-bold ph-book-bookmark text-amber-500 text-base"></i>
+              <span>Personal Diary</span>
+            </h2>
+            <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Private &amp; Offline</span>
+          </div>
+          
+          <form onsubmit="handleDiarySubmit(event)" class="space-y-2 text-xs">
+            <textarea id="diaryEntryText" rows="4" placeholder="How was your day? Write down your reflections, thoughts, or wins..." required class="w-full bg-cream-50 border border-cream-200 rounded-2xl p-3 font-medium text-xs focus:outline-none focus:border-amber-300"></textarea>
+            <div class="flex justify-between items-center pt-1">
+              <span class="text-[10px] text-charcoal-500">Auto-stamped with today's metrics</span>
+              <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs shadow-pill transition">
+                Save Entry (+200K XP)
+              </button>
+            </div>
+          </form>
+
+          <!-- Past Diary Entries -->
+          <div class="pt-3 border-t border-cream-200 space-y-2" id="diaryEntriesContainer">
+            <p class="text-[10px] text-charcoal-400 italic text-center py-2">No journal entries saved yet today.</p>
+          </div>
+        </div>
+      </section>
+
       <!-- ================= 6. TAB: SETTINGS & PREFERENCES ================= -->
       <section id="tab-settings" class="space-y-4 hidden">
         <!-- Account & Cloud Sync Banner Card -->
@@ -623,16 +807,121 @@
           </div>
         </details>
       </section>
-<!-- ... existing code ... -->
+
+    </main>
+
+    <!-- PERSISTENT BOTTOM NAVIGATION DOCK -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-cream-200 px-3 py-2 flex justify-around items-center max-w-md mx-auto shadow-lg">
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-0.5 text-lavender-500 transition active:scale-95">
+        <i class="ph-bold ph-house text-xl"></i>
+        <span class="text-[9px] font-bold" data-i18n="dashboard">Home</span>
+      </button>
+
+      <button onclick="switchTab('meals')" id="nav-meals" class="flex flex-col items-center gap-0.5 text-charcoal-700/50 hover:text-charcoal-800 transition active:scale-95">
+        <i class="ph-bold ph-fork-knife text-xl"></i>
+        <span class="text-[9px] font-bold" data-i18n="meals">Meals</span>
+      </button>
+
+      <button onclick="switchTab('hydration')" id="nav-hydration" class="flex flex-col items-center gap-0.5 text-charcoal-700/50 hover:text-charcoal-800 transition active:scale-95">
+        <i class="ph-bold ph-drop text-xl"></i>
+        <span class="text-[9px] font-bold" data-i18n="hydration">Water</span>
+      </button>
+
+      <button onclick="switchTab('cycle')" id="nav-cycle" class="flex flex-col items-center gap-0.5 text-charcoal-700/50 hover:text-charcoal-800 transition active:scale-95">
+        <i class="ph-bold ph-flower-lotus text-xl"></i>
+        <span class="text-[9px] font-bold" data-i18n="cycle">Cycle</span>
+      </button>
+
+      <button onclick="switchTab('diary')" id="nav-diary" class="flex flex-col items-center gap-0.5 text-charcoal-700/50 hover:text-charcoal-800 transition active:scale-95">
+        <i class="ph-bold ph-book-bookmark text-xl"></i>
+        <span class="text-[9px] font-bold" data-i18n="diary">Diary</span>
+      </button>
+
+      <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center gap-0.5 text-charcoal-700/50 hover:text-charcoal-800 transition active:scale-95">
+        <i class="ph-bold ph-gear text-xl"></i>
+        <span class="text-[9px] font-bold" data-i18n="settings">Settings</span>
+      </button>
+    </nav>
+
+    <!-- ================= ALL MODALS ================= -->
+
     <!-- Quick Transit Modal -->
     <div id="modalTravelSpend" class="fixed inset-0 bg-charcoal-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 hidden">
       <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-2xl border border-cream-200">
-        <h3 class="text-sm font-bold text-charcoal-900 mb-2">Record Transit Fare</h3>
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-sm font-bold text-charcoal-900">Record Transit Fare</h3>
+          <button onclick="closeTravelSpendModal()" class="text-charcoal-400 hover:text-charcoal-800"><i class="ph-bold ph-x text-sm"></i></button>
+        </div>
         <form onsubmit="saveTravelExpense(event)" class="space-y-3">
           <input type="text" id="travelTitleInput" placeholder="Bus, Metro, Auto, Gas" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
           <input type="number" step="any" id="travelAmountInput" placeholder="Amount" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
           <button type="submit" class="w-full py-2.5 bg-ocean-500 text-white rounded-xl text-xs font-bold shadow-pill">
             Deduct from Safe-to-Spend
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Quick Spend Modal -->
+    <div id="modalSpend" class="fixed inset-0 bg-charcoal-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 hidden">
+      <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-2xl border border-cream-200">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-sm font-bold text-charcoal-900">Log Daily Spend</h3>
+          <button onclick="closeSpendModal()" class="text-charcoal-400 hover:text-charcoal-800"><i class="ph-bold ph-x text-sm"></i></button>
+        </div>
+        <form onsubmit="handleManualSpendSubmit(event)" class="space-y-3">
+          <input type="text" id="spendTitleInput" placeholder="Coffee, Groceries, Medicine" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+          <input type="number" step="any" id="spendAmountInput" placeholder="Amount" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+          <button type="submit" class="w-full py-2.5 bg-mint-500 text-white rounded-xl text-xs font-bold shadow-pill">
+            Log Spend
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Weight Entry Modal -->
+    <div id="modalWeight" class="fixed inset-0 bg-charcoal-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 hidden">
+      <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-2xl border border-cream-200">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-sm font-bold text-charcoal-900">Morning Weight</h3>
+          <button onclick="document.getElementById('modalWeight').classList.add('hidden')" class="text-charcoal-400 hover:text-charcoal-800"><i class="ph-bold ph-x text-sm"></i></button>
+        </div>
+        <form onsubmit="saveWeightLog(event)" class="space-y-3">
+          <input type="number" step="0.1" id="weightInputKg" placeholder="Weight in kg (e.g. 58.5)" required class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+          <button type="submit" class="w-full py-2.5 bg-amber-500 text-white rounded-xl text-xs font-bold shadow-pill">
+            Save Weight (+150K XP)
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Guided Daily Reflection & Commute Modal -->
+    <div id="modalGuidedCheckIn" class="fixed inset-0 bg-charcoal-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 hidden">
+      <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-cream-200 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-charcoal-900">Daily Reflection &amp; Commute</h3>
+          <button onclick="closeGuidedCheckInModal()" class="text-charcoal-400 hover:text-charcoal-800"><i class="ph-bold ph-x text-sm"></i></button>
+        </div>
+        <form onsubmit="saveGuidedCheckIn(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-charcoal-800 mb-1">How are you feeling today?</label>
+            <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+              <button type="button" onclick="selectCheckInMood(this, 'Energized')" class="mood-opt-btn p-2 rounded-xl bg-cream-100 hover:bg-cream-200 transition">⚡ Energized</button>
+              <button type="button" onclick="selectCheckInMood(this, 'Calm')" class="mood-opt-btn p-2 rounded-xl bg-cream-100 hover:bg-cream-200 transition">🌿 Calm</button>
+              <button type="button" onclick="selectCheckInMood(this, 'Tired')" class="mood-opt-btn p-2 rounded-xl bg-cream-100 hover:bg-cream-200 transition">😴 Tired</button>
+            </div>
+            <input type="hidden" id="checkInMoodValue" value="Calm" />
+          </div>
+          <div>
+            <label class="block font-bold text-charcoal-800 mb-0.5">Did you travel anywhere today?</label>
+            <input type="number" id="checkInTravelFare" placeholder="Commute spend in ₹ (or 0)" class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+          </div>
+          <div>
+            <label class="block font-bold text-charcoal-800 mb-0.5">Other out-of-pocket expenses?</label>
+            <input type="number" id="checkInSpendAmt" placeholder="Snacks, chai, groceries" class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 text-xs font-semibold" />
+          </div>
+          <button type="submit" class="w-full py-2.5 bg-lavender-500 text-white rounded-xl text-xs font-bold shadow-pill">
+            Complete Daily Review (+200K XP)
           </button>
         </form>
       </div>
@@ -695,6 +984,70 @@
       </div>
     </div>
 
+    <!-- Onboarding / Location Modal -->
+    <div id="modalOnboarding" class="fixed inset-0 bg-charcoal-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 hidden">
+      <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-cream-200 space-y-3">
+        <h3 class="text-sm font-bold text-charcoal-900">Configure Location &amp; Preferences</h3>
+        <form onsubmit="saveOnboarding(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-charcoal-700 mb-1">City Name</label>
+            <input type="text" id="onboardCityInput" placeholder="Mumbai, Delhi, London, etc." class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 font-semibold" />
+          </div>
+          <div>
+            <label class="block font-bold text-charcoal-700 mb-1">Language</label>
+            <select id="onboardLangSelect" class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 font-semibold">
+              <option value="en">English</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="mr">मराठी (Marathi)</option>
+              <option value="ta">தமிழ் (Tamil)</option>
+              <option value="te">తెలుగు (Telugu)</option>
+              <option value="od">ଓଡ଼ିଆ (Odia)</option>
+              <option value="fr">Français (French)</option>
+              <option value="de">Deutsch (German)</option>
+              <option value="zh">中文 (Chinese)</option>
+              <option value="es">Español (Spanish)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-charcoal-700 mb-1">Currency</label>
+            <select id="onboardCurrencySelect" class="w-full bg-cream-50 border border-cream-200 rounded-xl px-3 py-2 font-semibold">
+              <option value="₹">₹ (INR)</option>
+              <option value="$">$ (USD)</option>
+              <option value="€">€ (EUR)</option>
+              <option value="£">£ (GBP)</option>
+              <option value="¥">¥ (JPY / CNY)</option>
+              <option value="A$">A$ (AUD)</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full py-2.5 bg-charcoal-900 text-white rounded-xl text-xs font-bold shadow-pill">
+            Save Preferences
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Language Selector Modal -->
+    <div id="modalLanguage" class="fixed inset-0 bg-charcoal-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 hidden">
+      <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-2xl border border-cream-200 space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-bold text-charcoal-900">Select Language</h3>
+          <button onclick="closeLanguageModal()" class="text-charcoal-400 hover:text-charcoal-800"><i class="ph-bold ph-x text-sm"></i></button>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+          <button onclick="setLanguage('en')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">English</button>
+          <button onclick="setLanguage('hi')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">हिन्दी</button>
+          <button onclick="setLanguage('mr')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">मराठी</button>
+          <button onclick="setLanguage('ta')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">தமிழ்</button>
+          <button onclick="setLanguage('te')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">తెలుగు</button>
+          <button onclick="setLanguage('od')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">ଓଡ଼ିଆ</button>
+          <button onclick="setLanguage('fr')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">Français</button>
+          <button onclick="setLanguage('de')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">Deutsch</button>
+          <button onclick="setLanguage('zh')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">中文</button>
+          <button onclick="setLanguage('es')" class="p-2.5 rounded-xl bg-cream-50 border border-cream-200 hover:bg-cream-100 text-left">Español</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast Notification Overlay -->
     <div id="toastNotification" class="fixed top-5 left-1/2 -translate-x-1/2 bg-charcoal-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-semibold flex items-center space-x-2 z-50 transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-4">
       <span id="toastIcon">✨</span>
@@ -726,7 +1079,6 @@
       DIARY_CHECKIN: 200000
     };
 
-    // Compact Formatter for huge XP numbers
     function formatXp(num) {
       if (num >= 1000000) {
         return (num / 1000000).toFixed(2).replace(/\.00$/, '') + 'M XP';
@@ -734,10 +1086,10 @@
       if (num >= 1000) {
         return (num / 1000).toFixed(0) + 'K XP';
       }
-      return num.toLocaleString() + ' XP';
+      return (num || 0).toLocaleString() + ' XP';
     }
 
-    // Web Audio Synthesizer for Level 4 Soundscapes
+    // Web Audio Synthesizer
     let audioCtx = null;
     let zenOscillator = null;
     let isPlayingZen = false;
@@ -748,7 +1100,7 @@
         zenOscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
         zenOscillator.type = 'sine';
-        zenOscillator.frequency.setValueAtTime(174, audioCtx.currentTime); // 174 Hz Solfeggio
+        zenOscillator.frequency.setValueAtTime(174, audioCtx.currentTime);
         gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
         zenOscillator.connect(gainNode);
         gainNode.connect(audioCtx.destination);
@@ -767,24 +1119,23 @@
       }
     }
 
-    // Multi-language Dictionary
     const I18N = {
       en: {
-        dashboard: "Dashboard", meals: "Meals", hydration: "Water", cycle: "Cycle", diary: "Diary", settings: "Settings",
+        dashboard: "Home", meals: "Meals", hydration: "Water", cycle: "Cycle", diary: "Diary", settings: "Settings",
         safeToSpend: "Safe to Spend Today", transitBtn: "Transit", logExpense: "Log Spend", calories: "Calories",
         dailyTasks: "Daily High-Roller Tasks", taskWeight: "Log Morning Weight", taskWater: "Reach Hydration Goal",
         taskMeals: "Log Food & Calories", taskBudget: "Review Daily Spending", checkInTitle: "Daily Check-In",
         checkInSub: "Review Mood, Commute & Spending", optInMealPrep: "Weekly Meal Prep Reminders"
       },
       hi: {
-        dashboard: "डैशबोर्ड", meals: "भोजन", hydration: "जल स्तर", cycle: "चक्र", diary: "डायरी", settings: "सेटिंग्स",
+        dashboard: "होम", meals: "भोजन", hydration: "जल स्तर", cycle: "चक्र", diary: "डायरी", settings: "सेटिंग्स",
         safeToSpend: "सुरक्षित राशि आज के लिए", transitBtn: "यात्रा", logExpense: "खर्च जोड़ें", calories: "कैलोरी",
         dailyTasks: "दैनिक कार्य सूची", taskWeight: "सुबह का वजन दर्ज करें", taskWater: "पानी का लक्ष्य पूरा करें",
         taskMeals: "भोजन और कैलोरी जोड़ें", taskBudget: "दैनिक बजट की समीक्षा", checkInTitle: "दैनिक चेक-इन",
         checkInSub: "मूड, यात्रा और खर्च की समीक्षा", optInMealPrep: "साप्ताहिक मील प्रेप रिमाइंडर"
       },
       mr: {
-        dashboard: "डॅशबोर्ड", meals: "आहार", hydration: "पाणी", cycle: "पाळी चक्र", diary: "डायरी", settings: "सेटिंग्ज",
+        dashboard: "होम", meals: "आहार", hydration: "पाणी", cycle: "पाळी चक्र", diary: "डायरी", settings: "सेटिंग्ज",
         safeToSpend: "आजचा सुरक्षित खर्च", transitBtn: "प्रवास", logExpense: "खर्च नोंदवा", calories: "कॅलरी",
         dailyTasks: "दैनिक कामे", taskWeight: "सकाळचे वजन नोंदवा", taskWater: "पाण्याचे उद्दिष्ट गाठा",
         taskMeals: "अन्नाची नोंद करा", taskBudget: "खर्चाचा आढावा घ्या", checkInTitle: "दैनिक चेक-इन",
@@ -798,14 +1149,14 @@
         checkInSub: "மனநிலை மற்றும் பயண செலவு", optInMealPrep: "வாராந்திர உணவு தயாரிப்பு"
       },
       te: {
-        dashboard: "డాష్‌బోర్డ్", meals: "ఆహారం", hydration: "నీరు", cycle: "పీరియడ్", diary: "డైరీ", settings: "సెట్టింగులు",
+        dashboard: "హోమ్", meals: "ఆహారం", hydration: "నీరు", cycle: "పీరియడ్", diary: "డైరీ", settings: "సెట్టింగులు",
         safeToSpend: "ఈరోజు ఖర్చు బడ్జెట్", transitBtn: "ప్రయాణం", logExpense: "ఖర్చు జోడించు", calories: "కేలరీలు",
         dailyTasks: "రోజువారీ లక్ష్యాలు", taskWeight: "బరువు నమోదు", taskWater: "నీటి లక్ష్యం",
         taskMeals: "ఆహార రికార్డు", taskBudget: "బడ్జెట్ సమీక్ష", checkInTitle: "రోజువారీ చెక్-ఇన్",
         checkInSub: "మూడ్ మరియు ప్రయాణం", optInMealPrep: "వీక్లీ మీల్ ప్రిపరేషన్"
       },
       od: {
-        dashboard: "ଡ୍ୟାସବୋର୍ଡ", meals: "ଖାଦ୍ୟ", hydration: "ଜଳ", cycle: "ଋତୁଚକ୍ର", diary: "ଡାଏରୀ", settings: "ସେଟିଂସ୍",
+        dashboard: "ହୋମ୍", meals: "ଖାଦ୍ୟ", hydration: "ଜଳ", cycle: "ଋତୁଚକ୍ର", diary: "ଡାଏରୀ", settings: "ସେଟିଂସ୍",
         safeToSpend: "ଆଜିର ଖର୍ଚ୍ଚ ସୀମା", transitBtn: "ଯାତ୍ରା", logExpense: "ଖର୍ଚ୍ଚ ଯୋଡନ୍ତୁ", calories: "କ୍ୟାଲୋରୀ",
         dailyTasks: "ଦୈନିକ କାର୍ଯ୍ୟ", taskWeight: "ଓଜନ ରେକର୍ଡ", taskWater: "ଜଳ ଲକ୍ଷ୍ୟ",
         taskMeals: "ଖାଦ୍ୟ ଲଗ୍", taskBudget: "ବଜେଟ୍ ସମୀକ୍ଷା", checkInTitle: "ଦୈନିକ ଚେକ୍-ଇନ୍",
@@ -819,7 +1170,7 @@
         checkInSub: "Humeur, transports et achats", optInMealPrep: "Rappel Meal Prep"
       },
       de: {
-        dashboard: "Übersicht", meals: "Mahlzeit", hydration: "Wasser", cycle: "Zyklus", diary: "Tagebuch", settings: "Optionen",
+        dashboard: "Home", meals: "Mahlzeit", hydration: "Wasser", cycle: "Zyklus", diary: "Tagebuch", settings: "Optionen",
         safeToSpend: "Tägliches Budget", transitBtn: "Fahrt", logExpense: "Ausgabe", calories: "Kalorien",
         dailyTasks: "Tagesroutine", taskWeight: "Gewicht wiegen", taskWater: "Wasser trinken",
         taskMeals: "Mahlzeit erfassen", taskBudget: "Budget prüfen", checkInTitle: "Tages-Check-in",
@@ -841,7 +1192,6 @@
       }
     };
 
-    // Regional Seasonal Produce Data
     const REGIONAL_PRODUCE = {
       default: {
         produce: "Fresh seasonal greens, legumes, whole grains, and citrus fruits.",
@@ -863,7 +1213,7 @@
 
     const defaultState = {
       user: null,
-      xp: 450000, // Starts with some XP to display progression
+      xp: 450000,
       config: {
         lang: 'en',
         city: 'Mumbai',
@@ -874,7 +1224,7 @@
         waterGoal: 2500,
         dailyMealBudget: 500,
         mealPrepOptIn: false,
-        onboarded: false
+        onboarded: true
       },
       cycle: {
         lastPeriodStartDate: new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0],
@@ -966,7 +1316,6 @@
       showToast(`Secret theme applied: ${theme.toUpperCase()}`);
     }
 
-    // Live Open-Meteo Weather API Call
     async function updateWeather(cityName) {
       try {
         const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=en&format=json`);
@@ -984,11 +1333,10 @@
           }
         }
       } catch (err) {
-        document.getElementById('headerWeatherBadge').innerHTML = `<i class="ph-bold ph-cloud"></i> <span>26°C · Mild</span>`;
+        document.getElementById('headerWeatherBadge').innerHTML = `<i class="ph-bold ph-cloud"></i> <span>28°C · Fair</span>`;
       }
     }
 
-    // Multi-Language Translation Engine
     function applyTranslations() {
       const lang = appState.config.lang || 'en';
       const dict = I18N[lang] || I18N.en;
@@ -1009,7 +1357,6 @@
     function openLanguageModal() { document.getElementById('modalLanguage').classList.remove('hidden'); }
     function closeLanguageModal() { document.getElementById('modalLanguage').classList.add('hidden'); }
 
-    // Onboarding Handling
     function openOnboardingModal(force = false) {
       if (!appState.config.onboarded || force) {
         document.getElementById('onboardCityInput').value = appState.config.city;
@@ -1045,12 +1392,15 @@
         document.getElementById('authLoginForm').classList.remove('hidden');
       }
     }
-    function closeAuthModal() { document.getElementById('modalAuth').classList.add('hidden'); }
+
+    function closeAuthModal() {
+      document.getElementById('modalAuth').classList.add('hidden');
+    }
 
     function sendSimulatedOtp() {
       const code = Math.floor(1000 + Math.random() * 9000);
       document.getElementById('authOtpInput').value = code;
-      showToast(`Simulated OTP sent: ${code}`);
+      showToast(`OTP code sent: ${code}`);
     }
 
     function handleUserAuth(e) {
@@ -1058,10 +1408,11 @@
       const email = document.getElementById('authEmailInput').value.trim();
       const code = document.getElementById('authCountryCode').value;
       const phone = code + ' ' + document.getElementById('authPhoneInput').value.trim();
+
       appState.user = { email, phone };
       saveState();
       closeAuthModal();
-      showToast(`Welcome ${email}! Connected to Google Drive.`);
+      showToast(`Signed in as ${email.split('@')[0]}!`);
     }
 
     function logoutUser() {
@@ -1102,7 +1453,7 @@
       document.getElementById('dashDaysLeftBadge').innerText = `${fin.daysRemaining} days left`;
       document.getElementById('dashSpentTodaySummary').innerText = `${fin.cur}${fin.spentToday.toFixed(0)} spent today`;
       
-      const pct = Math.min(100, (fin.spentToday / fin.dailyAllowance) * 100);
+      const pct = Math.min(100, (fin.spentToday / (fin.dailyAllowance || 1)) * 100);
       document.getElementById('dashSpendProgressBar').style.width = `${pct}%`;
 
       // Level and XP calculation
@@ -1124,7 +1475,7 @@
         document.getElementById('dashNextUnlockLabel').innerText = 'All Features Unlocked';
       }
 
-      // Dynamic Feature Visibility by Level
+      // Feature Visibility by Level
       const lvl = cur.level;
       document.getElementById('featureCardLevel2').classList.toggle('hidden', lvl < 2);
       document.getElementById('featureCardLevel3').classList.toggle('hidden', lvl < 3);
@@ -1132,12 +1483,13 @@
       document.getElementById('featureCardLevel5').classList.toggle('hidden', lvl < 5);
 
       if (appState.today.workoutCompleted) {
-        document.getElementById('btnMorningWorkoutDone').innerHTML = '<i class="ph-bold ph-check"></i> Done';
-        document.getElementById('btnMorningWorkoutDone').classList.replace('bg-amber-500', 'bg-cream-300');
-        document.getElementById('btnMorningWorkoutDone').classList.add('text-charcoal-700');
+        const btn = document.getElementById('btnMorningWorkoutDone');
+        btn.innerHTML = '<i class="ph-bold ph-check"></i> Done';
+        btn.classList.remove('bg-amber-500');
+        btn.classList.add('bg-cream-300', 'text-charcoal-700');
       }
 
-      // Seasonal produce widget
+      // Seasonal produce
       const city = appState.config.city.toLowerCase();
       let produceData = REGIONAL_PRODUCE.default;
       if (city.includes('mumbai') || city.includes('delhi') || city.includes('bangalore') || city.includes('pune')) {
@@ -1154,7 +1506,7 @@
       // Hydration
       const w = appState.today.water;
       const wg = appState.config.waterGoal;
-      const wp = Math.min(100, Math.round((w / wg) * 100));
+      const wp = Math.min(100, Math.round((w / (wg || 1)) * 100));
       document.getElementById('dashWaterVal').innerHTML = `${w} / ${wg} <span class="text-xs font-normal">ml</span>`;
       document.getElementById('dashWaterPercent').innerText = `${wp}% of goal`;
       document.getElementById('dashWaterProgressBar').style.width = `${wp}%`;
@@ -1162,17 +1514,38 @@
       document.getElementById('waterVolumeDisplay').innerText = `${w} / ${wg} ml`;
       document.getElementById('waterLevelFill').style.height = `${wp}%`;
 
-      // Task progression checklist
+      // Calories
+      const totalCals = appState.today.meals.reduce((sum, m) => sum + (m.calories || 0), 0);
+      const calGoal = appState.config.calGoal;
+      document.getElementById('dashCaloriesVal').innerText = `${totalCals} / ${calGoal}`;
+      document.getElementById('dashCalRemaining').innerText = `${Math.max(0, calGoal - totalCals)} kcal left`;
+      document.getElementById('dashCalProgressBar').style.width = `${Math.min(100, (totalCals / calGoal) * 100)}%`;
+
+      // Tasks
       let completed = 0;
-      if (appState.today.weight) completed++;
-      if (appState.today.water >= 2000) completed++;
-      if (appState.today.meals.length >= 2) completed++;
-      if (fin.remainingToday >= 0) completed++;
+      if (appState.today.weight) {
+        completed++;
+        document.getElementById('taskCheckWeight').innerHTML = '<i class="ph-bold ph-check text-mint-500"></i>';
+        document.getElementById('taskWeightSubtitle').innerText = `${appState.today.weight} kg recorded`;
+      }
+      if (appState.today.water >= 2000) {
+        completed++;
+        document.getElementById('taskCheckWater').innerHTML = '<i class="ph-bold ph-check text-mint-500"></i>';
+      }
+      if (appState.today.meals.length >= 2) {
+        completed++;
+        document.getElementById('taskCheckMeals').innerHTML = '<i class="ph-bold ph-check text-mint-500"></i>';
+      }
+      if (fin.remainingToday >= 0) {
+        completed++;
+        document.getElementById('taskCheckBudget').innerHTML = '<i class="ph-bold ph-check text-mint-500"></i>';
+      }
       document.getElementById('taskStreakSummary').innerText = `${completed} of 4 Completed`;
 
       // Auth indicator in header
       if (appState.user) {
-        document.getElementById('headerUserInitials').innerText = appState.user.email.split('@')[0].substring(0, 6);
+        const username = appState.user.email.split('@')[0];
+        document.getElementById('headerUserInitials').innerText = username.length > 7 ? username.substring(0, 6) + '..' : username;
         document.getElementById('settingsUserDisplay').innerText = appState.user.email;
         document.getElementById('settingsPhoneDisplay').innerText = appState.user.phone;
         document.getElementById('settingsAuthActionBtn').innerText = 'Manage';
@@ -1194,7 +1567,14 @@
           nav.classList.toggle('text-charcoal-700/50', t !== tabId);
         }
       });
+      const menu = document.getElementById('quickMenuDropdown');
+      if (menu) menu.classList.add('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleQuickMenu() {
+      const menu = document.getElementById('quickMenuDropdown');
+      if (menu) menu.classList.toggle('hidden');
     }
 
     function quickAddWater(ml) {
@@ -1214,7 +1594,7 @@
       showToast("Hydration reset for today");
     }
 
-    // Meal Photo Scanner Demo Simulation
+    // Photo Scanner Simulation
     function triggerCameraClick() {
       document.getElementById('mealImageInput').click();
     }
@@ -1249,6 +1629,58 @@
       document.getElementById('aiScanResultBox').classList.add('hidden');
     }
 
+    function handleManualMealLog(e) {
+      e.preventDefault();
+      const title = document.getElementById('manualMealTitle').value.trim();
+      const calories = parseFloat(document.getElementById('manualMealCal').value || 0);
+      const cost = parseFloat(document.getElementById('manualMealCost').value || 0);
+
+      appState.today.meals.push({ title, calories, cost });
+      appState.today.spent += cost;
+      document.getElementById('manualMealTitle').value = '';
+      document.getElementById('manualMealCal').value = '';
+      document.getElementById('manualMealCost').value = '';
+      awardXp(XP_REWARDS.MEAL_EXPENSE, `Logged Meal: ${title}`);
+    }
+
+    // Diary
+    function handleDiarySubmit(e) {
+      e.preventDefault();
+      const text = document.getElementById('diaryEntryText').value.trim();
+      if (!text) return;
+
+      const entry = {
+        id: Date.now(),
+        date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text: text,
+        weight: appState.today.weight,
+        water: appState.today.water
+      };
+      appState.diary = appState.diary || [];
+      appState.diary.unshift(entry);
+      document.getElementById('diaryEntryText').value = '';
+      renderDiaryList();
+      awardXp(XP_REWARDS.DIARY_CHECKIN, "Personal Diary Saved");
+    }
+
+    function renderDiaryList() {
+      const container = document.getElementById('diaryEntriesContainer');
+      if (!container) return;
+      if (!appState.diary || appState.diary.length === 0) {
+        container.innerHTML = '<p class="text-[10px] text-charcoal-400 italic text-center py-2">No journal entries saved yet today.</p>';
+        return;
+      }
+      container.innerHTML = appState.diary.map(d => `
+        <div class="p-3 bg-cream-50 rounded-2xl border border-cream-200 text-xs space-y-1">
+          <div class="flex justify-between items-center text-[10px] text-charcoal-500 font-bold">
+            <span>${d.date}</span>
+            <span>${d.weight ? d.weight + ' kg' : ''} · ${d.water} ml</span>
+          </div>
+          <p class="text-charcoal-800 leading-relaxed font-medium">${d.text}</p>
+        </div>
+      `).join('');
+    }
+
     // Guided Check-In
     function openGuidedCheckInModal() { document.getElementById('modalGuidedCheckIn').classList.remove('hidden'); }
     function closeGuidedCheckInModal() { document.getElementById('modalGuidedCheckIn').classList.add('hidden'); }
@@ -1260,94 +1692,3 @@
 
     function saveGuidedCheckIn(e) {
       e.preventDefault();
-      const travel = parseFloat(document.getElementById('checkInTravelFare').value || 0);
-      const spend = parseFloat(document.getElementById('checkInSpendAmt').value || 0);
-      appState.today.spent += (travel + spend);
-      closeGuidedCheckInModal();
-      awardXp(XP_REWARDS.DIARY_CHECKIN, "Daily Reflection & Check-In");
-    }
-
-    function openWeightModal() { document.getElementById('modalWeight').classList.remove('hidden'); }
-    function saveWeightLog(e) {
-      e.preventDefault();
-      appState.today.weight = parseFloat(document.getElementById('weightInputKg').value);
-      document.getElementById('modalWeight').classList.add('hidden');
-      awardXp(XP_REWARDS.WEIGHT, "Morning Weight Entry");
-    }
-
-    function openTravelSpendModal() { document.getElementById('modalTravelSpend').classList.remove('hidden'); }
-    function closeTravelSpendModal() { document.getElementById('modalTravelSpend').classList.add('hidden'); }
-    function saveTravelExpense(e) {
-      e.preventDefault();
-      const amt = parseFloat(document.getElementById('travelAmountInput').value || 0);
-      appState.today.spent += amt;
-      closeTravelSpendModal();
-      awardXp(XP_REWARDS.MEAL_EXPENSE, "Transit Fare Logged");
-    }
-
-    // Toast helper
-    function showToast(msg) {
-      const t = document.getElementById('toastNotification');
-      document.getElementById('toastMsg').innerText = msg;
-      t.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
-      setTimeout(() => t.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4'), 2200);
-    }
-
-    // Context exporter for AI
-    function copyContextToAI(target) {
-      const context = `Health & Finance Snapshot:
-- City: ${appState.config.city} (${appState.config.currency})
-- Level: L${getCurrentLevel().cur.level} (${formatXp(appState.xp)})
-- Weight: ${appState.today.weight || 'Unrecorded'} kg
-- Water: ${appState.today.water} ml / ${appState.config.waterGoal} ml
-- Safe-to-Spend Remaining Today: ${appState.config.currency}${computeSafeToSpend().remainingToday.toFixed(0)}
-- Meals Logged: ${appState.today.meals.length}
-Please suggest a nourishing dinner recipe with local seasonal produce under my remaining budget.`;
-      
-      const input = document.createElement('textarea');
-      input.value = context;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand('copy');
-      document.body.removeChild(input);
-      showToast(`Copied snapshot for ${target}!`);
-    }
-
-    function toggleMealPrepOptIn(checked) {
-      appState.config.mealPrepOptIn = checked;
-      saveState();
-      showToast(checked ? "Weekly meal prep enabled" : "Meal prep disabled");
-    }
-
-    function dismissMealPrepBanner() {
-      document.getElementById('weeklyMealPrepBanner').classList.add('hidden');
-    }
-
-    function saveFinanceSettings() {
-      appState.config.monthlyIncome = parseFloat(document.getElementById('cfgIncomeInput').value || 80000);
-      appState.config.savingsTarget = parseFloat(document.getElementById('cfgSavingsInput').value || 25000);
-      saveState();
-      showToast("Financial targets updated!");
-    }
-
-    function renderAll() {
-      applyTranslations();
-      renderDashboard();
-      document.getElementById('cfgIncomeInput').value = appState.config.monthlyIncome;
-      document.getElementById('cfgSavingsInput').value = appState.config.savingsTarget;
-      document.getElementById('settingsLocSummary').innerText = `${appState.config.city} · ${appState.config.currency}`;
-      document.getElementById('prefMealPrepOptIn').checked = !!appState.config.mealPrepOptIn;
-      document.getElementById('weeklyMealPrepBanner').classList.toggle('hidden', !appState.config.mealPrepOptIn);
-    }
-
-    window.onload = function() {
-      if (!appState.config.onboarded) {
-        openOnboardingModal();
-      } else {
-        updateWeather(appState.config.city);
-      }
-      renderAll();
-    };
-  </script>
-</body>
-</html>
